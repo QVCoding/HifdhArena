@@ -28,4 +28,4 @@ Run `make_quran_words.py`, then convert the resulting file to csv.
  Potential updates: Use ayah timing data from qul.ai to show the exact ayah to keep pace.
 
 ---
-The code itself is primarily AI-written, but AI did not generate any of the actual Quranic text. The text on the page (description, labels, tooltips, instructions etc.) is primarily human-written (a human can use an em dash).
+The code itself is primarily AI-written, but AI did not generate any of the actual Quranic text. The English text on the page (description, labels, tooltips, instructions etc.) is primarily human-written (a human can use an em dash).
