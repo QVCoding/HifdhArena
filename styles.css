@@ -530,6 +530,26 @@ button:disabled {
 }
 
 /* =====================================================================
+   Page footer (small credit/link line at the bottom of a page)
+   ===================================================================== */
+
+.home-footer {
+    margin-top: 56px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.home-footer a {
+    color: var(--text-muted);
+    text-decoration: underline;
+}
+
+.home-footer a:hover {
+    color: var(--accent);
+}
+
+/* =====================================================================
    Small screens
    ===================================================================== */
 
