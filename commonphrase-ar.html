@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8" />
 <!-- Applied as early as possible, before the page paints, so a saved
      theme choice doesn't flash the default gold theme first. -->
 <script>(function(){try{var t=localStorage.getItem('quranTester:theme');if(t&&t!=='gold')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Common Phrase Finder</title>
+<title>الباحث عن العبارات المشتركة</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&amp;family=Spectral:wght@400;500;600&amp;display=swap" rel="stylesheet">
@@ -20,6 +20,8 @@
      hidden element JS toggles) - both are left as-is here. */
 
   body{
+    font-family:'Amiri','Traditional Arabic',serif;
+    line-height:1.7;
     padding:4.5rem 1.25rem 5rem;
   }
   #app{max-width:700px;margin:0 auto;}
@@ -129,7 +131,7 @@
     background:var(--panel-alt);border:none;color:var(--text-muted);
     padding:0.45rem 1.15rem;font-size:0.88rem;font-family:inherit;cursor:pointer;
   }
-  .segment-btn + .segment-btn{border-left:1px solid var(--border);}
+  .segment-btn + .segment-btn{border-inline-start:1px solid var(--border);}
   .segment-btn.active{background:var(--accent);color:#1a1408;font-weight:600;}
 
   .settings-status{font-size:0.88rem;color:var(--text-muted);margin:0 0 0.85rem;}
@@ -253,105 +255,105 @@
 <div id="app">
 
   <header>
-    <h1>Common Phrase Finder</h1>
-    <p>Finds phrases repeated word-for-word across different surahs/azjaa'.</p>
-    <p>This site remembers which questions you've seen to prevent repeats — <button type="button" class="link-btn" id="reset-seen-btn">reset it here</button>.</p>
+    <h1>الباحث عن العبارات المشتركة</h1>
+    <p>يبحث عن عبارات مكررة حرفيًا عبر سور مختلفة.</p>
+    <p>يتذكر هذا الموقع الأسئلة التي شاهدتها لتجنب التكرار — <button type="button" class="link-btn" id="reset-seen-btn">إعادة التعيين من هنا</button>.</p>
   </header>
 
   <div id="top-actions" hidden>
     <p class="quiz-meta" id="pool-count-info"></p>
     <div class="top-actions-buttons">
-      <button type="button" class="btn" id="change-settings">Change settings</button>
-      <button type="button" class="btn btn-primary" id="new-question-top" hidden>New question</button>
+      <button type="button" class="btn" id="change-settings">تغيير الإعدادات</button>
+      <button type="button" class="btn btn-primary" id="new-question-top" hidden>سؤال جديد</button>
     </div>
   </div>
 
   <div id="status" class="status hidden"></div>
 
   <section id="settings-panel" class="panel">
-    <h2>Settings</h2>
+    <h2>الإعدادات</h2>
 
     <div class="field">
-      <span class="field-label">Group Questions By</span>
+      <span class="field-label">تجميع الأسئلة حسب</span>
       <div class="segmented" id="group-by-toggle">
-        <button type="button" class="segment-btn active" data-groupby="sura">Surah</button>
-        <button type="button" class="segment-btn" data-groupby="juz">Juz</button>
+        <button type="button" class="segment-btn active" data-groupby="sura">السورة</button>
+        <button type="button" class="segment-btn" data-groupby="juz">الجزء</button>
       </div>
-      <p class="field-help">Whether questions and answers are grouped by surah or by juz.</p>
+      <p class="field-help">ما إذا كانت الأسئلة والأجوبة مجمعة حسب السورة أو الجزء.</p>
     </div>
 
     <div class="field">
-      <span class="field-label">Portion to Test</span>
+      <span class="field-label">الجزء المراد اختباره</span>
       <div class="tabs">
-        <button type="button" class="tab-btn active" data-tab="surah">Surah</button>
-        <button type="button" class="tab-btn" data-tab="juz">Juz</button>
-        <button type="button" class="tab-btn" data-tab="page">Page</button>
+        <button type="button" class="tab-btn active" data-tab="surah">السورة</button>
+        <button type="button" class="tab-btn" data-tab="juz">الجزء</button>
+        <button type="button" class="tab-btn" data-tab="page">الصفحة</button>
       </div>
 
       <div class="tab-panel active" id="tab-surah">
         <div class="select-all-row">
           <input type="checkbox" id="surah-select-all" checked>
-          <label for="surah-select-all">Select all surahs</label>
+          <label for="surah-select-all">تحديد كل السور</label>
         </div>
-        <div class="checkbox-list" id="surah-list"><div class="list-loading">Loading Qur'an data<span class="loading-dots">.</span></div></div>
+        <div class="checkbox-list" id="surah-list"><div class="list-loading">جارٍ تحميل بيانات القرآن<span class="loading-dots">.</span></div></div>
       </div>
 
       <div class="tab-panel" id="tab-juz">
         <div class="select-all-row">
           <input type="checkbox" id="juz-select-all" checked>
-          <label for="juz-select-all">Select all juz</label>
+          <label for="juz-select-all">تحديد كل الأجزاء</label>
         </div>
-        <div class="checkbox-list" id="juz-list"><div class="list-loading">Loading Qur'an data<span class="loading-dots">.</span></div></div>
+        <div class="checkbox-list" id="juz-list"><div class="list-loading">جارٍ تحميل بيانات القرآن<span class="loading-dots">.</span></div></div>
       </div>
 
       <div class="tab-panel" id="tab-page">
-        <label class="field-label" for="page-ranges">Page ranges</label>
-        <input type="text" class="wide" id="page-ranges" placeholder="e.g. 1-100, 150-200">
-        <p class="field-help" id="page-ranges-help">Comma-separated page ranges. Leave blank to include every page.</p>
+        <label class="field-label" for="page-ranges">نطاقات الصفحات</label>
+        <input type="text" class="wide" id="page-ranges" placeholder="مثال: 1-100، 150-200">
+        <p class="field-help" id="page-ranges-help">نطاقات صفحات مفصولة بفواصل. اتركه فارغًا لتضمين كل الصفحات.</p>
         <p class="field-error" id="page-error"></p>
       </div>
     </div>
 
     <button type="button" class="more-settings-toggle" id="more-settings-toggle" aria-expanded="false">
-      <span class="chevron" id="more-settings-chevron">&rsaquo;</span> More settings
+      <span class="chevron" id="more-settings-chevron">&lsaquo;</span> إعدادات إضافية
     </button>
 
     <div id="more-settings" hidden>
       <div class="field">
-        <span class="field-label">Phrase Length (no. of words)</span>
+        <span class="field-label">طول العبارة (عدد الكلمات)</span>
         <div class="range-row">
-          <label>Min <input type="number" id="min-words" min="1" step="1" value="5"></label>
-          <label>Max <input type="number" id="max-words" min="1" step="1" value="8"></label>
+          <label>الحد الأدنى <input type="number" id="min-words" min="1" step="1" value="5"></label>
+          <label>الحد الأقصى <input type="number" id="max-words" min="1" step="1" value="8"></label>
         </div>
-        <p class="field-help">Length of the common phrase.</p>
+        <p class="field-help">طول العبارة المشتركة.</p>
         <p class="field-error" id="words-error"></p>
       </div>
 
       <div class="field">
-        <span class="field-label" id="unit-count-label">Number of Surahs the Phrase Appears In</span>
+        <span class="field-label" id="unit-count-label">عدد السور التي تظهر فيها العبارة</span>
         <div class="range-row">
-          <label>Min <input type="number" id="min-surahs" min="2" step="1" value="2"></label>
-          <label>Max <input type="number" id="max-surahs" min="2" step="1" value="10"></label>
+          <label>الحد الأدنى <input type="number" id="min-surahs" min="2" step="1" value="2"></label>
+          <label>الحد الأقصى <input type="number" id="max-surahs" min="2" step="1" value="10"></label>
         </div>
-        <p class="field-help" id="unit-count-help">Only phrases that occur in this many distinct surahs will be used as questions.</p>
+        <p class="field-help" id="unit-count-help">سيتم استخدام العبارات التي تظهر في هذا العدد من السور المختلفة فقط كأسئلة.</p>
         <p class="field-error" id="surahs-error"></p>
       </div>
 
       <div class="field">
-        <span class="field-label">Number of Similar Phrases</span>
+        <span class="field-label">عدد العبارات المتشابهة</span>
         <div class="range-row">
-          <label>Min <input type="number" id="min-similar" min="1" step="1" value="1"></label>
-          <label>Max <input type="number" id="max-similar" min="1" step="1" value="2"></label>
+          <label>الحد الأدنى <input type="number" id="min-similar" min="1" step="1" value="1"></label>
+          <label>الحد الأقصى <input type="number" id="max-similar" min="1" step="1" value="2"></label>
         </div>
-        <p class="field-help" id="similar-help">How many different phrases are allowed to share the exact same set of surahs.</p>
+        <p class="field-help" id="similar-help">عدد العبارات المختلفة المسموح لها بمشاركة نفس مجموعة السور تمامًا.</p>
         <p class="field-error" id="similar-error"></p>
       </div>
     </div>
 
     <p class="settings-status" id="settings-status"></p>
     <div class="btn-row">
-      <button type="button" class="btn btn-primary" id="apply-settings" disabled>Begin Test</button>
-      <span class="loading-note" id="begin-test-loading">Loading Qur'an data<span class="loading-dots">.</span></span>
+      <button type="button" class="btn btn-primary" id="apply-settings" disabled>بدء الاختبار</button>
+      <span class="loading-note" id="begin-test-loading">جارٍ تحميل بيانات القرآن<span class="loading-dots">.</span></span>
     </div>
   </section>
 
@@ -359,7 +361,7 @@
   <section id="quiz-panel" hidden>
     <div class="quiz-card">
       <div id="quiz-question">
-        <p class="quiz-prompt">This phrase(s) appears in:</p>
+        <p class="quiz-prompt">تظهر هذه العبارة (أو العبارات) في:</p>
         <p class="quiz-surahs" id="quiz-surah-names"></p>
         <p class="quiz-meta" id="quiz-count-meta"></p>
         <p class="quiz-meta" id="quiz-similar-meta" hidden></p>
@@ -369,8 +371,8 @@
       </div>
     </div>
     <div class="btn-row">
-      <button type="button" class="btn btn-primary" id="reveal-answer">Reveal answer</button>
-      <button type="button" class="btn btn-primary" id="new-question" hidden>New question</button>
+      <button type="button" class="btn btn-primary" id="reveal-answer">إظهار الإجابة</button>
+      <button type="button" class="btn btn-primary" id="new-question" hidden>سؤال جديد</button>
     </div>
   </section>
 
@@ -400,7 +402,7 @@
   let moreSettingsOpen = false;
 
   // ---------- Seen-question persistence (avoids repeats, survives reloads) ----------
-  const SEEN_STORAGE_KEY = "commonPhraseFinder:seenQuestions";
+  const SEEN_STORAGE_KEY = "commonPhraseFinder-ar:seenQuestions";
   let seenSet = loadSeenSet();
   let questionQueue = []; // shuffled indices into `pool`, not-yet-seen first
   let lastShownIndex = -1;
@@ -453,7 +455,10 @@
     const el = document.getElementById("pool-count-info");
     if(!el) return;
     const total = pool.length;
-    el.textContent = total + " question" + (total === 1 ? "" : "s") + ", " + questionQueue.length + " new";
+    el.textContent =
+      QuranPicker.pluralize(total, { one: "{n} سؤال", two: "{n} سؤالان", few: "{n} أسئلة", many: "{n} سؤالاً", other: "{n} سؤال" }, "ar") +
+      "، " +
+      QuranPicker.pluralize(questionQueue.length, { one: "{n} جديد", two: "{n} جديدان", few: "{n} جديدة", many: "{n} جديدًا", other: "{n} جديد" }, "ar");
   }
 
   // ---------- DOM refs ----------
@@ -522,10 +527,10 @@
     }catch(err){
       console.error("Failed to load/parse Qur'an data:", err);
       QuranPicker.stopLoadingAnimation();
-      setStatus("Couldn't load Qur'an data. Please try refreshing the page.", true);
-      document.getElementById("surah-list").innerHTML = '<div class="list-loading">Data unavailable.</div>';
-      document.getElementById("juz-list").innerHTML = '<div class="list-loading">Data unavailable.</div>';
-      document.getElementById("begin-test-loading").textContent = "Data unavailable.";
+      setStatus("تعذّر تحميل بيانات القرآن. يُرجى إعادة تحميل الصفحة.", true);
+      document.getElementById("surah-list").innerHTML = '<div class="list-loading">البيانات غير متوفرة.</div>';
+      document.getElementById("juz-list").innerHTML = '<div class="list-loading">البيانات غير متوفرة.</div>';
+      document.getElementById("begin-test-loading").textContent = "البيانات غير متوفرة.";
       throw err;
     }
   }
@@ -615,7 +620,7 @@
       const s = suraMeta.get(idx);
       const label = document.createElement("label");
       label.innerHTML = '<input type="checkbox" class="surah-cb" value="' + idx + '" checked>' +
-        '<span class="arabic-name" dir="rtl">' + s.name + '</span>';
+        '<span>' + s.name + '</span>';
       surahList.appendChild(label);
     });
 
@@ -624,12 +629,12 @@
     for(let j = 1; j <= juzCount; j++){
       const label = document.createElement("label");
       label.innerHTML = '<input type="checkbox" class="juz-cb" value="' + j + '" checked>' +
-        '<span>Juz ' + j + '</span>';
+        '<span>الجزء ' + j + '</span>';
       juzList.appendChild(label);
     }
 
     document.getElementById("page-ranges-help").textContent =
-      "Comma-separated page ranges (1-" + pageCount + "). Leave blank to include every page.";
+      "نطاقات صفحات مفصولة بفواصل (1-" + pageCount + "). اتركه فارغًا لتضمين كل الصفحات.";
 
     syncMoreSettingsUI();
     updateUnitCountLabels();
@@ -662,13 +667,12 @@
   // ---------- Group Questions By toggle ----------
   function updateUnitCountLabels(){
     const groupBy = getGroupByMode();
-    const unitWord = groupBy === "juz" ? "Juz" : "Surahs";
-    const unitWordLower = groupBy === "juz" ? "juz" : "surahs";
-    document.getElementById("unit-count-label").textContent = "Number of " + unitWord + " the Phrase Appears In";
+    const unitWord = groupBy === "juz" ? "الأجزاء" : "السور";
+    document.getElementById("unit-count-label").textContent = "عدد " + unitWord + " التي تظهر فيها العبارة";
     document.getElementById("unit-count-help").textContent =
-      "Only phrases that occur in this many distinct " + unitWordLower + " will be used as questions.";
+      "سيتم استخدام العبارات التي تظهر في هذا العدد من " + unitWord + " المختلفة فقط كأسئلة.";
     document.getElementById("similar-help").textContent =
-      "How many different phrases are allowed to share the exact same set of " + unitWordLower + ".";
+      "عدد العبارات المختلفة المسموح لها بمشاركة نفس مجموعة " + unitWord + " تمامًا.";
   }
   document.querySelectorAll("#group-by-toggle .segment-btn").forEach(function(btn){
     btn.addEventListener("click", function(){
@@ -693,17 +697,17 @@
         let a = parseInt(rangeMatch[1], 10), b = parseInt(rangeMatch[2], 10);
         if(a > b){ const t = a; a = b; b = t; }
         if(a < 1 || b > pageCount){
-          throw new Error("Pages must be between 1 and " + pageCount + ".");
+          throw new Error("يجب أن تكون الصفحات بين 1 و" + pageCount + ".");
         }
         for(let p = a; p <= b; p++) pages.add(p);
       }else if(singleMatch){
         const p = parseInt(singleMatch[1], 10);
         if(p < 1 || p > pageCount){
-          throw new Error("Pages must be between 1 and " + pageCount + ".");
+          throw new Error("يجب أن تكون الصفحات بين 1 و" + pageCount + ".");
         }
         pages.add(p);
       }else{
-        throw new Error('Could not understand page range "' + part + '". Use formats like "1-100" or "150".');
+        throw new Error('تعذّر فهم نطاق الصفحة "' + part + '". استخدم صيغًا مثل "1-100" أو "150".');
       }
     }
     return pages;
@@ -872,11 +876,11 @@
 
   function suraName(idx){
     const s = suraMeta.get(idx);
-    return s ? s.name : ("Surah " + idx);
+    return s ? s.name : ("سورة " + idx);
   }
 
   function unitLabel(unit, groupBy){
-    return groupBy === "juz" ? ("Juz " + unit) : suraName(unit);
+    return groupBy === "juz" ? ("الجزء " + unit) : suraName(unit);
   }
 
   function getGroupByMode(){
@@ -918,12 +922,12 @@
     namesEl.textContent = names.join(groupBy === "juz" ? ", " : "، ");
 
     document.getElementById("quiz-count-meta").textContent = (groupBy === "juz")
-      ? group.unitList.length + " juz"
-      : QuranPicker.pluralize(group.unitList.length, { one: "{n} surah", other: "{n} surahs" }, "en");
+      ? QuranPicker.pluralize(group.unitList.length, { one: "{n} جزء", two: "{n} جزءان", few: "{n} أجزاء", many: "{n} جزءًا", other: "{n} جزء" }, "ar")
+      : QuranPicker.pluralize(group.unitList.length, { one: "{n} سورة", two: "{n} سورتان", few: "{n} سور", many: "{n} سورة", other: "{n} سورة" }, "ar");
 
     const similarEl = document.getElementById("quiz-similar-meta");
     if(group.phrases.length > 1){
-      similarEl.textContent = QuranPicker.pluralize(group.phrases.length, { one: "{n} Similar Phrase", other: "{n} Similar Phrases" }, "en");
+      similarEl.textContent = QuranPicker.pluralize(group.phrases.length, { one: "{n} عبارة متشابهة", two: "{n} عبارتان متشابهتان", few: "{n} عبارات متشابهة", many: "{n} عبارة متشابهة", other: "{n} عبارة متشابهة" }, "ar");
       similarEl.hidden = false;
     }else{
       similarEl.hidden = true;
@@ -940,8 +944,8 @@
     return '<div class="occurrence">' +
         '<div class="occurrence-meta">' +
           '<span class="surah-name" dir="rtl">' + escapeHTML(suraName(o.sura)) + '</span>' +
-          '<span>Ayah ' + o.ayah + '</span>' +
-          '<span>Page ' + o.page + '</span>' +
+          '<span>الآية ' + o.ayah + '</span>' +
+          '<span>الصفحة ' + o.page + '</span>' +
         '</div>' +
         '<div class="ayah-text" dir="rtl">' + renderTokensWithHighlight(o.tokens, o.startTok, o.endTok) + '</div>' +
       '</div>';
@@ -961,7 +965,7 @@
 
       let html = "";
       if(multiple){
-        html += '<p class="phrase-label">Phrase ' + (idx + 1) + ' of ' + currentQuestion.phrases.length + '</p>';
+        html += '<p class="phrase-label">العبارة ' + (idx + 1) + ' من ' + currentQuestion.phrases.length + '</p>';
       }
       html += '<div class="answer-phrase">' + escapeHTML(phraseEntry.phrase) + '</div>';
 
@@ -973,7 +977,7 @@
         });
         const juzKeys = Array.from(byJuz.keys()).sort(function(a, b){ return a - b; });
         juzKeys.forEach(function(j){
-          html += '<p class="unit-heading"><span>Juz ' + j + '</span></p>';
+          html += '<p class="unit-heading"><span>الجزء ' + j + '</span></p>';
           const occs = byJuz.get(j).slice().sort(function(a, b){ return a.sura - b.sura || a.ayah - b.ayah; });
           occs.forEach(function(o){ html += occurrenceHTML(o); });
         });
@@ -1013,17 +1017,17 @@
     const minRaw = minEl.value.trim();
     const maxRaw = maxEl.value.trim();
     if(!INT_RE.test(minRaw) || !INT_RE.test(maxRaw)){
-      errEl.textContent = "Enter whole numbers only (no decimals).";
+      errEl.textContent = "أدخل أعدادًا صحيحة فقط (بدون كسور عشرية).";
       return null;
     }
     const min = parseInt(minRaw, 10);
     const max = parseInt(maxRaw, 10);
     if(min < floor){
-      errEl.textContent = "Minimum must be at least " + floorLabel + ".";
+      errEl.textContent = "يجب ألا يقل الحد الأدنى عن " + floorLabel + ".";
       return null;
     }
     if(max < min){
-      errEl.textContent = "Maximum must be greater than or equal to minimum.";
+      errEl.textContent = "يجب أن يكون الحد الأقصى أكبر من أو يساوي الحد الأدنى.";
       return null;
     }
     return { min: min, max: max };
@@ -1064,13 +1068,13 @@
       return;
     }
     if(portionSet.size === 0){
-      setSettingsStatus("The selected portion is empty. Select at least one surah, juz, or valid page range.", true);
+      setSettingsStatus("الجزء المُختار فارغ. اختر سورة واحدة على الأقل، أو جزءًا، أو نطاق صفحات صالحًا.", true);
       return;
     }
 
     const applyBtn = document.getElementById("apply-settings");
     applyBtn.disabled = true;
-    setSettingsStatusLoading("Building phrase index");
+    setSettingsStatusLoading("جارٍ إنشاء فهرس العبارات");
 
     // Yield a frame so the status message paints before the heavy loop runs.
     await new Promise(function(r){ requestAnimationFrame(function(){ requestAnimationFrame(r); }); });
@@ -1089,7 +1093,7 @@
       });
     }catch(err){
       console.error(err);
-      setSettingsStatus("Something went wrong while building the index. Please try again, or try different settings.", true);
+      setSettingsStatus("حدث خطأ أثناء إنشاء الفهرس. يُرجى المحاولة مرة أخرى، أو تجربة إعدادات مختلفة.", true);
       applyBtn.disabled = false;
       return;
     }
@@ -1097,7 +1101,7 @@
     applyBtn.disabled = false;
 
     if(pool.length === 0){
-      setSettingsStatus("No matching phrases were found with these settings.", true);
+      setSettingsStatus("لم يتم العثور على عبارات مطابقة بهذه الإعدادات.", true);
       return;
     }
 
@@ -1117,7 +1121,7 @@
   // own page-range field validates differently (see parsePageRanges()
   // above) - QuranPicker safely skips wiring anything it can't find.
   QuranPicker.wireCorePickerUI({});
-  QuranPicker.wireSideMenu('commonphrase', 'en');
+  QuranPicker.wireSideMenu('commonphrase', 'ar');
 
   document.getElementById("apply-settings").addEventListener("click", applySettings);
   document.getElementById("reveal-answer").addEventListener("click", revealAnswer);
@@ -1130,7 +1134,7 @@
     setSettingsStatus("", false);
   });
   document.getElementById("reset-seen-btn").addEventListener("click", function(){
-    if(!window.confirm("Reset questions?")) return;
+    if(!window.confirm("هل تريد إعادة تعيين الأسئلة؟")) return;
     seenSet = new Set();
     try{ localStorage.removeItem(SEEN_STORAGE_KEY); }catch(err){ console.warn("Could not clear seen-question history:", err); }
     if(pool.length > 0){

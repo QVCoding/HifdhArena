@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <!-- Applied as early as possible, before the page paints, so a saved
+         theme choice doesn't flash the default gold theme first. -->
+    <script>(function(){try{var t=localStorage.getItem('quranTester:theme');if(t&&t!=='gold')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار مواضع تكرار العبارات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Spectral:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Page-specific rules only - shared colours, fonts, tabs/checkbox-list,
+           buttons, field-help/error, and loading indicator live in styles.css. */
+
+        body {
+            font-family: 'Amiri', 'Traditional Arabic', serif;
+            line-height: 1.7;
+            padding: 70px 20px 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+        }
+
+        .occurrence-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .checkbox-group {
+            margin-top: 10px;
+        }
+
+        .checkbox-group input {
+            margin-inline-end: 8px;
+        }
+
+        .checkbox-group label {
+            display: inline;
+            font-weight: normal;
+        }
+
+        .info-icon {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            line-height: 18px;
+            text-align: center;
+            background: var(--accent);
+            color: var(--accent-text);
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-inline-start: 5px;
+            vertical-align: middle;
+        }
+
+        .info-tooltip {
+            display: none;
+            background: var(--panel-alt);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 5px;
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .info-tooltip.show {
+            display: block;
+        }
+
+        .question-types {
+            display: grid;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        /* styles.css provides the base flex layout for .button-group; this
+           app centres its buttons, matching minimaltest.html. */
+        .button-group {
+            justify-content: center;
+        }
+
+        #new-question-loading {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-inline-start: 4px;
+            display: none;
+        }
+
+        .test-area {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: var(--panel-alt);
+            border-radius: 4px;
+            min-height: 200px;
+        }
+
+        .question-display {
+            font-size: 20px;
+            font-weight: 600;
+            text-align: center;
+            padding: 20px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            margin-bottom: 20px;
+            color: var(--text);
+        }
+
+        .phrase-display {
+            font-size: 28px;
+            text-align: center;
+            padding: 30px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            margin-bottom: 20px;
+            direction: rtl;
+            line-height: 1.8;
+            font-family: var(--quran-font);
+        }
+
+        .answer-display {
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+        }
+
+        .answer-header {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text);
+        }
+
+        .occurrence-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--panel-alt);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            border-inline-start: 4px solid var(--accent);
+        }
+
+        .occurrence-number {
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .occurrence-verse {
+            font-size: 22px;
+            direction: rtl;
+            line-height: 2;
+            margin-bottom: 10px;
+            font-family: var(--quran-font);
+        }
+
+        .occurrence-verse .phrase-highlight {
+            font-weight: bold;
+            background: var(--highlight-bg);
+            color: var(--highlight-text);
+            padding: 0 0.2rem;
+            border-radius: 3px;
+        }
+
+        .occurrence-metadata {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .occurrence-metadata div {
+            margin-bottom: 3px;
+        }
+
+        .no-occurrences {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 70px 10px 10px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .phrase-display {
+                font-size: 22px;
+                padding: 20px;
+            }
+
+            .occurrence-verse {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>اختبار مواضع تكرار العبارات</h1>
+        <p class="subtitle">اختبر حفظك بتحديد مواضع معينة من عبارات مكررة. ستظهر لك عبارة من القرآن الكريم وستُسأل عن موضعها فيه.</p>
+
+        <div id="app">
+            <div class="controls">
+                <div class="control-group">
+                    <label>عدد مرات التكرار:
+                        <span class="info-icon" onclick="toggleOccurrenceTooltip(event)">i</span>
+                    </label>
+                    <div id="occurrence-tooltip" class="info-tooltip">
+                        الحد الأدنى والأقصى لعدد مرات ظهور العبارة في القرآن. إذا كان هذا العدد منخفضًا جدًا، فقد يكون التخمين سهلاً جدًا. وإذا كان مرتفعًا جدًا، فقد تكون العبارة المعروضة شائعة جدًا في القرآن، مما يجعل التخمين صعبًا. القيم الافتراضية هي 2-5 مرات.
+                    </div>
+                    <div class="occurrence-inputs">
+                        <div>
+                            <label style="font-size: 13px; font-weight: normal;">الحد الأدنى:</label>
+                            <input type="number" id="min-occurrences" value="2" min="1" max="100">
+                        </div>
+                        <div>
+                            <label style="font-size: 13px; font-weight: normal;">الحد الأقصى:</label>
+                            <input type="number" id="max-occurrences" value="5" min="1" max="100">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label><strong>اختر الجزء المراد اختباره:</strong></label>
+                    <div style="margin-top: 10px;">
+                        <input type="radio" id="entire-quran" name="portion-type" value="entire" checked>
+                        <label for="entire-quran" style="display: inline; font-weight: normal;">القرآن كاملاً (الافتراضي)</label>
+                    </div>
+                    <div style="margin-top: 5px;">
+                        <input type="radio" id="select-portion" name="portion-type" value="select">
+                        <label for="select-portion" style="display: inline; font-weight: normal;">اختيار جزء محدد</label>
+                    </div>
+                    <div id="portion-description" style="display: none; margin-top: 10px; padding: 10px; background: var(--panel-alt); border: 1px solid var(--border); border-radius: 4px; font-size: 13px; color: var(--text-muted);">
+                        ستظهر جميع الأسئلة من الجزء المُختار فقط. بالنسبة لأسئلة "أوجد التكرار رقم كذا" و"كم مرة"، اعتبر <em>فقط</em> هذا الجزء (المرة رقم كذا التي تظهر فيها العبارة <em>ضمن هذا الجزء</em>، وعدد مرات ظهورها <em>ضمن هذا الجزء</em>).
+                    </div>
+                </div>
+
+                <div id="filter-options" class="filter-options-box" style="display: none;">
+                    <div class="tabs">
+                        <button type="button" class="tab-btn active" data-tab="surah">السورة</button>
+                        <button type="button" class="tab-btn" data-tab="juz">الجزء</button>
+                        <button type="button" class="tab-btn" data-tab="page">الصفحة</button>
+                    </div>
+
+                    <div class="tab-panel active" id="tab-surah">
+                        <div class="select-all-row">
+                            <input type="checkbox" id="surah-select-all" checked>
+                            <label for="surah-select-all">تحديد كل السور</label>
+                        </div>
+                        <div class="checkbox-list" id="surah-list">
+                            <div class="list-loading">جارٍ تحميل بيانات القرآن<span class="loading-dots">.</span></div>
+                        </div>
+                    </div>
+
+                    <div class="tab-panel" id="tab-juz">
+                        <div class="select-all-row">
+                            <input type="checkbox" id="juz-select-all" checked>
+                            <label for="juz-select-all">تحديد كل الأجزاء</label>
+                        </div>
+                        <div class="checkbox-list" id="juz-list">
+                            <div class="list-loading">جارٍ تحميل بيانات القرآن<span class="loading-dots">.</span></div>
+                        </div>
+                    </div>
+
+                    <div class="tab-panel" id="tab-page">
+                        <label for="page-range">نطاقات الصفحات (مفصولة بفواصل، مثال: "1-100" أو "1-100، 150-200"):</label>
+                        <input type="text" id="page-range" placeholder="مثال: 1-100، 150-200، 300">
+                        <div class="field-error" id="page-range-error">نطاق غير صالح</div>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label><strong>أنواع الأسئلة (اختر واحدًا على الأقل):</strong></label>
+                    <div class="question-types">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="q-type-nth" checked>
+                            <label for="q-type-nth">أوجد التكرار رقم كذا</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="q-type-count" checked>
+                            <label for="q-type-count">كم مرة تظهر هذه العبارة؟</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="q-type-surah" checked>
+                            <label for="q-type-surah">هل تظهر هذه العبارة في السورة كذا؟</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="q-type-juz" checked>
+                            <label for="q-type-juz">هل تظهر هذه العبارة في الجزء كذا؟</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button id="new-question-btn" class="btn-primary" onclick="startNewQuestion()" disabled>سؤال جديد</button>
+                <span id="new-question-loading">جارٍ تحميل بيانات القرآن<span class="loading-dots">.</span></span>
+                <button id="change-settings-btn" class="btn-success" onclick="showSettings()" style="display: none;">تغيير الإعدادات</button>
+            </div>
+
+            <div id="error-message" class="error"></div>
+
+            <div id="test-area" class="test-area" style="display: none;">
+                <div id="question-display" class="question-display"></div>
+                <div id="phrase-display" class="phrase-display"></div>
+                
+                <div class="button-group">
+                    <button id="reveal-btn" class="btn-primary" onclick="revealAnswer()">إظهار الإجابة</button>
+                    <button id="next-question-btn" class="btn-primary" onclick="startNewQuestion()" style="display: none;">سؤال جديد</button>
+                </div>
+
+                <div id="answer-display" class="answer-display" style="display: none;"></div>
+
+                <div class="button-group" style="margin-top: 20px;">
+                    <button id="bottom-question-btn" class="btn-primary" onclick="startNewQuestion()" style="display: none;">سؤال جديد</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="quran-picker.js"></script>
+    <script>
+        let quranWords = [];
+        let metadata = null;
+        let currentQuestion = null;
+
+        // Load CSV file
+        async function loadCSV() {
+            const response = await fetch('quran_words.csv');
+            const text = await response.text();
+            const lines = text.trim().split('\n');
+            
+            // No header - start from first line
+            for (let i = 0; i < lines.length; i++) {
+                const parts = lines[i].split(',');
+                if (parts.length >= 5) {
+                    quranWords.push({
+                        globalWordNumber: parseInt(parts[0]),
+                        sura: parseInt(parts[1]),
+                        aya: parseInt(parts[2]),
+                        wordInAya: parseInt(parts[3]),
+                        text: parts.slice(4).join(',')
+                    });
+                }
+            }
+        }
+
+        // Metadata loading now lives in the shared QuranPicker module
+        // (quran-picker.js), since it's identical across all four apps.
+        async function loadXML() {
+            metadata = await QuranPicker.loadMetadataXML('app_quran_metadata.xml');
+        }
+
+        function populateSurahAndJuzLists() {
+            QuranPicker.populateSurahAndJuzLists(metadata, {
+                surahLabelHTML: sura => '<span>' + sura.index + '. ' + sura.name + '</span>'
+            });
+        }
+
+        // Wire up UI that doesn't depend on the Quran data having loaded yet, so the
+        // settings screen is interactive immediately.
+        function wireStaticUI() {
+            QuranPicker.wireCorePickerUI({ portionTypeName: 'portion-type' });
+            QuranPicker.wireSideMenu('occurrencetest', 'ar');
+
+            // The "select portion" explanation box isn't part of the shared
+            // wiring (only this app has it), so it's toggled separately here.
+            document.querySelectorAll('input[name="portion-type"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    document.getElementById('portion-description').style.display = (e.target.value === 'select') ? 'block' : 'none';
+                });
+            });
+
+            // Close tooltips when clicking outside
+            document.addEventListener('click', function(event) {
+                const infoIcon = event.target.closest('.info-icon');
+                if (!infoIcon) {
+                    const occurrenceTooltip = document.getElementById('occurrence-tooltip');
+                    if (occurrenceTooltip) occurrenceTooltip.classList.remove('show');
+                }
+            });
+        }
+
+        // Loads the Quran data in the background. The settings screen is already visible
+        // and usable while this runs; only starting a question actually requires the data.
+        async function loadData() {
+            QuranPicker.startLoadingAnimation();
+            try {
+                await loadCSV();
+                await loadXML();
+                populateSurahAndJuzLists();
+
+                QuranPicker.stopLoadingAnimation();
+                document.getElementById('new-question-btn').disabled = false;
+                document.getElementById('new-question-loading').style.display = 'none';
+            } catch (error) {
+                QuranPicker.stopLoadingAnimation();
+                const message = 'تعذّر تحميل بيانات القرآن. يُرجى إعادة تحميل الصفحة.';
+                document.querySelectorAll('.loading-text').forEach(el => {
+                    el.textContent = message;
+                    el.classList.remove('loading-text');
+                });
+                console.error(error);
+            }
+        }
+
+        function init() {
+            wireStaticUI();
+            loadData();
+        }
+
+        // Selection is now tab-based, so there's no need to clear one selector
+        // when another is used - only the active tab's selection matters. This
+        // also means portion filtering can use the shared QuranPicker helper.
+        function getFilteredWords() {
+            return QuranPicker.getFilteredByPortion(quranWords, { portionTypeName: 'portion-type' });
+        }
+
+        // Page-range parsing now lives in QuranPicker.parsePageRange (identical
+        // logic, and language-independent so it needs no per-app copy).
+
+        // Juz/page lookup by binary search now lives in the shared QuranPicker
+        // module. Call sites below use QuranPicker.findJuz(metadata, sura, aya)
+        // and QuranPicker.findPage(metadata, sura, aya) instead.
+
+        // Normalize text for comparison (remove shaddah at position 2)
+        function normalizeForComparison(text) {
+            if (text.length >= 2 && text.charCodeAt(1) === 0x0651) {
+                return text.charAt(0) + text.substring(2);
+            }
+            return text;
+        }
+
+        // Find all occurrences of a phrase in filtered words
+        function findPhraseOccurrences(phrase, filteredWords) {
+            const occurrences = [];
+            const normalizedPhrase = phrase.map((word, idx) => 
+                idx === 0 ? normalizeForComparison(word.text) : word.text
+            );
+
+            for (let i = 0; i <= filteredWords.length - phrase.length; i++) {
+                let matches = true;
+                
+                // Check if phrase matches
+                for (let j = 0; j < phrase.length; j++) {
+                    const currentWord = filteredWords[i + j].text;
+                    const normalizedCurrent = j === 0 ? normalizeForComparison(currentWord) : currentWord;
+                    if (normalizedCurrent !== normalizedPhrase[j]) {
+                        matches = false;
+                        break;
+                    }
+                }
+
+                // Check if all words are in the same ayah
+                if (matches) {
+                    const startWord = filteredWords[i];
+                    const endWord = filteredWords[i + phrase.length - 1];
+                    if (startWord.sura === endWord.sura && startWord.aya === endWord.aya) {
+                        occurrences.push({
+                            startIndex: i,
+                            words: filteredWords.slice(i, i + phrase.length)
+                        });
+                    }
+                }
+            }
+
+            return occurrences;
+        }
+
+        // Find a random phrase with the right number of occurrences
+        function findRandomPhrase(filteredWords, minOccurrences, maxOccurrences) {
+            const maxAttempts = 200;
+            
+            for (let attempt = 0; attempt < maxAttempts; attempt++) {
+                // Pick random starting point
+                const startIndex = Math.floor(Math.random() * filteredWords.length);
+                const startWord = filteredWords[startIndex];
+                
+                // Try different phrase lengths (1 to 10 words)
+                const maxLength = Math.min(10, filteredWords.length - startIndex);
+                for (let length = 1; length <= maxLength; length++) {
+                    // Check if phrase stays within one ayah
+                    const endWord = filteredWords[startIndex + length - 1];
+                    if (startWord.sura !== endWord.sura || startWord.aya !== endWord.aya) {
+                        break; // Crossed ayah boundary
+                    }
+
+                    const phrase = filteredWords.slice(startIndex, startIndex + length);
+                    const occurrences = findPhraseOccurrences(phrase, filteredWords);
+                    
+                    if (occurrences.length >= minOccurrences && occurrences.length <= maxOccurrences) {
+                        return {
+                            phrase: phrase,
+                            occurrences: occurrences
+                        };
+                    }
+                }
+            }
+            
+            return null;
+        }
+
+        // Get enabled question types
+        function getEnabledQuestionTypes() {
+            const types = [];
+            if (document.getElementById('q-type-nth').checked) types.push('nth');
+            if (document.getElementById('q-type-count').checked) types.push('count');
+            if (document.getElementById('q-type-surah').checked) types.push('surah');
+            if (document.getElementById('q-type-juz').checked) types.push('juz');
+            return types;
+        }
+
+        // Get unique surahs/juzs in the filtered portion
+        function getUniqueSurahsInPortion(filteredWords) {
+            const surahs = new Set();
+            filteredWords.forEach(word => surahs.add(word.sura));
+            return Array.from(surahs);
+        }
+
+        function getUniqueJuzsInPortion(filteredWords) {
+            const juzs = new Set();
+            filteredWords.forEach(word => juzs.add(QuranPicker.findJuz(metadata, word.sura, word.aya)));
+            return Array.from(juzs);
+        }
+
+        // Generate a question
+        function generateQuestion(phraseData, filteredWords, enabledTypes) {
+            const occurrences = phraseData.occurrences;
+            const availableTypes = [...enabledTypes];
+            
+            // Filter out question types that don't make sense
+            const uniqueSurahs = getUniqueSurahsInPortion(filteredWords);
+            const uniqueJuzs = getUniqueJuzsInPortion(filteredWords);
+            
+            if (uniqueSurahs.length <= 1) {
+                availableTypes.splice(availableTypes.indexOf('surah'), 1);
+            }
+            if (uniqueJuzs.length <= 1) {
+                availableTypes.splice(availableTypes.indexOf('juz'), 1);
+            }
+            
+            if (availableTypes.length === 0) {
+                return null;
+            }
+            
+            const questionType = availableTypes[Math.floor(Math.random() * availableTypes.length)];
+            
+            switch (questionType) {
+                case 'nth':
+                    const n = Math.floor(Math.random() * occurrences.length) + 1;
+                    return {
+                        type: 'nth',
+                        question: `أوجد التكرار رقم ${n} لهذه العبارة`,
+                        answer: n,
+                        showAll: true
+                    };
+                
+                case 'count':
+                    return {
+                        type: 'count',
+                        question: 'كم مرة تظهر هذه العبارة في المجموع؟',
+                        answer: occurrences.length,
+                        showAll: true
+                    };
+                
+                case 'surah':
+                    // Pick a random surah from the portion
+                    const randomSurah = uniqueSurahs[Math.floor(Math.random() * uniqueSurahs.length)];
+                    const surahName = metadata.suras.find(s => s.index === randomSurah).name;
+                    const inSurah = occurrences.some(occ => occ.words[0].sura === randomSurah);
+                    return {
+                        type: 'surah',
+                        question: `هل تظهر هذه العبارة في سورة ${surahName}؟`,
+                        answer: inSurah,
+                        filterSurah: randomSurah
+                    };
+                
+                case 'juz':
+                    const randomJuz = uniqueJuzs[Math.floor(Math.random() * uniqueJuzs.length)];
+                    const inJuz = occurrences.some(occ => QuranPicker.findJuz(metadata, occ.words[0].sura, occ.words[0].aya) === randomJuz);
+                    return {
+                        type: 'juz',
+                        question: `هل تظهر هذه العبارة في الجزء ${randomJuz}؟`,
+                        answer: inJuz,
+                        filterJuz: randomJuz
+                    };
+            }
+        }
+
+        // Start a new question
+        function startNewQuestion() {
+            const errorDiv = document.getElementById('error-message');
+            const pageRangeError = document.getElementById('page-range-error');
+            errorDiv.style.display = 'none';
+            pageRangeError.style.display = 'none';
+
+            // Validate the page range, but only if the page tab is actually the active selection.
+            const portionType = document.querySelector('input[name="portion-type"]:checked').value;
+            const activeTab = portionType === 'select' ? document.querySelector('.tab-btn.active').dataset.tab : null;
+
+            if (activeTab === 'page') {
+                const pages = QuranPicker.parsePageRange(document.getElementById('page-range').value);
+                if (pages === undefined) {
+                    pageRangeError.style.display = 'block';
+                    return;
+                }
+            }
+
+            // Get settings
+            const minOccurrences = parseInt(document.getElementById('min-occurrences').value);
+            const maxOccurrences = parseInt(document.getElementById('max-occurrences').value);
+            
+            if (minOccurrences < 1 || maxOccurrences < minOccurrences) {
+                errorDiv.textContent = 'نطاق تكرار غير صالح. يجب ألا يقل الحد الأدنى عن 1، وأن يكون الحد الأقصى أكبر من أو يساوي الحد الأدنى.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            const enabledTypes = getEnabledQuestionTypes();
+            if (enabledTypes.length === 0) {
+                errorDiv.textContent = 'يُرجى اختيار نوع سؤال واحد على الأقل.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            const filteredWords = getFilteredWords();
+            if (filteredWords.length === 0) {
+                errorDiv.textContent = 'لا توجد كلمات متاحة بإعدادات التصفية الحالية.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            // Find a phrase
+            const phraseData = findRandomPhrase(filteredWords, minOccurrences, maxOccurrences);
+            if (!phraseData) {
+                errorDiv.textContent = `تعذّر العثور على عبارة تتكرر بين ${minOccurrences} و${maxOccurrences} مرات. حاول تعديل نطاق التكرار أو الجزء المُختار.`;
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            // Generate question
+            const question = generateQuestion(phraseData, filteredWords, enabledTypes);
+            if (!question) {
+                errorDiv.textContent = 'تعذّر إنشاء سؤال مناسب. جرّب إعدادات مختلفة.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            currentQuestion = {
+                phraseData: phraseData,
+                question: question,
+                filteredWords: filteredWords
+            };
+
+            // Display question
+            document.getElementById('question-display').textContent = question.question;
+            document.getElementById('phrase-display').textContent = phraseData.phrase.map(w => w.text).join(' ');
+
+            // Hide controls, show test area
+            document.querySelector('.controls').style.display = 'none';
+            document.getElementById('change-settings-btn').style.display = 'inline-block';
+            document.getElementById('new-question-btn').style.display = 'inline-block';
+
+            document.getElementById('test-area').style.display = 'block';
+            document.getElementById('answer-display').style.display = 'none';
+            document.getElementById('reveal-btn').style.display = 'inline-block';
+            document.getElementById('next-question-btn').style.display = 'none';
+            document.getElementById('bottom-question-btn').style.display = 'none';
+        }
+
+        // Reveal the answer
+        function revealAnswer() {
+            if (!currentQuestion) return;
+
+            const answerDiv = document.getElementById('answer-display');
+            answerDiv.innerHTML = '';
+
+            const { phraseData, question } = currentQuestion;
+            let occurrencesToShow = phraseData.occurrences;
+
+            // Filter occurrences based on question type
+            if (question.type === 'surah') {
+                occurrencesToShow = occurrencesToShow.filter(occ => occ.words[0].sura === question.filterSurah);
+            } else if (question.type === 'juz') {
+                occurrencesToShow = occurrencesToShow.filter(occ => QuranPicker.findJuz(metadata, occ.words[0].sura, occ.words[0].aya) === question.filterJuz);
+            }
+
+            // For "nth occurrence" questions, show the specific answer first
+            if (question.type === 'nth') {
+                const nthOccurrence = phraseData.occurrences[question.answer - 1];
+                
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'answer-header';
+                headerDiv.textContent = `الإجابة: التكرار رقم ${question.answer}`;
+                answerDiv.appendChild(headerDiv);
+
+                // Show the specific occurrence
+                const occDiv = createOccurrenceElement(nthOccurrence, question.answer - 1, currentQuestion.filteredWords);
+                answerDiv.appendChild(occDiv);
+
+                // Add separator and show all occurrences
+                const allHeaderDiv = document.createElement('div');
+                allHeaderDiv.className = 'answer-header';
+                allHeaderDiv.style.marginTop = '30px';
+                allHeaderDiv.textContent = `كل مواضع التكرار (${phraseData.occurrences.length} إجمالاً):`;
+                answerDiv.appendChild(allHeaderDiv);
+
+                // Show all occurrences
+                phraseData.occurrences.forEach((occurrence, index) => {
+                    const occDiv = createOccurrenceElement(occurrence, index, currentQuestion.filteredWords);
+                    answerDiv.appendChild(occDiv);
+                });
+            } else {
+                // Show answer header for other question types
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'answer-header';
+                
+                if (question.type === 'count') {
+                    headerDiv.textContent = `الإجابة: ` + QuranPicker.pluralize(question.answer, { one: '{n} مرة', two: '{n} مرتان', few: '{n} مرات', many: '{n} مرة', other: '{n} مرة' }, 'ar');
+                } else if (question.type === 'surah') {
+                    const surahName = metadata.suras.find(s => s.index === question.filterSurah).name;
+                    headerDiv.textContent = `الإجابة: ${question.answer ? 'نعم' : 'لا'}` + (question.answer ? ` (` + QuranPicker.pluralize(occurrencesToShow.length, { one: '{n} مرة', two: '{n} مرتان', few: '{n} مرات', many: '{n} مرة', other: '{n} مرة' }, 'ar') + ` في سورة ${surahName})` : '');
+                } else if (question.type === 'juz') {
+                    headerDiv.textContent = `الإجابة: ${question.answer ? 'نعم' : 'لا'}` + (question.answer ? ` (` + QuranPicker.pluralize(occurrencesToShow.length, { one: '{n} مرة', two: '{n} مرتان', few: '{n} مرات', many: '{n} مرة', other: '{n} مرة' }, 'ar') + ` في الجزء ${question.filterJuz})` : '');
+                }
+                answerDiv.appendChild(headerDiv);
+
+                if (occurrencesToShow.length === 0) {
+                    const noOccDiv = document.createElement('div');
+                    noOccDiv.className = 'no-occurrences';
+                    noOccDiv.textContent = 'لا توجد مواضع تكرار في الموقع المحدد.';
+                    answerDiv.appendChild(noOccDiv);
+                } else {
+                    // Show each occurrence
+                    occurrencesToShow.forEach((occurrence, index) => {
+                        const occDiv = createOccurrenceElement(occurrence, index, currentQuestion.filteredWords);
+                        answerDiv.appendChild(occDiv);
+                    });
+                }
+            }
+
+            answerDiv.style.display = 'block';
+            document.getElementById('reveal-btn').style.display = 'none';
+            document.getElementById('next-question-btn').style.display = 'inline-block';
+            document.getElementById('new-question-btn').style.display = 'none';
+            document.getElementById('bottom-question-btn').style.display = 'inline-block';
+        }
+
+        // Helper function to create an occurrence element
+        function createOccurrenceElement(occurrence, index, filteredWords) {
+            const occDiv = document.createElement('div');
+            occDiv.className = 'occurrence-item';
+
+            // Occurrence number
+            const numDiv = document.createElement('div');
+            numDiv.className = 'occurrence-number';
+            numDiv.textContent = `التكرار رقم ${index + 1}:`;
+            occDiv.appendChild(numDiv);
+
+            // Get full verse
+            const firstWord = occurrence.words[0];
+            const verseWords = filteredWords.filter(w => 
+                w.sura === firstWord.sura && w.aya === firstWord.aya
+            );
+            
+            // Build verse with phrase highlighted
+            const verseDiv = document.createElement('div');
+            verseDiv.className = 'occurrence-verse';
+            
+            const phraseText = occurrence.words.map(w => w.text).join(' ');
+            const verseText = verseWords.map(w => w.text).join(' ');
+            
+            // Simple highlighting by replacing phrase text
+            const highlightedVerse = verseText.replace(phraseText, `<span class="phrase-highlight">${phraseText}</span>`);
+            verseDiv.innerHTML = highlightedVerse;
+            occDiv.appendChild(verseDiv);
+
+            // Metadata
+            const surahName = metadata.suras.find(s => s.index === firstWord.sura).name;
+            const juz = QuranPicker.findJuz(metadata, firstWord.sura, firstWord.aya);
+            const page = QuranPicker.findPage(metadata, firstWord.sura, firstWord.aya);
+
+            const metaDiv = document.createElement('div');
+            metaDiv.className = 'occurrence-metadata';
+            metaDiv.innerHTML = `
+                <div><strong>السورة:</strong> ${surahName} (${firstWord.sura})</div>
+                <div><strong>الآية:</strong> ${firstWord.aya}</div>
+                <div><strong>الجزء:</strong> ${juz}</div>
+                <div><strong>الصفحة:</strong> ${page}</div>
+            `;
+            occDiv.appendChild(metaDiv);
+
+            return occDiv;
+        }
+
+        // Show settings
+        function showSettings() {
+            document.querySelector('.controls').style.display = 'block';
+            document.getElementById('test-area').style.display = 'none';
+            document.getElementById('change-settings-btn').style.display = 'none';
+            document.getElementById('new-question-btn').style.display = 'inline-block';
+            document.getElementById('page-range-error').style.display = 'none';
+            currentQuestion = null;
+        }
+
+        // Toggle occurrence tooltip visibility
+        function toggleOccurrenceTooltip(event) {
+            event.stopPropagation();
+            const tooltip = document.getElementById('occurrence-tooltip');
+            tooltip.classList.toggle('show');
+        }
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

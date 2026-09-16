@@ -2,44 +2,25 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<!-- Applied as early as possible, before the page paints, so a saved
+     theme choice doesn't flash the default gold theme first. -->
+<script>(function(){try{var t=localStorage.getItem('quranTester:theme');if(t&&t!=='gold')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>اختبار الإعراب كلمة كلمة</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
 <style>
-    :root {
-        --bg: #101a16;
-        --panel: #17241f;
-        --panel-alt: #1e2f28;
-        --border: #2c3d35;
-        --text: #ede6d6;
-        --text-muted: #93a89b;
-        --accent: #c9a15a;
-        --accent-text: #1a1408;
-        --success: #4caf6e;
-        --success-text: #0d2113;
-        --danger: #c96a5a;
-        --danger-bg: #3a2420;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    /* Page-specific rules only - shared colours, fonts, tabs/checkbox-list,
+       buttons, field-help/error, and loading indicator live in styles.css. */
 
     body {
         font-family: 'Amiri', 'Traditional Arabic', serif;
         line-height: 1.7;
-        padding: 20px;
+        padding: 70px 20px 20px;
         max-width: 900px;
         margin: 0 auto;
-        background-color: var(--bg);
-        color: var(--text);
-    }
-
-    .container {
-        background: var(--panel);
-        border: 1px solid var(--border);
-        padding: 20px;
-        border-radius: 8px;
     }
 
     h1 {
@@ -58,160 +39,41 @@
 
     .subtitle a { color: var(--accent); }
 
-    .control-group { margin-bottom: 18px; }
-
     .control-group > label:first-child {
         display: block;
         margin-bottom: 8px;
         font-weight: 700;
     }
 
-    .choice-row {
-        display: flex;
-        gap: 18px;
-        flex-wrap: wrap;
-        margin-top: 6px;
-    }
-
-    .choice-row label {
-        display: flex;
-        align-items: center;
-        font-weight: 400;
-        cursor: pointer;
-    }
-
-    .filter-options-box {
-        margin-top: 12px;
-        padding: 15px;
-        background: var(--panel-alt);
-        border: 1px solid var(--border);
-        border-radius: 4px;
-    }
-
+    /* This app is RTL, so the checkbox needs space on its inline-start side
+       rather than the inline-end margin most LTR layouts would use. */
     input[type="radio"], input[type="checkbox"] {
-        accent-color: var(--accent);
-        width: 16px;
-        height: 16px;
-        vertical-align: middle;
         margin-inline-start: 6px;
     }
 
     input[type="text"] {
-        background: var(--panel);
-        border: 1px solid var(--border);
-        color: var(--text);
-        padding: 8px 10px;
-        border-radius: 4px;
-        font-size: 15px;
         width: 100%;
-        font-family: inherit;
     }
 
-    .field-help { color: var(--text-muted); font-size: 13px; margin-top: 6px; }
-
+    /* This app shows field errors as a small filled chip rather than plain text. */
     .field-error {
-        display: none;
-        color: var(--danger);
         background: var(--danger-bg);
         padding: 6px 10px;
         border-radius: 4px;
         margin-top: 6px;
-        font-size: 13px;
     }
 
-    .tabs {
-        display: flex;
-        gap: 4px;
-        margin-bottom: 12px;
-        border-bottom: 1px solid var(--border);
-    }
-
-    .tab-btn {
-        background: none;
-        border: none;
-        color: var(--text-muted);
-        padding: 8px 16px;
-        cursor: pointer;
-        font-size: 15px;
-        font-family: inherit;
-        border-bottom: 2px solid transparent;
-    }
-
-    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 700; }
-
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
-
-    .select-all-row {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid var(--border);
-    }
-
-    .select-all-row label { margin-bottom: 0; font-weight: 700; }
-
+    /* Arabic surah/juz names vary a lot in length, so this list uses
+       auto-fill columns rather than the other apps' fixed two columns. */
     .checkbox-list {
-        max-height: 220px;
-        overflow-y: auto;
-        display: grid;
         grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-        gap: 4px 10px;
-        padding: 4px;
     }
-
-    .checkbox-list label {
-        display: flex;
-        align-items: center;
-        font-weight: 400;
-        margin-bottom: 0;
-        font-size: 14px;
-        cursor: pointer;
-    }
-
-    .loading-text { color: var(--text-muted); font-size: 14px; }
-    .list-loading { grid-column: 1 / -1; }
 
     .button-group {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        flex-wrap: wrap;
         margin-top: 15px;
     }
 
-    button.btn-primary, button.btn-success {
-        font-family: inherit;
-        font-size: 15px;
-        padding: 10px 20px;
-        border-radius: 6px;
-        border: none;
-        cursor: pointer;
-        font-weight: 700;
-    }
-
-    button.btn-primary { background: var(--accent); color: var(--accent-text); }
-    button.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-    button.btn-success { background: var(--success); color: var(--success-text); }
-
-    button.btn-secondary {
-        background: var(--panel-alt);
-        color: var(--text);
-        border: 1px solid var(--border);
-        font-family: inherit;
-        font-size: 15px;
-        padding: 10px 20px;
-        border-radius: 6px;
-        cursor: pointer;
-    }
-
     .error {
-        display: none;
-        color: var(--danger);
-        background: var(--danger-bg);
-        padding: 10px 14px;
-        border-radius: 4px;
         margin-top: 15px;
     }
 
@@ -245,6 +107,7 @@
     }
 
     .word-text {
+        font-family: var(--quran-font);
         font-size: 24px;
         cursor: pointer;
         user-select: none;
@@ -266,8 +129,6 @@
     .word-colon { color: var(--text-muted); }
 
     .word-irab-text {
-        cursor: pointer;
-        user-select: none;
         font-size: 15px;
         flex: 1;
     }
@@ -282,6 +143,7 @@
     }
 
     .full-ayah-text {
+        font-family: var(--quran-font);
         font-size: 26px;
         text-align: center;
         margin-bottom: 14px;
@@ -303,19 +165,11 @@
         <h1>اختبار الإعراب كلمة كلمة</h1>
         <p class="subtitle">
             يعرض هذا التطبيق إعراب كل كلمة من الآية بينما تكون الكلمة نفسها مخفية.
-            اضغط على المربع لإظهار الكلمة، واضغط على إعرابها للتبديل من "مختصر" إلى "مفصل" لتلك الكلمة وحدها.
+            اضغط على المربع لإظهار الكلمة.
         </p>
 
         <div id="app">
             <div id="settings-panel">
-                <div class="control-group">
-                    <label>مستوى الإعراب في البداية:</label>
-                    <div class="choice-row">
-                        <label><input type="radio" name="start-tier" value="medium" checked> إعراب مختصر</label>
-                        <label><input type="radio" name="start-tier" value="easy"> إعراب مفصل</label>
-                    </div>
-                </div>
-
                 <div class="control-group">
                     <label>اختر الجزء المراد اختباره:</label>
                     <div style="margin-top: 6px;">
@@ -360,6 +214,14 @@
                 </div>
             </div>
 
+            <div class="control-group">
+                <label>خيارات إضافية:</label>
+                <div style="margin-top: 6px;">
+                    <input type="checkbox" id="hide-identifying-words" checked>
+                    <label for="hide-identifying-words" style="display: inline; font-weight: normal;">إخفاء الكلمات التي قد تكشف الإجابة (مثل "اسم الجلالة" وما بين الأقواس العادية)</label>
+                </div>
+            </div>
+
             <div class="button-group">
                 <button class="btn-primary" id="new-question-btn" onclick="startNewQuestion()" disabled>سؤال جديد</button>
                 <button class="btn-primary" id="new-question-btn-active" onclick="startNewQuestion()" style="display: none;">سؤال جديد</button>
@@ -390,6 +252,7 @@
         </div>
     </div>
 
+    <script src="quran-picker.js"></script>
     <script>
         // =====================================================================
         // Data loading
@@ -397,53 +260,36 @@
         // Expects these files alongside this HTML file, served over http/https
         // (fetch() of local files needs a local server, not plain file://):
         //   app_quran_metadata.xml
-        //   eerab-markaz-tafseer.json    (تفصيل/"easy" tier + the master word list)
-        //   alrab-al-quran-li-da-as.json (غير مفصل/"medium" tier)
+        //   eerab-markaz-tafseer.json    (the i'rab text + the master word list)
         //
-        // al-i-rab-al-muyassar.json was tried as a third, harder tier but
-        // dropped: it frequently names the ayah's actual words in plain
-        // prose with no ﴿ ﴾ markers at all (e.g. "ويا حرف نداء، وأبت منادى"),
-        // so there was no reliable way to redact it without also blanking
-        // out common grammatical terms elsewhere in the same explanation.
+        // Two other candidate sources were tried and dropped as unreliable
+        // for word-by-word display:
+        //   al-i-rab-al-muyassar.json frequently names the ayah's actual
+        //   words in plain prose with no ﴿ ﴾ markers at all (e.g. "ويا حرف
+        //   نداء، وأبت منادى"), so there was no reliable way to redact it.
+        //   alrab-al-quran-li-da-as.json interleaves out-of-order "word
+        //   meaning" asides with the real sequential grammar breakdown using
+        //   the same ﴿ ﴾ citation style for both, with no way to tell them
+        //   apart - this desynced the word alignment in ~41% of ayah groups
+        //   (e.g. Al-Fatihah 1:5, confirmed by instrumenting the parser).
         //
-        // Word boundaries: eerab-markaz-tafseer.json is treated as the single
-        // source of truth for where one word ends and the next begins (e.g.
-        // "يا أيها" is one word because that source treats it as one). The
-        // Medium source is phrase-based prose, so each of its ﴿ ﴾-marked
-        // phrases is matched against this master list by comparing
-        // normalised text (diacritics and spaces stripped) rather than by
-        // counting whitespace-separated tokens - this is what lets "يا أيها"
-        // line up correctly even when one source writes it with a space and
-        // another doesn't.
+        // eerab-markaz-tafseer.json is the only source that held up cleanly:
+        // it's genuinely one dedicated entry per word throughout.
 
-        const TIERS = ['medium', 'easy']; // one-way: tapping only moves toward 'easy' (مفصل)
         const FALLBACK_IRAB = 'لا يتوفر إعراب دقيق لهذه الكلمة في هذا المصدر.';
 
-        let masterByAyah = {};   // "sura:aya" -> [{ text, irab }, ...]  (irab = Easy/مفصل tier text)
+        let masterByAyah = {};   // "sura:aya" -> [{ text, irab }, ...]
         let ayahList = [];       // [{ sura, aya, juz, page }, ...]
         let metadata = null;     // { suras, juzs, pages }
-        let mediumIndex = {};    // "sura:aya" -> { text, ayah_keys } OR a string pointer to another key
 
         let dataReady = false;
         let dataLoadFailed = false;
         let pendingQuestionRequested = false;
 
+        // Metadata loading now lives in the shared QuranPicker module
+        // (quran-picker.js), since it's identical across all three apps.
         async function loadXML() {
-            const response = await fetch('app_quran_metadata.xml');
-            if (!response.ok) throw new Error('Could not fetch app_quran_metadata.xml (HTTP ' + response.status + ')');
-            const text = await response.text();
-            const xmlDoc = new DOMParser().parseFromString(text, 'text/xml');
-
-            metadata = { suras: [], juzs: [], pages: [] };
-            xmlDoc.querySelectorAll('sura').forEach(sura => {
-                metadata.suras.push({ index: parseInt(sura.getAttribute('index')), name: sura.getAttribute('name') });
-            });
-            xmlDoc.querySelectorAll('juz').forEach(juz => {
-                metadata.juzs.push({ index: parseInt(juz.getAttribute('index')), sura: parseInt(juz.getAttribute('sura')), aya: parseInt(juz.getAttribute('aya')) });
-            });
-            xmlDoc.querySelectorAll('page').forEach(page => {
-                metadata.pages.push({ index: parseInt(page.getAttribute('index')), sura: parseInt(page.getAttribute('sura')), aya: parseInt(page.getAttribute('aya')) });
-            });
+            metadata = await QuranPicker.loadMetadataXML('app_quran_metadata.xml');
         }
 
         async function loadMarkaz() {
@@ -457,120 +303,60 @@
             });
         }
 
-        async function loadMedium() {
-            const response = await fetch('alrab-al-quran-li-da-as.json');
-            if (!response.ok) throw new Error('Could not fetch alrab-al-quran-li-da-as.json (HTTP ' + response.status + ')');
-            mediumIndex = await response.json();
-        }
-
-        function findRangeIndex(list, sura, aya) {
-            let lo = 0, hi = list.length - 1, result = 1;
-            while (lo <= hi) {
-                const mid = (lo + hi) >> 1;
-                const item = list[mid];
-                if (sura > item.sura || (sura === item.sura && aya >= item.aya)) { result = item.index; lo = mid + 1; }
-                else { hi = mid - 1; }
-            }
-            return result;
-        }
-
+        // Juz/page lookup by binary search now lives in the shared
+        // QuranPicker module.
         function buildAyahList() {
             ayahList = Object.keys(masterByAyah).map(key => {
                 const [sura, aya] = key.split(':').map(Number);
-                return { sura, aya, juz: findRangeIndex(metadata.juzs, sura, aya), page: findRangeIndex(metadata.pages, sura, aya) };
+                return { sura, aya, juz: QuranPicker.findJuz(metadata, sura, aya), page: QuranPicker.findPage(metadata, sura, aya) };
             });
             ayahList.sort((a, b) => a.sura - b.sura || a.aya - b.aya);
         }
 
-        // =====================================================================
-        // Arabic text normalisation & phrase-to-word matching
-        // =====================================================================
-
-        function stripDiacritics(s) { return (s || '').replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g, ''); }
-        function normalize(s) { return stripDiacritics(s).replace(/\s+/g, ''); }
-        function stripHtmlTags(html) { return html.replace(/<[^>]+>/g, ' '); }
-
-        // Given a phrase's normalised text and the master word list, work out
-        // how many consecutive master words (starting at startPtr) it covers,
-        // by accumulating normalised master words until they match.
-        function countWordsForPhrase(phraseNorm, masterWords, startPtr) {
-            let acc = '', count = 0, p = startPtr;
-            while (p < masterWords.length) {
-                acc += normalize(masterWords[p].text);
-                count++; p++;
-                if (acc === phraseNorm) return count;
-                if (acc.length >= phraseNorm.length) break; // overshot without an exact match
-            }
-            return count || 1;
-        }
-
         // Replace anything inside ﴿ ﴾ with a fixed-length blank, keeping the
-        // brackets themselves. Used to stop the i'rab text for a still-blurred
-        // word from quoting the actual word inside a citation. Normal
-        // (parentheses) are left untouched. Only applied for DISPLAY - the
-        // parsing/matching above always runs on the original, unredacted text.
+        // brackets themselves. eerab-markaz-tafseer.json's own irab text
+        // sometimes quotes the word itself this way (e.g. "و﴿اسْمِ﴾ اسم
+        // مجرور" inside the entry for "بِسْمِ"), which would otherwise leak
+        // the hidden word. Normal (parentheses) are left untouched.
         function redactBrackets(text) {
             return (text || '').replace(/﴿[^﴿﴾]+﴾/g, '﴿___﴾');
         }
 
-        // Search for where a following marker's phrase actually begins,
-        // restricted to [searchFrom, limit). Used to stop the current
-        // marker's span early when a later, narrower marker's phrase is
-        // found nested inside what would otherwise be the current marker's
-        // naive word-count span (see parseAllMarkers below).
-        function findPhraseStartBounded(phraseNorm, masterWords, searchFrom, limit) {
-            for (let s = searchFrom; s < limit; s++) {
-                let acc = '', p = s;
-                while (p < limit && acc.length < phraseNorm.length) {
-                    acc += normalize(masterWords[p].text);
-                    p++;
-                    if (acc === phraseNorm) return s;
-                }
-            }
-            return -1;
+        // "اسم الجلالة" ("the Name of Majesty") is how the source refers to
+        // the word "الله" itself, so seeing that label immediately gives
+        // away a still-hidden word. Diacritics fall after every base letter
+        // in Arabic (e.g. اسْمُ الْجَلَالَةِ), so this allows optional
+        // diacritics after each letter rather than matching one fixed form -
+        // this is what lets it catch both the nominative and genitive case
+        // endings actually used in the data. It's redacted to look exactly
+        // like a redacted normal-parentheses citation ("(___)") rather than
+        // a bare "___", so a person can't tell just from the shape of the
+        // blank that the word being tested must be "الله".
+        function redactLafzAlJalala(text) {
+            const pattern = /ا[\u064B-\u065F\u0670]*س[\u064B-\u065F\u0670]*م[\u064B-\u065F\u0670]*\s*ا[\u064B-\u065F\u0670]*ل[\u064B-\u065F\u0670]*ج[\u064B-\u065F\u0670]*ل[\u064B-\u065F\u0670]*ا[\u064B-\u065F\u0670]*ل[\u064B-\u065F\u0670]*ة[\u064B-\u065F\u0670]*/g;
+            return (text || '').replace(pattern, '(___)');
         }
 
-        // Medium tier (alrab-al-quran-li-da-as.json): a <p> can contain
-        // several genuine headword+explanation pairs, so every ﴿ ﴾ marker in
-        // the flattened text is treated as a new headword. Some markers act
-        // as a "recap" covering a whole clause (several words) before later,
-        // narrower markers break that same clause down further - e.g. a
-        // 4-word recap marker followed shortly after by a marker for just
-        // its last word. If we didn't check for this, the recap marker would
-        // greedily consume all 4 words (they really do match its phrase) and
-        // the narrower marker's word would then be skipped entirely, leaving
-        // several unrelated words sharing one explanation. So: if the NEXT
-        // marker's phrase is found earlier than this marker's own naive end,
-        // stop this marker's span there instead.
-        function parseAllMarkers(html, masterWords) {
-            const slots = new Array(masterWords.length).fill(null);
-            const flat = stripHtmlTags(html);
-            const re = /﴿([^﴿﴾]+)﴾/g;
-            let m, markers = [];
-            while ((m = re.exec(flat)) !== null) markers.push({ phrase: m[1], start: m.index, end: m.index + m[0].length });
-
-            let ptr = 0;
-            for (let idx = 0; idx < markers.length; idx++) {
-                const n = countWordsForPhrase(normalize(markers[idx].phrase), masterWords, ptr);
-                let end = Math.min(ptr + n, masterWords.length);
-
-                if (idx + 1 < markers.length) {
-                    const nextNorm = normalize(markers[idx + 1].phrase);
-                    const foundAt = findPhraseStartBounded(nextNorm, masterWords, ptr, end);
-                    if (foundAt !== -1 && foundAt > ptr) end = foundAt;
-                }
-
-                const explEnd = (idx + 1 < markers.length) ? markers[idx + 1].start : flat.length;
-                const explanation = flat.slice(markers[idx].end, explEnd).trim();
-                for (let i = ptr; i < end; i++) slots[i] = explanation || markers[idx].phrase;
-                ptr = end;
-                if (ptr >= masterWords.length) break;
-            }
-            return slots;
+        // Normal (parentheses) sometimes re-quote the word itself too (e.g.
+        // "(الْبَاءُ) حَرْفُ جَرٍّ..." for the word "بِسْمِ"), so this is
+        // offered as an opt-in toggle rather than always applied, since it's
+        // not always a giveaway.
+        function redactNormalParens(text) {
+            return (text || '').replace(/\([^()]+\)/g, '(___)');
         }
 
-        function fillFallback(slots) {
-            return slots.map(s => s === null ? FALLBACK_IRAB : s);
+        // Applies the always-on ﴿ ﴾ redaction plus, if switched on in the
+        // settings, both of the "identifying words" redactions together -
+        // combined into one toggle (rather than two separate ones) so that
+        // seeing a redacted "(___)" never tells the person which kind of
+        // content used to be there.
+        function applyRedactions(text) {
+            let result = redactBrackets(text);
+            if (document.getElementById('hide-identifying-words').checked) {
+                result = redactLafzAlJalala(result);
+                result = redactNormalParens(result);
+            }
+            return result;
         }
 
         function getEasyIrabArray(sura, aya) {
@@ -580,132 +366,20 @@
             return master.map(w => w.irab || FALLBACK_IRAB);
         }
 
-        // Medium entries can cover a run of several ayahs at once (with an
-        // 'ayah_keys' list) and other ayahs in that run just store a string
-        // pointing back to the base key. Resolve that, parse across the
-        // whole combined run, then slice out the words for this one ayah.
-        function getMediumIrabArray(sura, aya) {
-            const key = sura + ':' + aya;
-            const master = masterByAyah[key];
-            if (!master) return [];
-
-            let entry = mediumIndex[key];
-            if (typeof entry === 'string') entry = mediumIndex[entry];
-            if (!entry || !entry.text) return master.map(() => FALLBACK_IRAB);
-
-            const ayahKeys = (entry.ayah_keys && entry.ayah_keys.length) ? entry.ayah_keys : [key];
-            let combined = [];
-            let offsetStart = 0, found = false;
-            for (const ak of ayahKeys) {
-                const mw = masterByAyah[ak];
-                if (!mw) return master.map(() => FALLBACK_IRAB);
-                if (ak === key) { offsetStart = combined.length; found = true; }
-                combined = combined.concat(mw);
-            }
-            if (!found) return master.map(() => FALLBACK_IRAB);
-
-            const fullSlots = fillFallback(parseAllMarkers(entry.text, combined));
-            return fullSlots.slice(offsetStart, offsetStart + master.length);
-        }
-
         // =====================================================================
-        // Loading indicator
-        // =====================================================================
-
-        let loadingDotsInterval = null, loadingDotsCount = 0;
-        function tickLoadingDots() {
-            loadingDotsCount = (loadingDotsCount % 3) + 1;
-            const dots = '.'.repeat(loadingDotsCount);
-            document.querySelectorAll('.loading-dots').forEach(el => { el.textContent = dots; });
-        }
-        function startLoadingAnimation() { if (!loadingDotsInterval) { tickLoadingDots(); loadingDotsInterval = setInterval(tickLoadingDots, 500); } }
-        function stopLoadingAnimation() { if (loadingDotsInterval) { clearInterval(loadingDotsInterval); loadingDotsInterval = null; } }
-
-        // =====================================================================
-        // Selection pane (Surah / Juz / Page)
+        // Loading indicator, selection pane, and page-range parsing all now
+        // live in the shared QuranPicker module (quran-picker.js).
         // =====================================================================
 
         function populateSurahAndJuzLists() {
-            const surahList = document.getElementById('surah-list');
-            surahList.innerHTML = '';
-            metadata.suras.forEach(sura => {
-                const label = document.createElement('label');
-                label.innerHTML = '<input type="checkbox" class="surah-cb" value="' + sura.index + '" checked>' +
-                    '<span>' + sura.index + '. ' + sura.name + '</span>';
-                surahList.appendChild(label);
+            QuranPicker.populateSurahAndJuzLists(metadata, {
+                surahLabelHTML: sura => '<span>' + sura.index + '. ' + sura.name + '</span>',
+                juzLabelHTML: i => '<span>الجزء ' + i + '</span>'
             });
-
-            const juzList = document.getElementById('juz-list');
-            juzList.innerHTML = '';
-            for (let i = 1; i <= 30; i++) {
-                const label = document.createElement('label');
-                label.innerHTML = '<input type="checkbox" class="juz-cb" value="' + i + '" checked>' +
-                    '<span>الجزء ' + i + '</span>';
-                juzList.appendChild(label);
-            }
-        }
-
-        function wireSelectAll(allId, itemClass) {
-            const allBox = document.getElementById(allId);
-            allBox.addEventListener('change', () => {
-                document.querySelectorAll('.' + itemClass).forEach(cb => { cb.checked = allBox.checked; });
-            });
-            document.addEventListener('change', (e) => {
-                if (e.target.classList.contains(itemClass)) {
-                    const all = document.querySelectorAll('.' + itemClass);
-                    const checked = document.querySelectorAll('.' + itemClass + ':checked');
-                    allBox.checked = (all.length === checked.length);
-                }
-            });
-        }
-
-        function parsePageRange(rangeText) {
-            rangeText = rangeText.trim();
-            if (rangeText === '') return null;
-            if (/[^0-9,\-\s]/.test(rangeText)) return undefined;
-            const pages = new Set();
-            for (let part of rangeText.split(',')) {
-                part = part.trim();
-                if (part === '') continue;
-                if (part.includes('-')) {
-                    const rangeParts = part.split('-');
-                    if (rangeParts.length !== 2) return undefined;
-                    const startStr = rangeParts[0].trim(), endStr = rangeParts[1].trim();
-                    if (!/^[0-9]+$/.test(startStr) || !/^[0-9]+$/.test(endStr)) return undefined;
-                    const start = parseInt(startStr), end = parseInt(endStr);
-                    if (start < 1 || end > 604 || start > end) return undefined;
-                    for (let i = start; i <= end; i++) pages.add(i);
-                } else {
-                    if (!/^[0-9]+$/.test(part)) return undefined;
-                    const page = parseInt(part);
-                    if (page < 1 || page > 604) return undefined;
-                    pages.add(page);
-                }
-            }
-            if (pages.size === 0) return undefined;
-            return Array.from(pages);
         }
 
         function getFilteredAyahs() {
-            const portionType = document.querySelector('input[name="portion-type"]:checked').value;
-            if (portionType === 'entire') return ayahList;
-
-            const activeTab = document.querySelector('.tab-btn.active').dataset.tab;
-            if (activeTab === 'surah') {
-                const selected = new Set(Array.from(document.querySelectorAll('.surah-cb:checked')).map(cb => parseInt(cb.value)));
-                if (selected.size === 0) return [];
-                return ayahList.filter(a => selected.has(a.sura));
-            } else if (activeTab === 'juz') {
-                const selected = new Set(Array.from(document.querySelectorAll('.juz-cb:checked')).map(cb => parseInt(cb.value)));
-                if (selected.size === 0) return [];
-                return ayahList.filter(a => selected.has(a.juz));
-            } else {
-                const pages = parsePageRange(document.getElementById('page-range').value);
-                if (pages === undefined) return [];
-                if (pages === null) return ayahList;
-                const pageSet = new Set(pages);
-                return ayahList.filter(a => pageSet.has(a.page));
-            }
+            return QuranPicker.getFilteredByPortion(ayahList, { portionTypeName: 'portion-type' });
         }
 
         function suraName(index) {
@@ -723,7 +397,7 @@
         function startNewQuestion() {
             if (dataLoadFailed) {
                 const errorDiv = document.getElementById('error-message');
-                errorDiv.textContent = 'تعذّر تحميل بيانات القرآن. يُرجى التأكد من وجود جميع الملفات المطلوبة في نفس المجلد ثم إعادة تحميل الصفحة.';
+                errorDiv.textContent = 'تعذّر تحميل بيانات القرآن. يُرجى إعادة تحميل الصفحة.';
                 errorDiv.style.display = 'block';
                 return;
             }
@@ -731,7 +405,7 @@
                 pendingQuestionRequested = true;
                 document.getElementById('new-question-btn').disabled = true;
                 document.getElementById('new-question-loading').style.display = 'inline';
-                startLoadingAnimation();
+                QuranPicker.startLoadingAnimation();
                 return;
             }
 
@@ -743,7 +417,7 @@
             const portionType = document.querySelector('input[name="portion-type"]:checked').value;
             const activeTab = portionType === 'select' ? document.querySelector('.tab-btn.active').dataset.tab : null;
             if (activeTab === 'page') {
-                const pages = parsePageRange(document.getElementById('page-range').value);
+                const pages = QuranPicker.parsePageRange(document.getElementById('page-range').value);
                 if (pages === undefined) { pageRangeError.style.display = 'block'; return; }
             }
 
@@ -757,16 +431,12 @@
             currentQuestion = filtered[Math.floor(Math.random() * filtered.length)];
             const key = currentQuestion.sura + ':' + currentQuestion.aya;
             const master = masterByAyah[key];
-            const startTier = document.querySelector('input[name="start-tier"]:checked').value;
 
-            const mediumArr = getMediumIrabArray(currentQuestion.sura, currentQuestion.aya);
             const easyArr = getEasyIrabArray(currentQuestion.sura, currentQuestion.aya);
 
             wordStates = master.map((w, idx) => ({
                 text: w.text,
-                medium: mediumArr[idx],
-                easy: easyArr[idx],
-                tier: startTier,
+                irab: easyArr[idx],
                 revealed: false
             }));
 
@@ -790,14 +460,10 @@
             document.getElementById('change-settings-btn').style.display = 'none';
         }
 
-        // Consecutive words that currently show the exact same tier and the
-        // exact same i'rab text (because the source explained them together
-        // as one phrase) are rendered as a single shared box with multiple
-        // blur placeholders before the colon. Advancing that box's tier
-        // advances every word in it together; since the Easy/مفصل tier is
-        // essentially always unique per word, a group naturally splits back
-        // into individual boxes as soon as it reaches Easy (no special-case
-        // logic needed - the grouping just stops matching).
+        // Consecutive words that happen to show the exact same i'rab text
+        // (e.g. two words both falling back to the "not available" message)
+        // are rendered as a single shared box with multiple blur
+        // placeholders before the colon.
         function renderWordGrid() {
             const grid = document.getElementById('word-grid');
             grid.innerHTML = '';
@@ -805,9 +471,7 @@
             let i = 0;
             while (i < wordStates.length) {
                 let j = i;
-                while (j + 1 < wordStates.length &&
-                       wordStates[j + 1].tier === wordStates[i].tier &&
-                       wordStates[j + 1][wordStates[j + 1].tier] === wordStates[i][wordStates[i].tier]) {
+                while (j + 1 < wordStates.length && wordStates[j + 1].irab === wordStates[i].irab) {
                     j++;
                 }
                 renderWordGroup(grid, i, j);
@@ -844,15 +508,11 @@
             // this box has been individually revealed - the shared note
             // could still reference a word that's still hidden.
             const allRevealed = wordStates.slice(startIdx, endIdx + 1).every(s => s.revealed);
-            const rawText = wordStates[startIdx][wordStates[startIdx].tier];
+            const rawText = wordStates[startIdx].irab;
 
             const irabSpan = document.createElement('span');
             irabSpan.className = 'word-irab-text';
-            irabSpan.textContent = allRevealed ? rawText : redactBrackets(rawText);
-            irabSpan.onclick = () => {
-                for (let idx = startIdx; idx <= endIdx; idx++) advanceTier(idx);
-                renderWordGrid();
-            };
+            irabSpan.textContent = allRevealed ? rawText : applyRedactions(rawText);
             unit.appendChild(irabSpan);
 
             grid.appendChild(unit);
@@ -861,12 +521,6 @@
         function toggleReveal(idx) {
             wordStates[idx].revealed = !wordStates[idx].revealed;
             renderWordGrid();
-        }
-
-        function advanceTier(idx) {
-            const current = wordStates[idx].tier;
-            const nextIdx = TIERS.indexOf(current) + 1;
-            if (nextIdx < TIERS.length) wordStates[idx].tier = TIERS[nextIdx]; // no-op if already 'easy'
         }
 
         function revealAnswer() {
@@ -890,50 +544,27 @@
         // =====================================================================
 
         function wireStaticUI() {
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-                    btn.classList.add('active');
-                    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-                });
-            });
-
-            document.querySelectorAll('input[name="portion-type"]').forEach(radio => {
-                radio.addEventListener('change', (e) => {
-                    document.getElementById('filter-options').style.display = (e.target.value === 'select') ? 'block' : 'none';
-                });
-            });
-
-            document.getElementById('page-range').addEventListener('input', () => {
-                document.getElementById('page-range-error').style.display = 'none';
-            });
-            document.getElementById('page-range').addEventListener('blur', (e) => {
-                const pages = parsePageRange(e.target.value);
-                document.getElementById('page-range-error').style.display = (pages === undefined) ? 'block' : 'none';
-            });
-
-            wireSelectAll('surah-select-all', 'surah-cb');
-            wireSelectAll('juz-select-all', 'juz-cb');
+            QuranPicker.wireCorePickerUI({ portionTypeName: 'portion-type' });
+            QuranPicker.wireSideMenu('irab', 'ar');
         }
 
         async function loadData() {
-            startLoadingAnimation();
+            QuranPicker.startLoadingAnimation();
             try {
-                await Promise.all([loadXML(), loadMarkaz(), loadMedium()]);
+                await Promise.all([loadXML(), loadMarkaz()]);
                 buildAyahList();
                 populateSurahAndJuzLists();
 
                 dataReady = true;
-                stopLoadingAnimation();
+                QuranPicker.stopLoadingAnimation();
                 document.getElementById('new-question-btn').disabled = false;
                 document.getElementById('new-question-loading').style.display = 'none';
 
                 if (pendingQuestionRequested) { pendingQuestionRequested = false; startNewQuestion(); }
             } catch (error) {
                 dataLoadFailed = true;
-                stopLoadingAnimation();
-                const message = 'تعذّر تحميل بيانات القرآن. يُرجى التأكد من وجود جميع الملفات المطلوبة في نفس المجلد، ثم إعادة تحميل الصفحة.';
+                QuranPicker.stopLoadingAnimation();
+                const message = 'تعذّر تحميل بيانات القرآن. يُرجى إعادة تحميل الصفحة.';
                 document.querySelectorAll('.loading-text').forEach(el => { el.textContent = message; el.classList.remove('loading-text'); });
                 document.getElementById('new-question-btn').disabled = false;
                 console.error(error);

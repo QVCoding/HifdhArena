@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <!-- Applied as early as possible, before the page paints, so a saved
          theme choice doesn't flash the default gold theme first. -->
     <script>(function(){try{var t=localStorage.getItem('quranTester:theme');if(t&&t!=='gold')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smallest Test</title>
+    <title>اختبار أقصر عبارة للحفظ</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Spectral:wght@400;500;600&display=swap" rel="stylesheet">
@@ -16,6 +16,8 @@
            buttons, field-help/error, and loading indicator live in styles.css. */
 
         body {
+            font-family: 'Amiri', 'Traditional Arabic', serif;
+            line-height: 1.7;
             padding: 70px 20px 20px;
             max-width: 800px;
             margin: 0 auto;
@@ -39,7 +41,7 @@
         }
 
         .checkbox-group input {
-            margin-right: 8px;
+            margin-inline-end: 8px;
         }
 
         .checkbox-group label {
@@ -59,7 +61,7 @@
             font-size: 12px;
             font-weight: bold;
             cursor: pointer;
-            margin-left: 5px;
+            margin-inline-start: 5px;
             vertical-align: middle;
         }
 
@@ -82,7 +84,7 @@
         #new-question-loading {
             color: var(--text-muted);
             font-size: 14px;
-            margin-left: 4px;
+            margin-inline-start: 4px;
             display: none;
         }
 
@@ -200,123 +202,123 @@
             .nav-buttons .word-nav-btn {
                 padding: 8px 10px;
                 font-size: 12.5px;
-                margin-right: 0;
+                margin-inline-end: 0;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 style="text-align: center;">Smallest Phrase Hifdh-Tester</h1>
-        <p style="text-align: center; color: var(--text-muted); margin-bottom: 20px; font-size: 14px;">This hifdh-testing app shows you the smallest portion of the Qur'an required for you to identify the ayah.</p>
+        <h1 style="text-align: center;">اختبار أقصر عبارة للحفظ</h1>
+        <p style="text-align: center; color: var(--text-muted); margin-bottom: 20px; font-size: 14px;">يعرض هذا التطبيق أصغر جزء من القرآن الكريم يلزم لتحديد الآية.</p>
 
         <div id="app">
             <div class="controls">
                 <div class="control-group">
-                    <label><strong>Select Portion for Testing:</strong></label>
+                    <label><strong>اختر الجزء المراد اختباره:</strong></label>
                     <div style="margin-top: 10px;">
                         <input type="radio" id="entire-quran" name="portion-type" value="entire" checked>
-                        <label for="entire-quran" style="display: inline; font-weight: normal;">Entire Qur'an (default)</label>
+                        <label for="entire-quran" style="display: inline; font-weight: normal;">القرآن كاملاً (الافتراضي)</label>
                     </div>
                     <div style="margin-top: 5px;">
                         <input type="radio" id="select-portion" name="portion-type" value="select">
-                        <label for="select-portion" style="display: inline; font-weight: normal;">Select Portion</label>
+                        <label for="select-portion" style="display: inline; font-weight: normal;">اختيار جزء محدد</label>
                     </div>
                 </div>
 
                 <div id="filter-options" class="filter-options-box" style="display: none;">
                     <div class="checkbox-group" style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid var(--border);">
                         <input type="checkbox" id="unique-in-quran" checked>
-                        <label for="unique-in-quran">Question is unique within entire Qur'an</label>
+                        <label for="unique-in-quran">السؤال فريد ضمن القرآن كاملاً</label>
                         <span class="info-icon" onclick="toggleUniqueTooltip(event)">i</span>
                         <div id="unique-tooltip" class="info-tooltip">
-                            If enabled, the question shown will be unique within the entire Qur'an, regardless of what portion of the Qur'an is selected. If disabled, the question will be unique <em>within the selected portion</em>, but may not be unique in the entire Qur'an.
+                            عند التفعيل، سيكون السؤال المعروض فريدًا ضمن القرآن كاملاً، بغض النظر عن الجزء المُختار. عند التعطيل، سيكون السؤال فريدًا ضمن الجزء المُختار فقط، وقد لا يكون فريدًا في القرآن كاملاً.
                         </div>
                     </div>
 
                     <div class="tabs">
-                        <button type="button" class="tab-btn active" data-tab="surah">Surah</button>
-                        <button type="button" class="tab-btn" data-tab="juz">Juz</button>
-                        <button type="button" class="tab-btn" data-tab="page">Page</button>
+                        <button type="button" class="tab-btn active" data-tab="surah">السورة</button>
+                        <button type="button" class="tab-btn" data-tab="juz">الجزء</button>
+                        <button type="button" class="tab-btn" data-tab="page">الصفحة</button>
                     </div>
 
                     <div class="tab-panel active" id="tab-surah">
                         <div class="select-all-row">
                             <input type="checkbox" id="surah-select-all" checked>
-                            <label for="surah-select-all">Select all surahs</label>
+                            <label for="surah-select-all">تحديد كل السور</label>
                         </div>
-                        <div class="checkbox-list" id="surah-list"><div class="loading-text list-loading">Loading Qur'an data<span class="loading-dots">.</span></div></div>
+                        <div class="checkbox-list" id="surah-list"><div class="loading-text list-loading">جارٍ تحميل بيانات القرآن<span class="loading-dots">.</span></div></div>
                     </div>
 
                     <div class="tab-panel" id="tab-juz">
                         <div class="select-all-row">
                             <input type="checkbox" id="juz-select-all" checked>
-                            <label for="juz-select-all">Select all juz</label>
+                            <label for="juz-select-all">تحديد كل الأجزاء</label>
                         </div>
-                        <div class="checkbox-list" id="juz-list"><div class="loading-text list-loading">Loading Qur'an data<span class="loading-dots">.</span></div></div>
+                        <div class="checkbox-list" id="juz-list"><div class="loading-text list-loading">جارٍ تحميل بيانات القرآن<span class="loading-dots">.</span></div></div>
                     </div>
 
                     <div class="tab-panel" id="tab-page">
-                        <label for="page-range">Page ranges</label>
-                        <input type="text" id="page-range" placeholder="e.g. 1-100, 150-200">
-                        <p class="field-help">Comma-separated page ranges (1-604). Leave blank to include every page.</p>
-                        <div id="page-range-error" class="field-error">Invalid Range</div>
+                        <label for="page-range">نطاقات الصفحات</label>
+                        <input type="text" id="page-range" placeholder="مثال: 1-100، 150-200">
+                        <p class="field-help">نطاقات صفحات مفصولة بفواصل (1-604). اتركه فارغًا لتضمين كل الصفحات.</p>
+                        <div id="page-range-error" class="field-error">نطاق غير صالح</div>
                     </div>
                 </div>
 
                 <div class="control-group" style="margin-top: 20px;">
-                    <label><strong>Options:</strong></label>
+                    <label><strong>خيارات:</strong></label>
                 </div>
 
                 <div class="checkbox-group">
                     <input type="checkbox" id="single-verse-only" checked>
-                    <label for="single-verse-only">Keep questions within one ayah</label>
+                    <label for="single-verse-only">إبقاء الأسئلة ضمن آية واحدة</label>
                     <span class="info-icon" onclick="toggleTooltip(event)">i</span>
                     <div id="verse-tooltip" class="info-tooltip">
-                        If selected, the question shown will be from within one ayah only. If deselected, the question may cross over multiple ayaat, or even to a new surah.
+                        عند التفعيل، سيكون السؤال المعروض من ضمن آية واحدة فقط. عند التعطيل، قد يمتد السؤال عبر عدة آيات، أو حتى إلى سورة جديدة.
                     </div>
                 </div>
 
                 <div class="checkbox-group">
                     <input type="checkbox" id="start-of-ayah">
-                    <label for="start-of-ayah">Keep questions at the beginning of an ayah</label>
+                    <label for="start-of-ayah">إبقاء العبارات في بداية الآية</label>
                     <span class="info-icon" onclick="toggleStartAyahTooltip(event)">i</span>
                     <div id="start-ayah-tooltip" class="info-tooltip">
-                        If selected, the question will always be from the beginning of an ayah. If deselected, the question can be from anywhere within an ayah.
+                        عند التفعيل، سيكون السؤال دائمًا من بداية الآية. عند التعطيل، يمكن أن يكون السؤال من أي موضع داخل الآية.
                     </div>
                 </div>
 
                 <div class="checkbox-group">
                     <input type="checkbox" id="show-ayah-marker" checked>
-                    <label for="show-ayah-marker">Show ayah marker</label>
+                    <label for="show-ayah-marker">إظهار علامة نهاية الآية</label>
                     <span class="info-icon" onclick="toggleAyahMarkerTooltip(event)">i</span>
                     <div id="ayah-marker-tooltip" class="info-tooltip">
-                        If selected, the ayah marker will be shown at the end of ayahs. If deselected, there will be no ayah marker.
+                        عند التفعيل، ستظهر علامة نهاية الآية. عند التعطيل، لن تظهر أي علامة.
                     </div>
                 </div>
 
                 <div class="checkbox-group">
                     <input type="checkbox" id="show-page-image" checked>
-                    <label for="show-page-image">Show page image when revealing answer</label>
+                    <label for="show-page-image">إظهار صورة الصفحة عند إظهار الإجابة</label>
                 </div>
 
                 <div class="checkbox-group">
                     <input type="checkbox" id="restrict-length">
-                    <label for="restrict-length">Restrict length of question</label>
+                    <label for="restrict-length">تحديد طول العبارة</label>
                     <span class="info-icon" onclick="toggleLengthTooltip(event)">i</span>
                     <div id="length-tooltip" class="info-tooltip">
-                        The minimum and maximum number of words in the unique phrase. CAUTION: Searching can take a while. If the minimum is set too high, it could lead to no results being found.
+                        الحد الأدنى والأقصى لعدد الكلمات في العبارة الفريدة. تنبيه: قد يستغرق البحث بعض الوقت. إذا كان الحد الأدنى مرتفعًا جدًا، فقد لا يتم العثور على أي نتائج.
                     </div>
                 </div>
 
-                <div id="length-inputs" class="control-group" style="display: none; margin-left: 30px; margin-top: 10px;">
+                <div id="length-inputs" class="control-group" style="display: none; margin-inline-start: 30px; margin-top: 10px;">
                     <div class="occurrence-inputs">
                         <div>
-                            <label style="font-size: 13px; font-weight: normal;">Minimum words:</label>
+                            <label style="font-size: 13px; font-weight: normal;">الحد الأدنى للكلمات:</label>
                             <input type="number" id="min-length" min="1" max="25" placeholder="">
                         </div>
                         <div>
-                            <label style="font-size: 13px; font-weight: normal;">Maximum words:</label>
+                            <label style="font-size: 13px; font-weight: normal;">الحد الأقصى للكلمات:</label>
                             <input type="number" id="max-length" min="1" max="25" placeholder="">
                             <div id="length-error" class="field-error"></div>
                         </div>
@@ -325,9 +327,9 @@
             </div>
 
             <div class="button-group">
-                <button class="btn-primary" id="new-question-btn" onclick="startNewQuestion()">New Question</button>
-                <button id="change-settings-btn" onclick="showSettings()" style="display: none;">Change Settings</button>
-                <span id="new-question-loading" class="loading-text">Loading Qur'an data<span class="loading-dots">.</span></span>
+                <button class="btn-primary" id="new-question-btn" onclick="startNewQuestion()">سؤال جديد</button>
+                <button id="change-settings-btn" onclick="showSettings()" style="display: none;">تغيير الإعدادات</button>
+                <span id="new-question-loading" class="loading-text">جارٍ تحميل بيانات القرآن<span class="loading-dots">.</span></span>
             </div>
 
             <div id="error-message" class="error" style="display: none;"></div>
@@ -336,18 +338,18 @@
                 <div id="phrase-display" class="phrase-display"></div>
 
                 <div class="button-group nav-buttons">
-                    <button class="btn-primary word-nav-btn" id="show-more-btn" onclick="showMoreWord()">Show Next Word</button>
-                    <button class="btn-primary word-nav-btn" id="show-previous-btn" onclick="showPreviousWord()">Show Previous Word</button>
+                    <button class="btn-primary word-nav-btn" id="show-more-btn" onclick="showMoreWord()">إظهار الكلمة التالية</button>
+                    <button class="btn-primary word-nav-btn" id="show-previous-btn" onclick="showPreviousWord()">إظهار الكلمة السابقة</button>
                 </div>
                 <div class="button-group" style="margin-top: 10px;">
-                    <button class="btn-success" id="reveal-btn" onclick="revealAnswer()">Reveal Answer</button>
-                    <button class="btn-primary" id="next-question-btn" onclick="startNewQuestion()" style="display: none;">New Question</button>
+                    <button class="btn-success" id="reveal-btn" onclick="revealAnswer()">إظهار الإجابة</button>
+                    <button class="btn-primary" id="next-question-btn" onclick="startNewQuestion()" style="display: none;">سؤال جديد</button>
                 </div>
 
                 <div id="answer-display" class="answer-display" style="display: none;"></div>
 
                 <div class="button-group" style="margin-top: 20px;">
-                    <button class="btn-primary" id="bottom-question-btn" onclick="startNewQuestion()" style="display: none;">New Question</button>
+                    <button class="btn-primary" id="bottom-question-btn" onclick="startNewQuestion()" style="display: none;">سؤال جديد</button>
                 </div>
             </div>
         </div>
@@ -563,7 +565,7 @@
         // storage key and field list, plus the couple of display-toggle side effects
         // (filter-options / length-inputs) that only this page has.
 
-        const settingsStore = QuranPicker.createSettingsStore('quranTester:minimaltest', [
+        const settingsStore = QuranPicker.createSettingsStore('quranTester:minimaltest-ar', [
             { key: 'portionType', type: 'radioGroup', name: 'portion-type' },
             { type: 'activeTab' },
             { key: 'selectedSurahs', type: 'checkboxGroup', class: 'surah-cb' },
@@ -615,7 +617,7 @@
         // settings screen is interactive immediately.
         function wireStaticUI() {
             QuranPicker.wireCorePickerUI({ portionTypeName: 'portion-type' });
-            QuranPicker.wireSideMenu('minimaltest', 'en');
+            QuranPicker.wireSideMenu('minimaltest', 'ar');
 
             document.getElementById('show-ayah-marker').addEventListener('change', () => {
                 if (currentQuestion) {
@@ -640,7 +642,7 @@
 
         function populateSurahAndJuzLists() {
             QuranPicker.populateSurahAndJuzLists(metadata, {
-                surahLabelHTML: sura => '<span>' + sura.index + '. </span><span class="arabic-name" dir="rtl">' + sura.name + '</span>'
+                surahLabelHTML: sura => '<span>' + sura.index + '. ' + sura.name + '</span>'
             });
         }
 
@@ -667,7 +669,7 @@
             } catch (error) {
                 dataLoadFailed = true;
                 QuranPicker.stopLoadingAnimation();
-                const message = "Couldn't load Qur'an data. Please try refreshing the page.";
+                const message = 'تعذّر تحميل بيانات القرآن. يُرجى إعادة تحميل الصفحة.';
                 document.querySelectorAll('.loading-text').forEach(el => {
                     el.textContent = message;
                     el.classList.remove('loading-text');
@@ -695,7 +697,7 @@
         function startNewQuestion() {
             if (dataLoadFailed) {
                 const errorDiv = document.getElementById('error-message');
-                errorDiv.textContent = "Couldn't load Qur'an data. Please try refreshing the page.";
+                errorDiv.textContent = 'تعذّر تحميل بيانات القرآن. يُرجى إعادة تحميل الصفحة.';
                 errorDiv.style.display = 'block';
                 return;
             }
@@ -729,7 +731,7 @@
             const filteredWords = getFilteredWords();
 
             if (filteredWords.length === 0) {
-                errorDiv.textContent = 'No words available with current filter settings.';
+                errorDiv.textContent = 'لا توجد كلمات متاحة بإعدادات التصفية الحالية.';
                 errorDiv.style.display = 'block';
                 return;
             }
@@ -746,13 +748,13 @@
                 maxLength = parseInt(document.getElementById('max-length').value);
 
                 if (isNaN(minLength) || isNaN(maxLength) || minLength < 1 || maxLength < 1 || minLength > 25 || maxLength > 25) {
-                    lengthError.textContent = 'Please enter valid length values (1-25).';
+                    lengthError.textContent = 'يُرجى إدخال قيم طول صحيحة (1-25).';
                     lengthError.style.display = 'block';
                     return;
                 }
 
                 if (maxLength < minLength) {
-                    lengthError.textContent = 'Maximum length cannot be less than minimum length.';
+                    lengthError.textContent = 'لا يمكن أن يكون الحد الأقصى أقل من الحد الأدنى.';
                     lengthError.style.display = 'block';
                     return;
                 }
@@ -770,7 +772,7 @@
                     if (word.wordInAya === 1) startPositions.push(idx);
                 });
                 if (startPositions.length === 0) {
-                    errorDiv.textContent = 'No words at the beginning of ayahs available with current filter settings.';
+                    errorDiv.textContent = 'لا توجد كلمات في بداية الآيات متاحة بإعدادات التصفية الحالية.';
                     errorDiv.style.display = 'block';
                     return;
                 }
@@ -804,7 +806,7 @@
             }
 
             if (!uniquePhrase) {
-                errorDiv.textContent = 'No results found. Try widening your filter settings or length restriction.';
+                errorDiv.textContent = 'لم يتم العثور على نتائج. حاول توسيع إعدادات التصفية أو قيود الطول.';
                 errorDiv.style.display = 'block';
                 return;
             }
@@ -825,7 +827,7 @@
             document.querySelector('.controls').style.display = 'none';
             document.getElementById('change-settings-btn').style.display = 'inline-block';
             document.getElementById('new-question-btn').style.display = 'inline-block';
-            document.getElementById('new-question-btn').textContent = 'New Question';
+            document.getElementById('new-question-btn').textContent = 'سؤال جديد';
 
             document.getElementById('test-area').style.display = 'block';
             document.getElementById('answer-display').style.display = 'none';
@@ -980,10 +982,10 @@
             const metadataDiv = document.createElement('div');
             metadataDiv.className = 'answer-metadata';
             metadataDiv.innerHTML = `
-                <div><strong>Surah:</strong> ${surahName} (${firstWord.sura})</div>
-                <div><strong>Ayah:</strong> ${ayahDisplay}</div>
-                <div><strong>Juz:</strong> ${juz}</div>
-                <div><strong>Page:</strong> ${page}</div>
+                <div><strong>السورة:</strong> ${surahName} (${firstWord.sura})</div>
+                <div><strong>الآية:</strong> ${ayahDisplay}</div>
+                <div><strong>الجزء:</strong> ${juz}</div>
+                <div><strong>الصفحة:</strong> ${page}</div>
             `;
             answerDiv.appendChild(metadataDiv);
 
@@ -994,19 +996,19 @@
 
                 const imageLabel = document.createElement('div');
                 imageLabel.className = 'image-label';
-                imageLabel.textContent = `Page ${page} - ${surahName}`;
+                imageLabel.textContent = `الصفحة ${page} - ${surahName}`;
                 pageImageContainer.appendChild(imageLabel);
 
                 const pageNumber = String(page).padStart(3, '0');
                 const img = document.createElement('img');
                 img.src = `images/${pageNumber}.png`;
-                img.alt = `Page ${page}`;
+                img.alt = `الصفحة ${page}`;
                 img.onerror = function() {
                     this.style.display = 'none';
                     const errorMsg = document.createElement('div');
                     errorMsg.style.color = 'var(--danger)';
                     errorMsg.style.fontSize = '14px';
-                    errorMsg.textContent = `Image not found: images/${pageNumber}.png`;
+                    errorMsg.textContent = `تعذّر العثور على الصورة: images/${pageNumber}.png`;
                     pageImageContainer.appendChild(errorMsg);
                 };
                 pageImageContainer.appendChild(img);
@@ -1027,7 +1029,7 @@
         window.addEventListener('DOMContentLoaded', init);
     </script>
     <div class="home-footer">
-        Qur'an text from <a href="https://tanzil.net/download/" target="_blank">tanzil.net</a>
+        النص القرآني مأخوذ من <a href="https://tanzil.net/download/" target="_blank">tanzil.net</a>.
     </div>
 </body>
 </html>
