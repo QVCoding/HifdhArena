@@ -1,7 +1,7 @@
 # Quran Tester
 HTML-based Quran (Hifdh) testing apps.
 
-Are made public on [https://qurantester.neocities.org](https://qurantester.neocities.org)
+Are made public on [hifdharena.com](hifdharena.com).
 
 # Files
 All Quranic data is taken from [tanzil.org](https://tanzil.net/docs/).
@@ -20,7 +20,7 @@ Run `make_quran_words.py`, then convert the resulting file to csv.
 
  `quran-simple-plain_nobasmalah.sql` Sql of entire Quran with the basmalah from the beginning of the surahs removed (except Fatihah). The basmalahs are removed to prevent them from being identified as a common phrase in every surah.
 
- `Occurrences_Tester.html` App which tests the user in identifying whether certain phrases appear in certain Surahs/Juz's of the Quran.
+ `occurrencetester.html` App which tests the user in identifying whether certain phrases appear in certain Surahs/Juz's of the Quran.
 
  `changecolour.py` Changes the colour of the Quran page pngs to give them contrast on whatever background the app has.
 
