@@ -1,0 +1,14 @@
+#Images
+images/
+
+# Git repository
+.git/
+
+# Python development scripts
+*.py
+
+# Khatmah Clock
+khatmahclock.html
+
+# Documentation
+*.md
