@@ -1,0 +1,2275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<!-- Applied as early as possible, before the page paints, so a saved
+     theme choice doesn't flash the default gold theme first. -->
+<script>(function(){try{var t=localStorage.getItem('quranTester:theme');if(t&&t!=='gold')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Smallest Phrase Hifdh-Tester - Competitive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&amp;family=Spectral:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* Page-specific rules only - shared colours, fonts, tabs/checkbox-list,
+     buttons, field-help/error, and loading indicator live in styles.css.
+     The panel/status/field/segmented/arena family of rules below is
+     carried over unchanged from commonphrase-competitive.html, so both
+     competitive apps look and behave the same way - see that file for the
+     original commentary on the arena layout choices. */
+
+  body{ padding:1.5rem 1.1rem 3rem; }
+  #app{ max-width:700px; margin:0 auto; }
+
+  /* Once a game is under way, the header is hidden and the app fills the
+     whole viewport (see requestFullscreenIfPossible() in the script) so
+     the arena gets as much screen space as possible for the players
+     sitting round it. */
+  body.game-active{ padding:0; overflow:hidden; }
+  body.game-active #app{ max-width:none; margin:0; }
+  body.game-active #arena{ min-height:100dvh; }
+  /* The shared hamburger menu (from quran-picker.js/styles.css) gets in
+     the way of the arena, so it's hidden for the duration of a game. This
+     only touches this page's own stylesheet, not the shared one. */
+  body.game-active .side-menu-toggle,
+  body.game-active .side-menu-overlay,
+  body.game-active .side-menu-panel{ display:none !important; }
+
+  header{ margin-bottom:1.5rem; border-bottom:1px solid var(--border); padding-bottom:1.1rem; }
+  h1{ font-size:1.6rem; margin:0 0 0.35rem; }
+  header p{ margin:0; color:var(--text-muted); font-size:0.92rem; }
+  header p + p{ margin-top:0.4rem; }
+
+  h2{
+    font-family:"Spectral",Georgia,serif;
+    font-weight:500;
+    font-size:1.1rem;
+    margin:0 0 0.9rem;
+    color:var(--text);
+  }
+  h2.section-heading{ margin-top:1.9rem; padding-top:1.4rem; border-top:1px solid var(--border); }
+  h2.section-heading:first-child{ margin-top:0; padding-top:0; border-top:none; }
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:4px;
+    padding:1.4rem;
+  }
+
+  .status{
+    padding:0.85rem 1rem;
+    border:1px solid var(--border);
+    border-radius:4px;
+    background:var(--panel);
+    color:var(--text-muted);
+    font-size:0.9rem;
+    margin-bottom:1.5rem;
+  }
+  .status.error{ border-color:var(--danger); color:var(--danger); }
+  .status.hidden{ display:none; }
+
+  .field{ margin-bottom:1.3rem; }
+  .field:last-child{ margin-bottom:0; }
+  .field-label{
+    display:block;
+    font-size:0.9rem;
+    font-weight:600;
+    margin-bottom:0.4rem;
+    color:var(--text);
+  }
+
+  .range-row{ display:flex; gap:1rem; align-items:center; flex-wrap:wrap; }
+  .range-row label{ font-size:0.85rem; color:var(--text-muted); display:flex; align-items:center; gap:0.5rem; }
+  input[type="number"]{ width:5.5rem; }
+  input[type="text"].wide{ width:100%; }
+
+  .loading-note{ font-size:0.88rem; color:var(--text-muted); }
+
+  .checkbox-group{ margin-top:10px; }
+  .checkbox-group input{ margin-right:8px; }
+  .checkbox-group label{ display:inline; font-weight:normal; }
+
+  .info-icon{
+    display:inline-block; width:18px; height:18px; line-height:18px;
+    text-align:center; background:var(--accent); color:var(--accent-text);
+    border-radius:50%; font-size:12px; font-weight:bold; cursor:pointer;
+    margin-left:5px; vertical-align:middle;
+  }
+  .info-tooltip{
+    display:none; background:var(--panel-alt); border:1px solid var(--border);
+    border-radius:4px; padding:10px; margin-top:5px; font-size:13px;
+    color:var(--text-muted); line-height:1.5;
+  }
+  .info-tooltip.show{ display:block; }
+
+  .occurrence-inputs{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+  .more-settings-toggle{
+    display:flex; align-items:center; gap:0.4rem;
+    background:none; border:none; color:var(--text-muted);
+    font-family:inherit; font-size:0.88rem; cursor:pointer;
+    padding:0.4rem 0; margin-bottom:0.5rem;
+  }
+  .more-settings-toggle:hover{ color:var(--text); }
+  .more-settings-toggle .chevron{ display:inline-block; transition:transform 0.15s ease; font-size:1.1rem; line-height:1; }
+  .more-settings-toggle[aria-expanded="true"] .chevron{ transform:rotate(90deg); }
+  #more-settings{ border-top:1px solid var(--border); padding-top:1.3rem; margin-bottom:1.3rem; }
+  #more-settings .field:last-child{ margin-bottom:0; }
+
+  .segmented{ display:inline-flex; border:1px solid var(--border); border-radius:4px; overflow:hidden; flex-wrap:wrap; }
+  .segment-btn{
+    background:var(--panel-alt); border:none; color:var(--text-muted);
+    padding:0.45rem 1.1rem; font-size:0.88rem; font-family:inherit; cursor:pointer;
+  }
+  .segment-btn + .segment-btn{ border-inline-start:1px solid var(--border); }
+  .segment-btn.active{ background:var(--accent); color:var(--accent-text); font-weight:600; }
+
+  .settings-status{ font-size:0.88rem; color:var(--text-muted); margin:0 0 0.85rem; }
+  .settings-status.error{ color:var(--danger); }
+  .settings-status:empty{ display:none; }
+
+  .player-name-field{ display:flex; align-items:center; gap:0.6rem; margin-bottom:0.6rem; }
+  .player-name-field:last-child{ margin-bottom:0; }
+  .player-swatch{ width:14px; height:14px; border-radius:50%; flex:none; }
+  .player-name-field input[type="text"]{ flex:1; }
+
+  [hidden]{ display:none !important; }
+
+  /* =====================================================================
+     Competitive arena - two entirely separate layouts depending on player
+     count, since they turned out to want genuinely different things.
+
+     2 players: the ORIGINAL grid layout, unchanged - one player per half,
+     each with their own full zone (reveal text duplicated inside it), plus
+     a separate centre console (scoreboard + admin buttons).
+
+     3/4 players: no centre console at all. Two halves (top/bottom), each
+     holding 1-2 players side by side sharing ONE reveal-text banner; a
+     single slim strip between them carries only "no one's got it" and
+     "change settings" (no scoreboard - that's already in each player's own
+     box) and faces one direction only (bottom) rather than being shown
+     twice or upright for everyone.
+     ===================================================================== */
+
+  #arena{ height:100dvh; box-sizing:border-box; }
+  #arena-2p, #arena-multi{ height:100%; }
+
+  /* ---------- 2-player layout (restored exactly as it was) ---------- */
+
+  #arena-2p{
+    display:grid;
+    grid-template-columns:1fr;
+    grid-template-rows:1fr auto 1fr;
+    grid-template-areas:"top" "center" "bottom";
+    gap:8px;
+    padding:4px 0;
+  }
+
+  /* Grid items default to a content-based min size ("min-height: auto"),
+     which - before this fix - let a tall zone silently grow its whole grid
+     row past the viewport instead of scrolling internally, and since the
+     body clips overflow, that content became completely unreachable. This
+     is the actual fix for that; the .zone overflow-y:auto below only works
+     once the grid track itself is allowed to shrink to fit the layout. */
+  .zone-top-wrap, .zone-bottom-wrap, .game-bar{
+    min-height:0;
+    min-width:0;
+  }
+
+  .zone-top-wrap{ grid-area:top; }
+  .zone-bottom-wrap{ grid-area:bottom; }
+  .game-bar{ grid-area:center; }
+
+  .zone{
+    border:3px solid var(--border);
+    border-radius:10px;
+    background:var(--panel);
+    padding:1rem;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    text-align:center;
+    height:100%;
+    box-sizing:border-box;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  /* justify-content:center directly on a scrolling flex container clips
+     off however much content overflows above the fold, with no way to
+     scroll up to reach it. margin-block:auto on this inner wrapper instead
+     centers the content only when there's slack space, and collapses to 0
+     (i.e. plain top-anchored, fully scrollable) the moment content is
+     taller than the box - the standard fix for centered-but-scrollable
+     flex content. Shared with the 3/4-player layout below too. */
+  .zone-inner{
+    margin-block:auto;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:0.7rem;
+    width:100%;
+  }
+
+  .zone-top{ transform:rotate(180deg); }
+
+  .zone.dimmed{ opacity:0.35; pointer-events:none; }
+
+  .game-bar{
+    background:var(--panel-alt);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:0.7rem 0.8rem;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:0.55rem;
+    text-align:center;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  .game-bar-message{ font-size:0.85rem; color:var(--text-muted); }
+  .game-bar-message.win-message{ font-size:1rem; font-weight:700; color:var(--accent); }
+  .game-bar .button-group{ justify-content:center; }
+  .game-bar button{ font-size:0.85rem; padding:0.5rem 0.9rem; }
+
+  /* ---------- 3/4-player layout (top half / single strip / bottom half) ---------- */
+
+  #arena-multi{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    padding:4px;
+  }
+  .multi-half{
+    flex:1;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:0.6rem;
+    padding:0.6rem;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  .multi-half.top{ transform:rotate(180deg); }
+
+  .half-shared{ width:100%; text-align:center; }
+
+  .half-players{
+    display:flex;
+    flex-direction:row;
+    gap:0.6rem;
+    width:100%;
+    flex:1;
+    min-height:0;
+  }
+
+  .player-box{
+    flex:1;
+    min-width:0;
+    min-height:0;
+    border:3px solid var(--border);
+    border-radius:10px;
+    background:var(--panel);
+    padding:0.8rem;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    text-align:center;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  .player-box.dimmed{ opacity:0.35; pointer-events:none; }
+
+  /* The single admin strip between the two halves - no scoreboard (each
+     player box already shows its own score), and always upright/facing
+     the bottom half only, since it doesn't need to be read by everyone
+     right-side up the way the growing reveal text does. */
+  .middle-strip{
+    flex:none;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:0.5rem;
+    padding:0.6rem;
+    background:var(--panel-alt);
+    border:1px solid var(--border);
+    border-radius:8px;
+    text-align:center;
+  }
+  .middle-strip .button-group{ justify-content:center; }
+  .middle-strip button{ font-size:0.85rem; padding:0.5rem 0.9rem; }
+
+  /* ---------- Shared between both layouts ---------- */
+
+  /* The whole box is the buzzer (no separate button) whenever this class
+     is present - see buzz-hint below and the click-delegation in JS, which
+     puts data-action="buzz-zone" on the box element itself rather than on
+     a child button. */
+  .zone.buzzable, .player-box.buzzable{ cursor:pointer; animation:buzzable-pulse 1.6s ease-in-out infinite; }
+  .zone.buzzable:active, .player-box.buzzable:active{ filter:brightness(1.2); }
+  @keyframes buzzable-pulse{
+    0%, 100% { box-shadow:0 0 0 0 var(--accent-soft); }
+    50% { box-shadow:0 0 0 10px transparent; }
+  }
+
+  /* Same tap-anywhere mechanic as .buzzable, but amber rather than the
+     accent colour, so it reads visually as a different kind of action
+     (objecting to the other player's buzz, rather than buzzing yourself).
+     Only ever used in the 2-player layout, since objections are 2-player
+     only, but defined generically here alongside its .buzzable sibling. */
+  .zone.objectable, .player-box.objectable{ cursor:pointer; animation:objectable-pulse 1.6s ease-in-out infinite; }
+  .zone.objectable:active, .player-box.objectable:active{ filter:brightness(1.2); }
+  @keyframes objectable-pulse{
+    0%, 100% { box-shadow:0 0 0 0 rgba(224,168,58,0.55); }
+    50% { box-shadow:0 0 0 10px transparent; }
+  }
+
+  .zone-player-name{ font-weight:700; font-size:1.05rem; }
+  .zone-score{ font-size:0.85rem; color:var(--text-muted); }
+  .zone-eliminated-tag{ font-size:0.82rem; color:var(--danger); font-weight:700; }
+
+  .reveal-phrase{
+    font-family:var(--quran-font);
+    font-size:1.55rem;
+    direction:rtl;
+    line-height:1.9;
+  }
+  .reveal-meta{ font-size:0.78rem; color:var(--text-muted); }
+  .buzz-hint{ font-size:0.85rem; color:var(--accent); font-weight:700; }
+  .objection-hint{ font-size:0.8rem; color:#e0a83a; font-weight:700; }
+  .objection-list{
+    text-align:start;
+    direction:ltr;
+    font-family:"Spectral",Georgia,serif;
+    font-size:0.85rem;
+    color:var(--text);
+    margin:0;
+    width:100%;
+    max-width:32rem;
+    display:flex;
+    flex-direction:column;
+    gap:0.5rem;
+  }
+  .objection-item{
+    display:flex;
+    align-items:flex-start;
+    gap:0.6rem;
+    padding:0.55rem 0.7rem;
+    border:1px solid var(--border);
+    border-radius:4px;
+    background:var(--panel-alt);
+    cursor:pointer;
+    text-align:start;
+  }
+  .objection-item input{ flex:none; margin-top:0.35rem; }
+  .objection-item-text{ display:flex; flex-direction:column; gap:0.2rem; }
+  .objection-item-verse{ font-family:var(--quran-font); font-size:1.15rem; direction:rtl; line-height:1.7; }
+  .objection-item-ref{ font-family:"Spectral",Georgia,serif; font-size:0.75rem; color:var(--text-muted); direction:ltr; }
+
+  /* Custom stepper instead of a native number input - a mobile OS keyboard
+     is a separate UI layer that can't be rotated along with the rotated
+     page content, so for anyone but the player sitting the "right way up"
+     it would always appear sideways/upside-down. Buttons stay part of the
+     rotated content and sidestep the problem entirely. */
+  .count-stepper{ display:flex; align-items:center; justify-content:center; gap:0.5rem; margin:0.4rem 0; }
+  .count-stepper .stepper-value{ font-size:2rem; font-weight:700; min-width:3rem; text-align:center; }
+  .count-stepper button{ padding:0.5rem 0.7rem; font-size:0.9rem; }
+
+  .buzz-countdown{
+    font-size:3rem;
+    font-weight:700;
+    color:var(--accent);
+    line-height:1;
+  }
+  .buzz-status-note{ font-size:0.9rem; color:var(--text-muted); }
+
+  .zone-answer{ font-family:var(--quran-font); font-size:1.05rem; direction:rtl; line-height:1.9; width:100%; }
+  .zone-answer .answer-verse{
+    padding:0.6rem 0.7rem;
+    background:var(--panel-alt);
+    border-inline-start:3px solid var(--accent);
+    border-radius:4px;
+    margin-bottom:0.6rem;
+  }
+  .zone-answer .answer-metadata{
+    font-family:"Spectral",Georgia,serif;
+    font-size:0.8rem;
+    color:var(--text-muted);
+    direction:ltr;
+    text-align:center;
+  }
+  .zone-answer .answer-metadata div{ margin-bottom:0.2rem; }
+  .zone-answer .answer-match{ margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px dashed var(--border); }
+  .zone-answer .answer-match:last-child{ margin-bottom:0; padding-bottom:0; border-bottom:none; }
+
+  .scoreboard{ display:flex; flex-wrap:wrap; gap:0.4rem; justify-content:center; }
+  .score-chip{
+    font-size:0.78rem;
+    padding:0.25rem 0.6rem;
+    border-radius:999px;
+    border:1px solid var(--border);
+    background:var(--panel-alt);
+    white-space:nowrap;
+  }
+  .score-chip.eliminated{ text-decoration:line-through; color:var(--text-muted); }
+
+  .win-message{ font-size:1rem; font-weight:700; color:var(--accent); }
+
+  .end-game-link{
+    background:none; border:none; padding:0; margin:0;
+    font:inherit; font-size:0.78rem; color:var(--text-muted);
+    text-decoration:underline; cursor:pointer;
+  }
+  .end-game-link:hover{ color:var(--text); }
+
+  /* =====================================================================
+     Full-screen checking takeover - see the HTML comment above the markup.
+     The arena itself only ever rotates content 0/180deg now (top/bottom
+     halves either way), but this overlay still supports the full
+     0/90/180/270 vocabulary sized against the viewport rather than a grid
+     cell, in case it's ever needed for a future layout - whichever player
+     is checking gets the whole screen, right-way-up for their seat, while
+     the rest of the arena is simply covered up.
+     ===================================================================== */
+
+  #fullscreen-check{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:1000;
+    background:var(--panel);
+  }
+  #fullscreen-check.active{ display:flex; align-items:center; justify-content:center; }
+
+  .fc-inner{
+    box-sizing:border-box;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    text-align:center;
+    padding:2rem 1.5rem;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  #fullscreen-check.rot-0 .fc-inner{ width:100vw; height:100dvh; }
+  #fullscreen-check.rot-180 .fc-inner{ width:100vw; height:100dvh; transform:rotate(180deg); }
+  #fullscreen-check.rot-90 .fc-inner{ width:100dvh; height:100vw; transform:rotate(90deg); }
+  #fullscreen-check.rot-270 .fc-inner{ width:100dvh; height:100vw; transform:rotate(-90deg); }
+
+  #fullscreen-check .zone-player-name{ font-size:1.3rem; }
+  #fullscreen-check .zone-answer{ font-size:1.25rem; }
+  #fullscreen-check .objection-list{ font-size:1rem; }
+
+  /* ---------- How To Play modal ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; z-index:2000;
+    background:rgba(0,0,0,0.5);
+    display:flex; align-items:center; justify-content:center;
+    padding:1.2rem;
+  }
+  .modal-box{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:1.4rem;
+    max-width:480px;
+    width:100%;
+    max-height:80vh;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    position:relative;
+  }
+  .modal-close{
+    position:absolute; top:0.6rem; right:0.8rem;
+    background:none; border:none; font-size:1.6rem; line-height:1;
+    color:var(--text-muted); cursor:pointer; padding:0.2rem 0.4rem;
+  }
+  .modal-close:hover{ color:var(--text); }
+
+  @media (max-width:520px){
+    .reveal-phrase{ font-size:1.3rem; }
+    .buzz-countdown{ font-size:2.4rem; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header id="page-header">
+    <h1>Smallest Phrase &mdash; Competitive</h1>
+    <p>A local, pass-the-phone buzzer game built on the same shortest-unique-phrase engine as the single-player Smallest Phrase Tester.</p>
+    <p>Sit around one device. A word or two appears, then more are added one at a time &mdash; tap anywhere in your zone the moment you know the ayah.</p>
+    <button type="button" class="btn-secondary" id="how-to-play-btn" style="margin-top:0.8rem;">How To Play</button>
+  </header>
+
+  <div id="how-to-play-modal" class="modal-overlay" hidden>
+    <div class="modal-box">
+      <button type="button" class="modal-close" id="how-to-play-close" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0;">How To Play</h2>
+      <div id="how-to-play-content">
+      A part of the Qur'an will be revealed on the screen, appearing one word at a time. This can be from anywhere in the Qur'an, not just the beginning of an ayah. Players should have their fingers ready to buzz in their zone. Once the phrase (portion of the Quran) shown becomes unique (only comes once in the Qur'an - this could even be just the first word), the first player to (mentally) find the beginning of the ayah should buzz and recite it. There is no time to buzz and then think - the answer must be given immediately after buzzing, and the ayah should be recited at least from its beginning up until the displayed phrase (concession can be given for very long ayaat). If the player buzzes when the displayed phrase is unique and recites the ayah, they win one point.
+        <br><br>
+      However, if a player buzzes whilst the shown phrase is not yet unique (it comes more than once in the Qur'an), then what happens next depends on whether there are 2 players or more:
+      <br><br>
+      <b>2 players:</b> The opponent may 'object' immediately by tapping their screen. They then have a few seconds to name at least 2 places where the shown phrase comes in the Qur'an. If they are successful, then they receive points equal to the number of ayaat they recited where the phrase appears. If the phrase shown was not unique, but the player who objected did not manage to recite at least 2 ayaat, then no one gets the point. If the objection was false (the phrase was indeed unique), then the one who objected loses, and the other wins a point.
+      <br>
+      <b>3 or 4 players:</b> The point is lost, and the player who buzzed early is eliminated from the next round.
+        <br><br>
+      Both of the above (objection and round elimination) can be turned off, in which case early buzzing has no penalty.
+        <br><br>
+      The first player to reach the set point threshold wins.
+      </div>
+    </div>
+  </div>
+
+  <div id="status" class="status hidden"></div>
+
+  <section id="settings-panel" class="panel">
+
+    <h2 class="section-heading">Game Setup</h2>
+
+    <div class="field">
+      <label><strong>Select Portion for Testing:</strong></label>
+      <div style="margin-top: 10px;">
+        <input type="radio" id="entire-quran" name="portion-type" value="entire" checked>
+        <label for="entire-quran" style="display: inline; font-weight: normal;">Entire Qur'an (default)</label>
+      </div>
+      <div style="margin-top: 5px;">
+        <input type="radio" id="select-portion" name="portion-type" value="select">
+        <label for="select-portion" style="display: inline; font-weight: normal;">Select Portion</label>
+      </div>
+    </div>
+
+    <div id="filter-options" class="filter-options-box" style="display: none;">
+      <div class="tabs">
+        <button type="button" class="tab-btn active" data-tab="surah">Surah</button>
+        <button type="button" class="tab-btn" data-tab="juz">Juz</button>
+        <button type="button" class="tab-btn" data-tab="page">Page</button>
+      </div>
+
+      <div class="tab-panel active" id="tab-surah">
+        <div class="select-all-row">
+          <input type="checkbox" id="surah-select-all" checked>
+          <label for="surah-select-all">Select all surahs</label>
+        </div>
+        <div class="checkbox-list" id="surah-list"><div class="list-loading">Loading Qur'an data<span class="loading-dots">.</span></div></div>
+      </div>
+
+      <div class="tab-panel" id="tab-juz">
+        <div class="select-all-row">
+          <input type="checkbox" id="juz-select-all" checked>
+          <label for="juz-select-all">Select all juz</label>
+        </div>
+        <div class="checkbox-list" id="juz-list"><div class="list-loading">Loading Qur'an data<span class="loading-dots">.</span></div></div>
+      </div>
+
+      <div class="tab-panel" id="tab-page">
+        <label for="page-range">Page ranges</label>
+        <input type="text" class="wide" id="page-range" placeholder="e.g. 1-100, 150-200">
+        <p class="field-help">Comma-separated page ranges (1-604). Leave blank to include every page.</p>
+        <p class="field-error" id="page-range-error"></p>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Number of Players</span>
+      <div class="segmented" id="player-count-toggle">
+        <button type="button" class="segment-btn active" data-players="2">2</button>
+        <button type="button" class="segment-btn" data-players="3">3</button>
+        <button type="button" class="segment-btn" data-players="4">4</button>
+      </div>
+      <p class="field-help" id="player-count-warning" style="display:none; color:var(--danger);">Warning: 3/4 players is not suitable for small screens.</p>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Player Names</span>
+      <div id="player-names">
+        <div class="player-name-field" data-index="1"><span class="player-swatch" style="background:var(--p1)"></span><input type="text" class="wide" id="player-name-1" placeholder="Player 1"></div>
+        <div class="player-name-field" data-index="2"><span class="player-swatch" style="background:var(--p2)"></span><input type="text" class="wide" id="player-name-2" placeholder="Player 2"></div>
+        <div class="player-name-field" data-index="3" hidden><span class="player-swatch" style="background:var(--p3)"></span><input type="text" class="wide" id="player-name-3" placeholder="Player 3"></div>
+        <div class="player-name-field" data-index="4" hidden><span class="player-swatch" style="background:var(--p4)"></span><input type="text" class="wide" id="player-name-4" placeholder="Player 4"></div>
+      </div>
+      <p class="field-help">Leave any blank to use the default "Player N".</p>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Timing</span>
+      <div class="range-row">
+        <label>Starting words shown <input type="number" id="start-words" min="1" step="1" value="1"></label>
+        <label>Seconds between reveals <input type="number" id="reveal-delay" min="1" step="0.5" value="3"></label>
+      </div>
+      <p class="field-error" id="timing-error"></p>
+    </div>
+
+    <div class="field" id="objections-field">
+      <div class="checkbox-group">
+        <input type="checkbox" id="enable-objections" checked>
+        <label for="enable-objections">Hide word-count progress and allow objections (2-player games only)</label>
+        <span class="info-icon" data-tooltip="objections-tooltip">i</span>
+        <div id="objections-tooltip" class="info-tooltip">
+          Instead of showing "X of Y words shown", while a player is answering the other player can tap anywhere in their own zone to object that not enough has been revealed to identify the ayah uniquely yet. They then get their own time limit to name at least two ayahs where the shown words occur. If they're right, they score points equal to how many times the phrase occurs in the selected portion. If the phrase turns out to already be unique, the objector loses a point and their opponent automatically wins the point instead.
+        </div>
+      </div>
+      <div class="range-row" id="objection-time-row" style="margin-top:10px;">
+        <label>Objection answer time (s) <input type="number" id="objection-time" min="1" step="1" value="8"></label>
+      </div>
+    </div>
+
+    <button type="button" class="more-settings-toggle" id="more-settings-toggle" aria-expanded="false">
+      <span class="chevron">&rsaquo;</span> More settings
+    </button>
+
+    <div id="more-settings" hidden>
+      <div class="field">
+        <span class="field-label">Points to Win</span>
+        <input type="number" id="points-to-win" min="1" step="1" value="5">
+        <p class="field-error" id="points-error"></p>
+      </div>
+
+      <div class="field">
+        <span class="field-label">More Timing</span>
+        <div class="range-row">
+          <label>Answer time after buzzing (s) <input type="number" id="answer-time" min="1" step="1" value="3"></label>
+          <label>Time limit after an elimination (s) <input type="number" id="elimination-time-limit" min="1" step="1" value="20"></label>
+        </div>
+      </div>
+
+      <div class="field" id="early-buzz-penalty-field" hidden>
+        <div class="checkbox-group">
+          <input type="checkbox" id="penalize-early-buzz" checked>
+          <label for="penalize-early-buzz">Eliminate early buzzers from the next round (3/4 players)</label>
+          <span class="info-icon" data-tooltip="early-buzz-tooltip">i</span>
+          <div id="early-buzz-tooltip" class="info-tooltip">
+            If someone buzzes while the shown phrase still matches more than one ayah, the round ends immediately (showing every match, within the limit below) instead of going to a private check - and that player sits out the following round entirely.
+          </div>
+        </div>
+      </div>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="single-verse-only" checked>
+        <label for="single-verse-only">Keep questions within one ayah</label>
+        <span class="info-icon" data-tooltip="verse-tooltip">i</span>
+        <div id="verse-tooltip" class="info-tooltip">
+          If selected, the phrase will be from within one ayah only. If deselected, it may cross over multiple ayaat, or even to a new surah.
+        </div>
+      </div>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="start-of-ayah">
+        <label for="start-of-ayah">Keep questions at the beginning of an ayah</label>
+        <span class="info-icon" data-tooltip="start-ayah-tooltip">i</span>
+        <div id="start-ayah-tooltip" class="info-tooltip">
+          If selected, the phrase will always start from the beginning of an ayah.
+        </div>
+      </div>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="show-ayah-marker" checked>
+        <label for="show-ayah-marker">Show ayah marker while revealing</label>
+        <span class="info-icon" data-tooltip="ayah-marker-tooltip">i</span>
+        <div id="ayah-marker-tooltip" class="info-tooltip">
+          If selected, the ayah marker (\u06DD) is shown at the end of ayahs within the revealed words.
+        </div>
+      </div>
+
+      <div class="field" style="margin-top: 15px;">
+        <span class="field-label">Maximum matches to list</span>
+        <input type="number" id="match-list-cap" min="1" step="1" value="10">
+        <p class="field-help">If a phrase (or a challenged objection) turns out to match more places than this, listing them all gets unwieldy - past this limit, the answer view just shows the total count instead of every match, and an objector types how many they found rather than ticking them one by one.</p>
+        <p class="field-error" id="match-list-cap-error"></p>
+      </div>
+    </div>
+
+    <p class="settings-status" id="settings-status"></p>
+    <div class="button-group">
+      <button class="btn-primary" id="start-game-btn" disabled>Start Game</button>
+      <span class="loading-note" id="start-game-loading">Loading Qur'an data<span class="loading-dots">.</span></span>
+    </div>
+  </section>
+
+  <section id="arena" hidden>
+    <div id="arena-2p" hidden>
+      <div class="zone-wrap zone-top-wrap"><div class="zone zone-top" data-slot="top"></div></div>
+      <div class="game-bar" id="game-bar"></div>
+      <div class="zone-wrap zone-bottom-wrap"><div class="zone zone-bottom" data-slot="bottom"></div></div>
+    </div>
+    <div id="arena-multi" hidden>
+      <div class="multi-half top">
+        <div class="half-shared" id="multi-shared-top"></div>
+        <div class="half-players" id="multi-players-top"></div>
+      </div>
+      <div class="middle-strip" id="middle-strip"></div>
+      <div class="multi-half bottom">
+        <div class="half-shared" id="multi-shared-bottom"></div>
+        <div class="half-players" id="multi-players-bottom"></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- Shown full-screen, covering everything, whenever one player is
+     privately checking an answer or an objection - since the other player
+     isn't meant to be looking at the screen at all during that moment,
+     there's no need to keep them confined to their half. Kept outside
+     #app so its position:fixed anchors to the real viewport rather than
+     to any rotated/transformed ancestor. -->
+<div id="fullscreen-check">
+  <div class="fc-inner" id="fc-inner-content"></div>
+</div>
+
+<script src="quran-picker.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  const PLAYER_COLORS = ['#c9a15a', '#5aa9d6', '#6abf6a', '#d6708a'];
+  document.documentElement.style.setProperty('--p1', PLAYER_COLORS[0]);
+  document.documentElement.style.setProperty('--p2', PLAYER_COLORS[1]);
+  document.documentElement.style.setProperty('--p3', PLAYER_COLORS[2]);
+  document.documentElement.style.setProperty('--p4', PLAYER_COLORS[3]);
+
+  // Which half (top or bottom) each player index sits in. 2 players get one
+  // each; 3 splits 2-and-1; 4 splits 2-and-2 - see the write-up on why
+  // pairs-per-side replaced the old one-person-per-edge arrangement.
+  const PLAYER_HALF = {
+    2: ['top', 'bottom'],
+    3: ['top', 'top', 'bottom'],
+    4: ['top', 'top', 'bottom', 'bottom']
+  };
+  const SLOT_ROTATION_CLASS = { top: "rot-180", bottom: "rot-0" };
+  const OBJECTION_COOLDOWN_MS = 300;
+  const NEXT_ROUND_COUNTDOWN_SECONDS = 3;
+
+  // ---------- Qur'an data state (identical approach to minimaltest.html) ----------
+  let quranWords = [];
+  let quranWordMap = {}; // globalWordNumber -> word object
+  let metadata = null;
+  let dataReady = false;
+
+  const statusEl = document.getElementById("status");
+  const pageHeader = document.getElementById("page-header");
+  const settingsPanel = document.getElementById("settings-panel");
+  const arena = document.getElementById("arena");
+  const arena2p = document.getElementById("arena-2p");
+  const arenaMulti = document.getElementById("arena-multi");
+  const gameBar = document.getElementById("game-bar");
+  const multiSharedEls = { top: document.getElementById("multi-shared-top"), bottom: document.getElementById("multi-shared-bottom") };
+  const multiPlayersEls = { top: document.getElementById("multi-players-top"), bottom: document.getElementById("multi-players-bottom") };
+  const middleStripEl = document.getElementById("middle-strip");
+  const fullscreenCheck = document.getElementById("fullscreen-check");
+  const fcInner = document.getElementById("fc-inner-content");
+
+  // Fullscreen is requested from inside the Start Game click handler, which
+  // counts as a user gesture, so browsers allow it. Not all browsers/contexts
+  // support the Fullscreen API (notably iOS Safari for non-video elements),
+  // so this is best-effort and never blocks the game from starting.
+  function requestFullscreenIfPossible(){
+    const el = document.documentElement;
+    const fn = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+    if(!fn) return;
+    try{
+      const result = fn.call(el);
+      if(result && typeof result.catch === "function") result.catch(function(){ /* not fatal - just stay windowed */ });
+    }catch(e){ /* not fatal - just stay windowed */ }
+  }
+  function exitFullscreenIfActive(){
+    const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+    if(!isFullscreen) return;
+    const fn = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+    if(fn){ try{ fn.call(document); }catch(e){ /* ignore */ } }
+  }
+
+  function setStatus(msg, isError){
+    statusEl.textContent = msg;
+    statusEl.classList.toggle("error", !!isError);
+    statusEl.classList.remove("hidden");
+  }
+  function hideStatus(){ statusEl.classList.add("hidden"); }
+
+  async function loadCSV(){
+    const response = await fetch('quran_words.csv');
+    if(!response.ok) throw new Error('Could not fetch quran_words.csv (HTTP ' + response.status + ')');
+    const text = await response.text();
+    const lines = text.trim().split('\n');
+    for(let i = 0; i < lines.length; i++){
+      const line = lines[i].replace(/\r$/, '');
+      const parts = line.split(',');
+      if(parts.length >= 5){
+        const word = {
+          globalWordNumber: parseInt(parts[0]),
+          sura: parseInt(parts[1]),
+          aya: parseInt(parts[2]),
+          wordInAya: parseInt(parts[3]),
+          text: parts.slice(4).join(','),
+          juz: null,
+          page: null
+        };
+        quranWords.push(word);
+        quranWordMap[word.globalWordNumber] = word;
+      }
+    }
+  }
+
+  async function loadXML(){
+    metadata = await QuranPicker.loadMetadataXML('app_quran_metadata.xml');
+  }
+
+  function precomputeJuzAndPage(){
+    quranWords.forEach(function(word){
+      word.juz = QuranPicker.findJuz(metadata, word.sura, word.aya);
+      word.page = QuranPicker.findPage(metadata, word.sura, word.aya);
+    });
+  }
+
+  async function loadData(){
+    QuranPicker.startLoadingAnimation();
+    try{
+      await loadCSV();
+      await loadXML();
+      precomputeJuzAndPage();
+      populateSettingsUI();
+    }catch(err){
+      console.error("Failed to load/parse Qur'an data:", err);
+      QuranPicker.stopLoadingAnimation();
+      setStatus("Couldn't load Qur'an data. Please try refreshing the page.", true);
+      document.getElementById("surah-list").innerHTML = '<div class="list-loading">Data unavailable.</div>';
+      document.getElementById("juz-list").innerHTML = '<div class="list-loading">Data unavailable.</div>';
+      document.getElementById("start-game-loading").textContent = "Data unavailable.";
+      throw err;
+    }
+  }
+
+  function populateSettingsUI(){
+    QuranPicker.populateSurahAndJuzLists(metadata, {
+      surahLabelHTML: function(sura){ return '<span>' + sura.index + '. </span><span class="arabic-name" dir="rtl">' + sura.name + '</span>'; }
+    });
+
+    syncMoreSettingsUI();
+    dataReady = true;
+    QuranPicker.stopLoadingAnimation();
+    document.getElementById("start-game-btn").disabled = false;
+    document.getElementById("start-game-loading").hidden = true;
+    hideStatus();
+  }
+
+  // ---------- More settings toggle ----------
+  let moreSettingsOpen = false;
+  function syncMoreSettingsUI(){
+    document.getElementById("more-settings").hidden = !moreSettingsOpen;
+    document.getElementById("more-settings-toggle").setAttribute("aria-expanded", moreSettingsOpen ? "true" : "false");
+  }
+  document.getElementById("more-settings-toggle").addEventListener("click", function(){
+    moreSettingsOpen = !moreSettingsOpen;
+    syncMoreSettingsUI();
+  });
+
+  // ---------- Info tooltips ----------
+  document.querySelectorAll(".info-icon").forEach(function(icon){
+    icon.addEventListener("click", function(e){
+      e.stopPropagation();
+      const tip = document.getElementById(icon.dataset.tooltip);
+      if(tip) tip.classList.toggle("show");
+    });
+  });
+  document.addEventListener("click", function(e){
+    if(!e.target.closest(".info-icon")){
+      document.querySelectorAll(".info-tooltip").forEach(function(t){ t.classList.remove("show"); });
+    }
+  });
+
+  // ---------- Player count toggle ----------
+  document.querySelectorAll("#player-count-toggle .segment-btn").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      document.querySelectorAll("#player-count-toggle .segment-btn").forEach(function(b){ b.classList.remove("active"); });
+      btn.classList.add("active");
+      const count = parseInt(btn.dataset.players, 10);
+      document.querySelectorAll(".player-name-field").forEach(function(field){
+        field.hidden = parseInt(field.dataset.index, 10) > count;
+      });
+      // Objections are a 2-player-only mode - see the tooltip on the checkbox.
+      document.getElementById("objections-field").hidden = (count !== 2);
+      document.getElementById("early-buzz-penalty-field").hidden = (count === 2);
+      document.getElementById("player-count-warning").style.display = (count === 2) ? "none" : "block";
+    });
+  });
+  function getPlayerCount(){
+    const btn = document.querySelector("#player-count-toggle .segment-btn.active");
+    return btn ? parseInt(btn.dataset.players, 10) : 2;
+  }
+
+  document.getElementById("enable-objections").addEventListener("change", function(e){
+    document.getElementById("objection-time-row").style.display = e.target.checked ? "flex" : "none";
+  });
+
+  // =====================================================================
+  // Shortest-unique-phrase search (identical logic to minimaltest.html)
+  // =====================================================================
+
+  function normalizeForComparison(text){
+    if(text.length >= 2 && text.charCodeAt(1) === 0x0651){
+      return text.charAt(0) + text.substring(2);
+    }
+    return text;
+  }
+
+  function buildStartIndexMap(checkAgainst){
+    const map = new Map();
+    for(let i = 0; i < checkAgainst.length; i++){
+      const key = normalizeForComparison(checkAgainst[i].text);
+      let positions = map.get(key);
+      if(!positions){ positions = []; map.set(key, positions); }
+      positions.push(i);
+    }
+    return map;
+  }
+
+  function narrowCandidates(candidates, checkAgainst, wordOffset, wordText){
+    const next = [];
+    for(let i = 0; i < candidates.length; i++){
+      const pos = candidates[i];
+      const checkWord = checkAgainst[pos + wordOffset];
+      if(checkWord && checkWord.text === wordText) next.push(pos);
+    }
+    return next;
+  }
+
+  function shuffleArray(arr){
+    for(let i = arr.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+    return arr;
+  }
+
+  function findUniquePhraseFromIndex(startIndex, filteredWords, singleVerseOnly, checkAgainst, startIndexMap, targetLength){
+    const startWord = filteredWords[startIndex];
+    const firstWordKey = normalizeForComparison(startWord.text);
+    let candidates = startIndexMap.get(firstWordKey) || [];
+
+    if(targetLength){
+      let length = 1;
+      while(length < targetLength){
+        if(startIndex + length >= filteredWords.length) return null;
+        const currentWord = filteredWords[startIndex + length];
+        const previousWord = filteredWords[startIndex + length - 1];
+        if(currentWord.globalWordNumber !== previousWord.globalWordNumber + 1) return null;
+        if(singleVerseOnly && (currentWord.sura !== startWord.sura || currentWord.aya !== startWord.aya)) return null;
+        candidates = narrowCandidates(candidates, checkAgainst, length, currentWord.text);
+        if(candidates.length === 0) return null;
+        length++;
+      }
+      if(candidates.length === 1){
+        const phrase = [];
+        for(let i = 0; i < targetLength; i++) phrase.push(filteredWords[startIndex + i]);
+        return { words: phrase, startIndex: startIndex, length: targetLength };
+      }
+      return null;
+    }
+
+    let length = 1;
+    while(startIndex + length <= filteredWords.length){
+      if(length > 1){
+        const currentWord = filteredWords[startIndex + length - 1];
+        const previousWord = filteredWords[startIndex + length - 2];
+        if(currentWord.globalWordNumber !== previousWord.globalWordNumber + 1) return null;
+        if(singleVerseOnly && (currentWord.sura !== startWord.sura || currentWord.aya !== startWord.aya)) return null;
+        candidates = narrowCandidates(candidates, checkAgainst, length - 1, currentWord.text);
+        if(candidates.length === 0) return null;
+      }
+      if(candidates.length === 1){
+        const phrase = [];
+        for(let i = 0; i < length; i++) phrase.push(filteredWords[startIndex + i]);
+        return { words: phrase, startIndex: startIndex, length: length };
+      }
+      length++;
+    }
+    return null;
+  }
+
+  function getFilteredWords(){
+    return QuranPicker.getFilteredByPortion(quranWords, { portionTypeName: 'portion-type' });
+  }
+
+  // Runs the same search minimaltest.html's "New Question" button runs, but
+  // returns a result object instead of touching the DOM directly, so the
+  // competitive round-start flow can call it repeatedly.
+  // The basmalah is included in the data as the first 4 words of ayah 1 for
+  // every surah except Al-Fatihah (surah 1, where it IS ayah 1 itself) and
+  // At-Tawbah (surah 9, which has none). It's never useful as the *start*
+  // of a question - it's identical everywhere, so a round beginning there
+  // just makes players wait it out - but it's left completely alone
+  // otherwise: normal to see mid-expansion when a round's context crosses
+  // from one surah into the next.
+  function isBasmalahWord(word){
+    return word.aya === 1 && word.wordInAya <= 4 && word.sura !== 1 && word.sura !== 9;
+  }
+
+  function generateQuestion(settings){
+    const filteredWords = getFilteredWords();
+    if(filteredWords.length === 0){
+      return { ok: false, message: 'No words available with current filter settings.' };
+    }
+
+    let startPositions = [];
+    if(settings.startOfAyah){
+      filteredWords.forEach(function(word, idx){ if(word.wordInAya === 1 && !isBasmalahWord(word)) startPositions.push(idx); });
+      if(startPositions.length === 0){
+        return { ok: false, message: 'No words at the beginning of ayahs available with current filter settings.' };
+      }
+    }else{
+      filteredWords.forEach(function(word, idx){ if(!isBasmalahWord(word)) startPositions.push(idx); });
+      if(startPositions.length === 0){
+        return { ok: false, message: 'No words available with current filter settings.' };
+      }
+    }
+    shuffleArray(startPositions);
+
+    const checkAgainst = filteredWords;
+    const startIndexMap = buildStartIndexMap(checkAgainst);
+
+    let uniquePhrase = null;
+    for(let p = 0; p < startPositions.length; p++){
+      const startIndex = startPositions[p];
+      uniquePhrase = findUniquePhraseFromIndex(startIndex, filteredWords, settings.singleVerseOnly, checkAgainst, startIndexMap, null);
+      if(uniquePhrase) break;
+    }
+
+    if(!uniquePhrase){
+      return { ok: false, message: 'No results found. Try widening your filter settings or length restriction.' };
+    }
+    return { ok: true, uniquePhrase: uniquePhrase };
+  }
+
+  // Finds every place the exact word-sequence currently on screen occurs
+  // within the selected portion - used to resolve an objection and to
+  // check whether an answer was unique yet. Reuses the same narrowing
+  // primitives as generateQuestion, just without stopping once uniqueness
+  // is confirmed. Everything (the original search, context expansion, and
+  // this) is scoped to the selected portion, so they always agree with
+  // each other.
+  function findPortionOccurrences(words){
+    const checkAgainst = getFilteredWords();
+    const startIndexMap = buildStartIndexMap(checkAgainst);
+    let candidates = startIndexMap.get(normalizeForComparison(words[0].text)) || [];
+    for(let offset = 1; offset < words.length && candidates.length; offset++){
+      candidates = narrowCandidates(candidates, checkAgainst, offset, words[offset].text);
+    }
+
+    // Each match records every ayah its word-span actually touches (almost
+    // always just one, but a match can cross an ayah/surah boundary just
+    // like the original phrase can), plus the first/last word objects
+    // (already carrying precomputed juz/page) for metadata display.
+    const matches = candidates.map(function(pos){
+      const seenAyah = new Set();
+      const ayahs = [];
+      for(let i = 0; i < words.length; i++){
+        const w = checkAgainst[pos + i];
+        const key = w.sura + ':' + w.aya;
+        if(!seenAyah.has(key)){ seenAyah.add(key); ayahs.push({ sura: w.sura, aya: w.aya }); }
+      }
+      return { firstWord: checkAgainst[pos], lastWord: checkAgainst[pos + words.length - 1], ayahs: ayahs };
+    });
+
+    // Flattened, de-duplicated across all matches - what the objector needs
+    // to name at least two of.
+    const seenOverall = new Set();
+    const uniqueAyahs = [];
+    matches.forEach(function(m){
+      m.ayahs.forEach(function(a){
+        const key = a.sura + ':' + a.aya;
+        if(!seenOverall.has(key)){ seenOverall.add(key); uniqueAyahs.push(a); }
+      });
+    });
+
+    // totalCount is the raw match count (what "number of times it appears"
+    // means for objection scoring); uniqueAyahs and matches are both used
+    // for display - see buildObjectionCheckHTML and buildAnswerBlockHTML.
+    return { totalCount: candidates.length, uniqueAyahs: uniqueAyahs, matches: matches };
+  }
+
+  // ---------- Rendering helpers ----------
+  function escapeHTML(s){
+    const div = document.createElement("div");
+    div.textContent = s;
+    return div.innerHTML;
+  }
+  function suraNameOf(idx){
+    const s = metadata.suras.find(function(s){ return s.index === idx; });
+    return s ? s.name : ("Surah " + idx);
+  }
+  function buildPhraseText(words, showMarker){
+    if(!showMarker) return words.map(function(w){ return w.text; }).join(' ');
+    let text = '';
+    for(let i = 0; i < words.length; i++){
+      text += words[i].text;
+      if(i < words.length - 1){
+        const cur = words[i], next = words[i + 1];
+        if(cur.sura !== next.sura || cur.aya !== next.aya) text += ' \u06DD';
+        text += ' ';
+      }
+    }
+    return text;
+  }
+  // Shared by buildAnswerHTML (the actual answer) and buildMatchAnswerHTML
+  // (an alternate match found when the phrase wasn't unique yet) - both are
+  // just "render this ayah-span's verse text + reference", the only
+  // difference being which word-span and ayah list they're given.
+  function verseTextFor(sura, aya){
+    const verseWords = quranWords.filter(function(w){ return w.sura === sura && w.aya === aya; });
+    return verseWords.map(function(w){ return w.text; }).join(' ');
+  }
+
+  function buildAyahSpanHTML(ayahs, firstWord, lastWord){
+    let html = '';
+    ayahs.forEach(function(a){
+      html += '<div class="answer-verse">' + escapeHTML(verseTextFor(a.sura, a.aya)) + '</div>';
+    });
+
+    const surahName = suraNameOf(firstWord.sura);
+    let ayahDisplay;
+    if(ayahs.length > 1){
+      ayahDisplay = (firstWord.sura !== lastWord.sura)
+        ? (surahName + ' ' + firstWord.aya + ' \u2013 ' + suraNameOf(lastWord.sura) + ' ' + lastWord.aya)
+        : (firstWord.aya + ' \u2013 ' + lastWord.aya);
+    }else{
+      ayahDisplay = String(firstWord.aya);
+    }
+
+    html += '<div class="answer-metadata">';
+    html += '<div><strong>Surah:</strong> ' + escapeHTML(surahName) + ' (' + firstWord.sura + ')</div>';
+    html += '<div><strong>Ayah:</strong> ' + escapeHTML(ayahDisplay) + '</div>';
+    html += '<div><strong>Juz:</strong> ' + firstWord.juz + '</div>';
+    html += '<div><strong>Page:</strong> ' + firstWord.page + '</div>';
+    html += '</div>';
+    return html;
+  }
+
+  function buildAnswerHTML(question){
+    const words = question.uniquePhrase.words;
+    const ayahs = [];
+    const seen = new Set();
+    words.forEach(function(w){
+      const k = w.sura + ':' + w.aya;
+      if(!seen.has(k)){ seen.add(k); ayahs.push({ sura: w.sura, aya: w.aya }); }
+    });
+    return buildAyahSpanHTML(ayahs, words[0], words[words.length - 1]);
+  }
+
+  function buildMatchAnswerHTML(match){
+    return '<div class="answer-match">' + buildAyahSpanHTML(match.ayahs, match.firstWord, match.lastWord) + '</div>';
+  }
+
+  // ---------- Field-level validation helpers ----------
+  const INT_RE = /^\d+$/;
+  const NUM_RE = /^\d+(\.\d+)?$/;
+
+  function clearFieldErrors(){
+    ["page-range-error", "points-error", "timing-error", "match-list-cap-error"].forEach(function(id){
+      const el = document.getElementById(id);
+      el.textContent = "";
+      el.style.display = "none";
+    });
+  }
+  function showFieldError(id, msg){
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.style.display = "block";
+  }
+  function validatePositiveNumber(el, errId, floor, mustBeInteger){
+    const raw = el.value.trim();
+    const re = mustBeInteger ? INT_RE : NUM_RE;
+    if(!re.test(raw)){
+      showFieldError(errId, mustBeInteger ? "Enter a whole number." : "Enter a positive number.");
+      return null;
+    }
+    const val = mustBeInteger ? parseInt(raw, 10) : parseFloat(raw);
+    if(val < floor){ showFieldError(errId, "Must be at least " + floor + "."); return null; }
+    return val;
+  }
+  function setSettingsStatus(msg, isError){
+    const el = document.getElementById("settings-status");
+    el.textContent = msg;
+    el.classList.toggle("error", !!isError);
+  }
+
+  // =====================================================================
+  // Game state
+  // =====================================================================
+
+  let game = null;
+  let confirmingEndGame = false;
+
+  // ---------- Start Game ----------
+  function startGame(){
+    clearFieldErrors();
+    setSettingsStatus("", false);
+
+    const pointsToWin = validatePositiveNumber(document.getElementById("points-to-win"), "points-error", 1, true);
+    const startWords = validatePositiveNumber(document.getElementById("start-words"), "timing-error", 1, true);
+    const revealDelay = validatePositiveNumber(document.getElementById("reveal-delay"), "timing-error", 1, false);
+    const answerTime = validatePositiveNumber(document.getElementById("answer-time"), "timing-error", 1, true);
+    const eliminationTimeLimit = validatePositiveNumber(document.getElementById("elimination-time-limit"), "timing-error", 1, true);
+    const matchListCap = validatePositiveNumber(document.getElementById("match-list-cap"), "match-list-cap-error", 1, true);
+
+    const portionType = document.querySelector('input[name="portion-type"]:checked').value;
+    const activeTab = portionType === 'select' ? document.querySelector('.tab-btn.active').dataset.tab : null;
+    if(activeTab === 'page'){
+      const pages = QuranPicker.parsePageRange(document.getElementById('page-range').value);
+      if(pages === undefined){ showFieldError('page-range-error', 'Invalid range.'); return; }
+    }
+
+    const playerCount = getPlayerCount();
+    const objectionsEnabled = playerCount === 2 && document.getElementById('enable-objections').checked;
+    let objectionTimeSeconds = null;
+    if(objectionsEnabled){
+      objectionTimeSeconds = validatePositiveNumber(document.getElementById('objection-time'), 'timing-error', 1, true);
+      if(objectionTimeSeconds === null) return;
+    }
+    const penalizeEarlyBuzz = playerCount > 2 && document.getElementById('penalize-early-buzz').checked;
+
+    if(pointsToWin === null || startWords === null || revealDelay === null || answerTime === null || eliminationTimeLimit === null || matchListCap === null) return;
+
+    const players = [];
+    for(let i = 0; i < playerCount; i++){
+      const nameInput = document.getElementById("player-name-" + (i + 1));
+      const name = (nameInput.value || "").trim() || ("Player " + (i + 1));
+      players.push({ id: i, name: name, color: PLAYER_COLORS[i], score: 0, eliminatedThisRound: false, eliminatedNextRound: false });
+    }
+
+    // Context expansion (tickReveal) needs to know exactly which words
+    // count as "existing" so it can stop at the portion's edge instead of
+    // pulling in real but out-of-scope surrounding text - everything here
+    // is always scoped to the selected portion.
+    const portionWordNumbers = new Set(getFilteredWords().map(function(w){ return w.globalWordNumber; }));
+
+    game = {
+      players: players,
+      pointsToWin: pointsToWin,
+      startWords: startWords,
+      revealDelayMs: revealDelay * 1000,
+      answerTimeSeconds: answerTime,
+      eliminationTimeLimitSeconds: eliminationTimeLimit,
+      matchListCap: matchListCap,
+      objectionsEnabled: objectionsEnabled,
+      penalizeEarlyBuzz: penalizeEarlyBuzz,
+      objectionTimeSeconds: objectionTimeSeconds,
+      portionWordNumbers: portionWordNumbers,
+      showAyahMarker: document.getElementById('show-ayah-marker').checked,
+      questionSettings: {
+        singleVerseOnly: document.getElementById('single-verse-only').checked,
+        startOfAyah: document.getElementById('start-of-ayah').checked
+      },
+      currentQuestion: null,
+      displayedWords: [],
+      phraseTotal: 0,
+      leftGlobal: null,
+      rightGlobal: null,
+      expandNextDirection: "forward",
+      expansionExhausted: false,
+      revealTimerId: null,
+      phase: "revealing",       // revealing | answering | checking | objecting | objectingChecking | roundOver | gameOver | searchFailed
+      activeBuzzerId: null,
+      revealedToBuzzer: false,
+      checkOccurrences: null,
+      answerRemaining: 0,
+      answerTimerId: null,
+      objectorId: null,
+      objectionRemaining: 0,
+      objectionTimerId: null,
+      objectionCooldownActive: false,
+      objectionCooldownTimerId: null,
+      objectionOccurrences: null,
+      objectionRevealed: false,
+      objectionTypedCount: 0,
+      roundOverMessage: null,
+      skipAnswerReveal: false,
+      revealTargetPlayerId: null,
+      eliminationCountdownRemaining: 0,
+      eliminationCountdownTimerId: null,
+      winnerName: null,
+      searchFailMessage: null,
+      countdownRemaining: 0,
+      countdownTimerId: null
+    };
+
+    pageHeader.hidden = true;
+    settingsPanel.hidden = true;
+    arena.hidden = false;
+    document.body.classList.add("game-active");
+    requestFullscreenIfPossible();
+    beginCountdownThenStartRound();
+  }
+
+  // ---------- Round flow ----------
+  function stopRevealTimer(){
+    if(game.revealTimerId){ clearInterval(game.revealTimerId); game.revealTimerId = null; }
+  }
+  function stopAnswerTimer(){
+    if(game.answerTimerId){ clearInterval(game.answerTimerId); game.answerTimerId = null; }
+  }
+  function stopObjectionTimer(){
+    if(game.objectionTimerId){ clearInterval(game.objectionTimerId); game.objectionTimerId = null; }
+  }
+  function stopObjectionCooldownTimer(){
+    if(game.objectionCooldownTimerId){ clearTimeout(game.objectionCooldownTimerId); game.objectionCooldownTimerId = null; }
+  }
+
+  function startRound(){
+    stopRevealTimer();
+    stopAnswerTimer();
+    stopObjectionTimer();
+    stopObjectionCooldownTimer();
+    stopCountdownTimer();
+    stopEliminationCountdown();
+
+    const result = generateQuestion(game.questionSettings);
+    if(!result.ok){
+      game.phase = "searchFailed";
+      game.searchFailMessage = result.message;
+      renderArena();
+      return;
+    }
+
+    const phraseWords = result.uniquePhrase.words;
+    game.currentQuestion = result;
+    game.phraseTotal = phraseWords.length;
+    const initialCount = Math.min(game.startWords, phraseWords.length);
+    game.displayedWords = phraseWords.slice(0, initialCount);
+    game.leftGlobal = game.displayedWords[0].globalWordNumber;
+    game.rightGlobal = game.displayedWords[game.displayedWords.length - 1].globalWordNumber;
+    game.expandNextDirection = "forward";
+    game.expansionExhausted = false;
+    game.phase = "revealing";
+    game.activeBuzzerId = null;
+    game.revealedToBuzzer = false;
+    game.checkOccurrences = null;
+    game.objectorId = null;
+    game.objectionRemaining = 0;
+    game.objectionOccurrences = null;
+    game.objectionRevealed = false;
+    game.objectionTypedCount = 0;
+    game.objectionCooldownActive = false;
+    game.roundOverMessage = null;
+    game.skipAnswerReveal = false;
+    game.revealTargetPlayerId = null;
+    game.players.forEach(function(p){
+      p.eliminatedThisRound = p.eliminatedNextRound;
+      p.eliminatedNextRound = false;
+    });
+
+    if(endRoundIfCompleteAyahShown()) return;
+    game.revealTimerId = setInterval(tickReveal, game.revealDelayMs);
+    renderArena();
+  }
+
+  // Reveals one more word every tick. First it grows forward through the
+  // shortest-unique phrase that was actually found (so the "X of Y words"
+  // count stays meaningful); once that's fully shown it keeps going by
+  // pulling in surrounding context in both directions - alternating so
+  // neither side runs ahead - using the same raw word-adjacency lookup as
+  // the single-player app's Show Next/Previous Word buttons. When
+  // uniqueness is scoped to the selected portion (see portionWordNumbers
+  // above), expansion stops at the portion's edge instead of crossing into
+  // ayahs outside it. This only stops if someone buzzes, expansion is
+  // confined to an exhausted portion, or in the vanishingly unlikely case
+  // that both directions simultaneously hit the very start/end of the
+  // mushaf in whole-Qur'an mode.
+  // True once the currently displayed words fully span at least one ayah
+  // from its own first word to its own last word (not just a fragment of
+  // one). A whole verse is always trivially placeable from memorisation,
+  // so once one is fully visible the round ends rather than let it keep
+  // growing into something that isn't really a "smallest phrase" anymore.
+  function containsCompleteAyah(words){
+    const seenAyah = new Set();
+    for(let i = 0; i < words.length; i++){
+      const w = words[i];
+      const key = w.sura + ':' + w.aya;
+      if(seenAyah.has(key)) continue;
+      seenAyah.add(key);
+
+      const hasFirstWord = words.some(function(x){ return x.sura === w.sura && x.aya === w.aya && x.wordInAya === 1; });
+      if(!hasFirstWord) continue;
+
+      const hasLastWord = words.some(function(x){
+        if(x.sura !== w.sura || x.aya !== w.aya) return false;
+        const next = quranWordMap[x.globalWordNumber + 1];
+        return !next || next.sura !== x.sura || next.aya !== x.aya;
+      });
+      if(hasLastWord) return true;
+    }
+    return false;
+  }
+
+  // Ends the round as unsolved the moment a complete ayah becomes visible.
+  // Called right after displayedWords changes, from both startRound (the
+  // rare case where even the very first reveal already covers a whole,
+  // typically very short, ayah) and tickReveal.
+  function endRoundIfCompleteAyahShown(){
+    if(!containsCompleteAyah(game.displayedWords)) return false;
+    stopRevealTimer();
+    stopEliminationCountdown();
+    game.checkOccurrences = findPortionOccurrences(game.displayedWords);
+    finishRound("A full ayah was revealed \u2014 no one got it in time.");
+    return true;
+  }
+
+  function tickReveal(){
+    const phraseWords = game.currentQuestion.uniquePhrase.words;
+
+    if(game.displayedWords.length < phraseWords.length){
+      game.displayedWords.push(phraseWords[game.displayedWords.length]);
+      game.rightGlobal = game.displayedWords[game.displayedWords.length - 1].globalWordNumber;
+      if(endRoundIfCompleteAyahShown()) return;
+      renderArena();
+      return;
+    }
+
+    const tryForward = function(){
+      const next = quranWordMap[game.rightGlobal + 1];
+      if(!next) return false;
+      if(!game.portionWordNumbers.has(next.globalWordNumber)) return false;
+      game.displayedWords.push(next);
+      game.rightGlobal++;
+      return true;
+    };
+    const tryBackward = function(){
+      const prev = quranWordMap[game.leftGlobal - 1];
+      if(!prev) return false;
+      if(!game.portionWordNumbers.has(prev.globalWordNumber)) return false;
+      game.displayedWords.unshift(prev);
+      game.leftGlobal--;
+      return true;
+    };
+
+    let extended;
+    if(game.expandNextDirection === "forward"){
+      extended = tryForward() || tryBackward();
+      game.expandNextDirection = "backward";
+    }else{
+      extended = tryBackward() || tryForward();
+      game.expandNextDirection = "forward";
+    }
+
+    if(!extended){ game.expansionExhausted = true; stopRevealTimer(); renderArena(); return; }
+    if(endRoundIfCompleteAyahShown()) return;
+    renderArena();
+  }
+
+  function resumeRevealIfNeeded(){
+    if(!game.expansionExhausted && !game.revealTimerId){
+      game.revealTimerId = setInterval(tickReveal, game.revealDelayMs);
+    }
+  }
+
+  function buzz(playerId){
+    if(game.phase !== "revealing") return;
+    const player = game.players[playerId];
+    if(!player || player.eliminatedThisRound) return;
+
+    // Optional 3/4-player rule: buzzing while the phrase still matches more
+    // than one ayah ends the round immediately (showing every match) and
+    // costs the buzzer their next round, instead of going to a private
+    // check - the app can tell objectively that it wasn't unique yet, so
+    // there's nothing to self-report.
+    if(game.players.length > 2 && game.penalizeEarlyBuzz){
+      const occ = findPortionOccurrences(game.displayedWords);
+      if(occ.totalCount > 1){
+        stopRevealTimer();
+        stopEliminationCountdown();
+        game.checkOccurrences = occ;
+        player.eliminatedNextRound = true;
+        finishRound(player.name + " buzzed before it was unique \u2014 they\u2019ll sit out next round.");
+        return;
+      }
+    }
+
+    stopRevealTimer();
+    stopEliminationCountdown();
+    game.phase = "answering";
+    game.activeBuzzerId = playerId;
+    game.answerRemaining = game.answerTimeSeconds;
+
+    // Brief grace period before the other player's zone becomes tappable
+    // for an objection - without this, two near-simultaneous buzzes could
+    // resolve as one real buzz plus an accidental "objection" from what was
+    // actually just a slightly-late competing buzz.
+    game.objectionCooldownActive = true;
+    game.objectionCooldownTimerId = setTimeout(function(){
+      game.objectionCooldownTimerId = null;
+      game.objectionCooldownActive = false;
+      if(game.phase === "answering") renderArena();
+    }, OBJECTION_COOLDOWN_MS);
+
+    renderArena();
+
+    game.answerTimerId = setInterval(function(){
+      game.answerRemaining--;
+      if(game.answerRemaining <= 0){
+        stopAnswerTimer();
+        game.phase = "checking";
+        game.revealedToBuzzer = false;
+      }
+      renderArena();
+    }, 1000);
+  }
+
+  function checkAnswer(){
+    if(game.phase !== "checking") return;
+    game.checkOccurrences = findPortionOccurrences(game.displayedWords);
+    game.revealedToBuzzer = true;
+    renderArena();
+  }
+
+  // Ends the round, applying whatever score changes already happened,
+  // showing `message` centrally, and moving to gameOver if anyone has now
+  // reached the points-to-win threshold.
+  function finishRound(message){
+    game.roundOverMessage = message;
+    const winner = game.players.find(function(p){ return p.score >= game.pointsToWin; });
+    if(winner){
+      game.phase = "gameOver";
+      game.winnerName = winner.name;
+    }else{
+      game.phase = "roundOver";
+    }
+    renderArena();
+  }
+
+  function markCorrect(){
+    if(game.phase !== "checking" || game.activeBuzzerId === null) return;
+    const player = game.players[game.activeBuzzerId];
+    player.score++;
+    // The buzzer already privately confirmed this themselves, so in a
+    // 2-player game there's no need to show it to them again - just take
+    // over the screen for whoever didn't buzz. (3-4 player games keep the
+    // per-zone display, since "the other player" isn't well-defined there.)
+    if(game.players.length === 2){
+      const other = game.players.find(function(p){ return p.id !== player.id; });
+      game.revealTargetPlayerId = other.id;
+    }
+    finishRound(player.name + " scores a point!");
+  }
+
+  function markWrong(){
+    if(game.phase !== "checking" || game.activeBuzzerId === null) return;
+    game.players[game.activeBuzzerId].eliminatedThisRound = true;
+    game.activeBuzzerId = null;
+    game.revealedToBuzzer = false;
+
+    const allEliminated = game.players.every(function(p){ return p.eliminatedThisRound; });
+    if(allEliminated){
+      finishRound("No one got it this time.");
+    }else{
+      game.phase = "revealing";
+      resumeRevealIfNeeded();
+      startEliminationCountdown();
+      renderArena();
+    }
+  }
+
+  function manualReveal(){
+    if(game.phase !== "revealing") return;
+    stopRevealTimer();
+    stopAnswerTimer();
+    stopEliminationCountdown();
+    game.checkOccurrences = findPortionOccurrences(game.displayedWords);
+    finishRound("No one got it this time.");
+  }
+
+  // ---------- Objections (2-player games only - see the settings tooltip) ----------
+
+  // Raised by the non-buzzing player, mid-answer-countdown, to challenge
+  // that not enough has been shown yet to identify the ayah uniquely.
+  function raiseObjection(playerId){
+    if(!game.objectionsEnabled || game.phase !== "answering") return;
+    if(playerId === game.activeBuzzerId) return;
+
+    stopAnswerTimer();
+    game.objectorId = playerId;
+    game.objectionRemaining = game.objectionTimeSeconds;
+    game.phase = "objecting";
+    renderArena();
+
+    game.objectionTimerId = setInterval(function(){
+      game.objectionRemaining--;
+      if(game.objectionRemaining <= 0){
+        stopObjectionTimer();
+        game.phase = "objectingChecking";
+        game.objectionRevealed = false;
+      }
+      renderArena();
+    }, 1000);
+  }
+
+  // Lets the objector tap again once they've finished naming ayahs, rather
+  // than sitting through the rest of their own countdown.
+  function finishObjecting(){
+    if(game.phase !== "objecting") return;
+    stopObjectionTimer();
+    game.phase = "objectingChecking";
+    game.objectionRevealed = false;
+    renderArena();
+  }
+
+  // The objector privately checks what's currently on screen against every
+  // occurrence of that exact sequence within the selected portion. If it
+  // turns out to already be unique (<=1 match), that's decided by the app
+  // itself, automatically, since there's nothing left to self-report; with
+  // 2+ matches, the objector is shown the list to verify their spoken
+  // answer against, then self-reports as normal.
+  function checkObjection(){
+    if(game.phase !== "objectingChecking" || game.objectionRevealed) return;
+    game.objectionOccurrences = findPortionOccurrences(game.displayedWords);
+    game.objectionRevealed = true;
+    game.objectionTypedCount = 0;
+
+    if(game.objectionOccurrences.totalCount <= 1){
+      resolveObjectionOutcome(false);
+      return;
+    }
+    renderArena();
+  }
+
+  function stepObjectionCount(delta){
+    if(game.phase !== "objectingChecking" || !game.objectionRevealed || !game.objectionOccurrences) return;
+    const max = game.objectionOccurrences.totalCount;
+    game.objectionTypedCount = Math.max(0, Math.min(max, game.objectionTypedCount + delta));
+    renderArena();
+  }
+
+  // Reads how many of the listed ayahs the objector actually ticked. At
+  // least 2 are required for the objection to count at all (matching the
+  // original "name at least 2" rule); scoring then follows exactly how
+  // many they ticked, not the total occurrence count, so an objector who
+  // only remembers 2 of 5 scores 2, not 5.
+  function confirmObjectionTicks(){
+    if(game.phase !== "objectingChecking" || !game.objectionRevealed) return;
+    const occ = game.objectionOccurrences;
+    const claimedCount = occ.totalCount > game.matchListCap
+      ? game.objectionTypedCount
+      : fcInner.querySelectorAll(".objection-tick:checked").length;
+    if(claimedCount >= 2){
+      resolveObjectionOutcome(true, claimedCount);
+    }else{
+      game.skipAnswerReveal = true;
+      finishRound(game.players[game.objectorId].name + "\u2019s objection was valid, but they didn\u2019t claim at least two ayahs \u2014 no points awarded.");
+    }
+  }
+
+  function resolveObjectionOutcome(wasCorrect, awardedCount){
+    const objector = game.players[game.objectorId];
+    const buzzer = game.players[game.activeBuzzerId];
+    if(wasCorrect){
+      objector.score += awardedCount;
+      // The tick screen they just came from already showed every matching
+      // ayah's text - showing the same list again at round-end would just
+      // be repeating it, so skip it here.
+      game.skipAnswerReveal = true;
+      finishRound(objector.name + " correctly objects and scores " + awardedCount + " point" + (awardedCount === 1 ? "" : "s") + "!");
+    }else{
+      objector.score -= 1;
+      buzzer.score += 1;
+      finishRound("Objection failed \u2014 the phrase was already unique. " + objector.name + " loses a point, " + buzzer.name + " wins the point!");
+    }
+  }
+
+  function stopCountdownTimer(){
+    if(game.countdownTimerId){ clearInterval(game.countdownTimerId); game.countdownTimerId = null; }
+  }
+
+  function stopEliminationCountdown(){
+    if(game.eliminationCountdownTimerId){ clearInterval(game.eliminationCountdownTimerId); game.eliminationCountdownTimerId = null; }
+  }
+
+  // Starts once at least one player has been eliminated from a round but
+  // others remain in it - without this, whoever's left could just wait
+  // indefinitely while context keeps expanding in their favour. If time
+  // runs out before anyone else buzzes, the round ends as unsolved.
+  function startEliminationCountdown(){
+    stopEliminationCountdown();
+    game.eliminationCountdownRemaining = game.eliminationTimeLimitSeconds;
+    game.eliminationCountdownTimerId = setInterval(function(){
+      game.eliminationCountdownRemaining--;
+      if(game.eliminationCountdownRemaining <= 0){
+        stopEliminationCountdown();
+        stopRevealTimer();
+        stopAnswerTimer();
+        game.checkOccurrences = findPortionOccurrences(game.displayedWords);
+        finishRound("Time\u2019s up \u2014 no one got it this time.");
+        return;
+      }
+      renderArena();
+    }, 1000);
+  }
+
+  // A few seconds of "get ready" between pressing Next Round/Play Again and
+  // the reveal actually starting, so whoever just pressed it (likely still
+  // looking at their own private check-answer view a moment ago) has time
+  // to look up before words start appearing.
+  function beginCountdownThenStartRound(){
+    stopCountdownTimer();
+    game.phase = "countdown";
+    game.countdownRemaining = NEXT_ROUND_COUNTDOWN_SECONDS;
+    renderArena();
+    game.countdownTimerId = setInterval(function(){
+      game.countdownRemaining--;
+      if(game.countdownRemaining <= 0){
+        stopCountdownTimer();
+        startRound();
+        return;
+      }
+      renderArena();
+    }, 1000);
+  }
+
+  function nextRound(){
+    if(game.phase !== "roundOver" && game.phase !== "searchFailed") return;
+    beginCountdownThenStartRound();
+  }
+
+  function playAgain(){
+    game.players.forEach(function(p){ p.score = 0; });
+    beginCountdownThenStartRound();
+  }
+
+  // Two-tap confirm instead of window.confirm() - see buildChangeSettingsButtonHTML.
+  function requestEndGame(){
+    if(!confirmingEndGame){
+      confirmingEndGame = true;
+      renderArena();
+      return;
+    }
+    confirmingEndGame = false;
+    backToSettings();
+  }
+
+  function backToSettings(){
+    stopRevealTimer();
+    stopAnswerTimer();
+    stopObjectionTimer();
+    stopObjectionCooldownTimer();
+    stopCountdownTimer();
+    stopEliminationCountdown();
+    confirmingEndGame = false;
+    game = null;
+    arena.hidden = true;
+    settingsPanel.hidden = false;
+    pageHeader.hidden = false;
+    document.body.classList.remove("game-active");
+    exitFullscreenIfActive();
+  }
+
+  // =====================================================================
+  // Rendering
+  // =====================================================================
+
+  function renderArena(){
+    if(game.players.length === 2){
+      arena2p.hidden = false;
+      arenaMulti.hidden = true;
+      renderArena2p();
+    }else{
+      arena2p.hidden = true;
+      arenaMulti.hidden = false;
+      renderArenaMulti();
+    }
+    updateFullscreenCheck();
+  }
+
+  // ---------- 2-player rendering (restored exactly as it was) ----------
+  function renderArena2p(){
+    ["top", "bottom"].forEach(function(slot){
+      const wrap = document.querySelector(".zone-" + slot + "-wrap");
+      const player = game.players[PLAYER_HALF[2].indexOf(slot)];
+      const zone = wrap.querySelector(".zone");
+      zone.style.borderColor = player.color;
+
+      let tapAction = null;
+      if(game.phase === "revealing" && !player.eliminatedThisRound){
+        tapAction = "buzz-zone";
+      }else if(game.phase === "answering" && game.objectionsEnabled && !game.objectionCooldownActive && player.id !== game.activeBuzzerId){
+        tapAction = "raise-objection";
+      }else if(game.phase === "objecting" && player.id === game.objectorId){
+        tapAction = "finish-objecting";
+      }
+      zone.classList.toggle("buzzable", tapAction === "buzz-zone");
+      zone.classList.toggle("objectable", tapAction === "raise-objection" || tapAction === "finish-objecting");
+      if(tapAction){
+        zone.dataset.action = tapAction;
+        zone.dataset.player = player.id;
+      }else{
+        delete zone.dataset.action;
+        delete zone.dataset.player;
+      }
+
+      zone.innerHTML = '<div class="zone-inner">' + buildZoneHTML(player) + '</div>';
+
+      const dimmed = (game.phase === "checking" && game.activeBuzzerId !== player.id) ||
+                     (game.phase === "objectingChecking" && game.objectorId !== player.id);
+      zone.classList.toggle("dimmed", dimmed);
+    });
+
+    gameBar.innerHTML = buildGameBarHTML();
+  }
+
+  // ---------- 3/4-player rendering (two halves + one single admin strip) ----------
+  function renderArenaMulti(){
+    const halves = PLAYER_HALF[game.players.length];
+    const activePhases = ["revealing", "answering", "checking"];
+    const sharedHTML = activePhases.indexOf(game.phase) !== -1 ? buildRevealPhraseHTML() : "";
+
+    ["top", "bottom"].forEach(function(halfName){
+      multiSharedEls[halfName].innerHTML = sharedHTML;
+
+      const playersInHalf = game.players.filter(function(p){ return halves[p.id] === halfName; });
+      const container = multiPlayersEls[halfName];
+      container.innerHTML = playersInHalf.map(function(p){
+        return '<div class="player-box" data-player-box="' + p.id + '"></div>';
+      }).join('');
+
+      playersInHalf.forEach(function(player){
+        const box = container.querySelector('[data-player-box="' + player.id + '"]');
+        box.style.borderColor = player.color;
+
+        // Objections are 2-player only, so the only tap action a box in
+        // this layout ever needs is buzzing.
+        const buzzable = game.phase === "revealing" && !player.eliminatedThisRound;
+        box.classList.toggle("buzzable", buzzable);
+        if(buzzable){
+          box.dataset.action = "buzz-zone";
+          box.dataset.player = player.id;
+        }else{
+          delete box.dataset.action;
+          delete box.dataset.player;
+        }
+
+        box.innerHTML = '<div class="zone-inner">' + buildMultiPlayerBoxHTML(player) + '</div>';
+
+        const dimmed = game.phase === "checking" && game.activeBuzzerId !== player.id;
+        box.classList.toggle("dimmed", dimmed);
+      });
+    });
+
+    middleStripEl.innerHTML = buildMiddleStripHTML();
+  }
+
+  // While one player is privately checking an answer or objection, take
+  // over the whole screen (rotated for their seat) instead of confining
+  // them to their own zone - the other player isn't meant to be looking at
+  // all during this moment, so there's nothing to preserve a "half" for.
+  function updateFullscreenCheck(){
+    const isChecking = game.phase === "checking";
+    const isObjectionChecking = game.phase === "objectingChecking";
+    const isRoundEnd = game.phase === "roundOver" || game.phase === "gameOver";
+
+    if(!isChecking && !isObjectionChecking && !isRoundEnd){
+      fullscreenCheck.classList.remove("active");
+      fullscreenCheck.className = "";
+      return;
+    }
+
+    // Game over is always shown upright to everyone - it's a "look at this
+    // together" moment either way, and Play Again/Change Settings need to
+    // be reliably reachable regardless of who happened to win. A round-end
+    // reveal only rotates toward a specific player when there is one
+    // (the buzzer already knows, so it's just for the other player);
+    // otherwise (no one got it, objection failed, etc.) it's shown upright
+    // too, since neither player already knows the answer.
+    let playerId = null;
+    if(isObjectionChecking) playerId = game.objectorId;
+    else if(isChecking) playerId = game.activeBuzzerId;
+    else if(game.phase === "roundOver" && game.revealTargetPlayerId !== null) playerId = game.revealTargetPlayerId;
+
+    let rotClass = "rot-0";
+    let nameHTML = "";
+    if(playerId !== null){
+      const player = game.players[playerId];
+      const slot = PLAYER_HALF[game.players.length][playerId];
+      rotClass = SLOT_ROTATION_CLASS[slot] || "rot-0";
+      nameHTML = '<div class="zone-player-name">' + escapeHTML(player.name) + '</div>';
+    }
+
+    fullscreenCheck.className = "active " + rotClass;
+
+    let html = nameHTML;
+    if(isObjectionChecking){
+      if(!game.objectionRevealed){
+        html += '<div class="buzz-status-note">Ready to check?</div>';
+        html += '<button type="button" class="btn-primary" data-action="check-objection">Check occurrences</button>';
+      }else{
+        html += buildObjectionCheckHTML();
+      }
+    }else if(isChecking){
+      if(!game.revealedToBuzzer){
+        html += '<div class="buzz-status-note">Ready to check?</div>';
+        html += '<button type="button" class="btn-primary" data-action="check-answer">Check my answer</button>';
+      }else{
+        html += buildAnswerBlockHTML();
+        html += '<div class="button-group">';
+        html += '<button type="button" class="btn-success" data-action="mark-correct">\u2705 I got it right</button>';
+        html += '<button type="button" class="btn-secondary" data-action="mark-wrong">\u274c I was wrong</button>';
+        html += '</div>';
+      }
+    }else if(game.phase === "gameOver"){
+      html += '<div class="win-message">\ud83c\udfc6 ' + escapeHTML(game.winnerName) + ' wins!</div>';
+      html += buildAnswerBlockHTML();
+      html += '<div class="button-group">';
+      html += '<button type="button" class="btn-primary" data-action="play-again">Play Again</button>';
+      html += buildChangeSettingsButtonHTML("btn-secondary");
+      html += '</div>';
+    }else{
+      html += '<div class="win-message">' + escapeHTML(game.roundOverMessage) + '</div>';
+      html += buildAnswerBlockHTML();
+      html += '<button type="button" class="btn-primary" data-action="next-round">Next Round \u25b6</button>';
+    }
+    fcInner.innerHTML = '<div class="zone-inner">' + html + '</div>';
+  }
+
+  function buildMultiPlayerBoxHTML(player){
+    const isBuzzer = game.activeBuzzerId === player.id;
+    let html = '<div class="zone-player-name">' + escapeHTML(player.name) + '</div>';
+    html += '<div class="zone-score">' + player.score + ' point' + (player.score === 1 ? '' : 's') + '</div>';
+
+    // searchFailed/countdown/roundOver/gameOver are all handled once in the
+    // middle strip now - the individual box just shows name/score then.
+    if(game.phase === "searchFailed" || game.phase === "countdown" || game.phase === "roundOver" || game.phase === "gameOver"){
+      return html;
+    }
+
+    if(player.eliminatedThisRound){
+      html += '<div class="zone-eliminated-tag">Out this round</div>';
+      return html;
+    }
+
+    if(game.phase === "revealing"){
+      html += '<div class="buzz-hint">\ud83d\udc46 Tap anywhere to buzz</div>';
+      return html;
+    }
+
+    if(game.phase === "answering" && isBuzzer){
+      html += '<div class="buzz-countdown">' + Math.max(game.answerRemaining, 0) + '</div>';
+      html += '<div class="buzz-status-note">Say your answer now!</div>';
+      return html;
+    }
+
+    if(game.phase === "checking" && isBuzzer && !game.revealedToBuzzer){
+      html += '<div class="buzz-status-note">Ready to check?</div>';
+      html += '<button type="button" class="btn-primary" data-action="check-answer">Check my answer</button>';
+      // Once revealed, the fullscreen overlay takes over the whole screen.
+    }
+
+    return html;
+  }
+
+  function buildRevealPhraseHTML(){
+    const words = game.displayedWords;
+    return '<div class="reveal-phrase">' + escapeHTML(buildPhraseText(words, game.showAyahMarker)) + '</div>';
+  }
+
+  function buildAnswerBlockHTML(){
+    const occ = game.checkOccurrences || game.objectionOccurrences;
+    if(occ && occ.totalCount > 1){
+      let html = '<div class="zone-answer">';
+      if(occ.totalCount > game.matchListCap){
+        html += '<div class="buzz-status-note">Woah, comes ' + occ.totalCount + ' times, very not unique.</div>';
+      }else{
+        html += '<div class="buzz-status-note">This phrase wasn\u2019t unique yet when it was checked \u2014 it matched ' + occ.totalCount + ' place' + (occ.totalCount === 1 ? '' : 's') + ':</div>';
+        occ.matches.forEach(function(m){ html += buildMatchAnswerHTML(m); });
+      }
+      html += '</div>';
+      return html;
+    }
+    return '<div class="zone-answer">' + buildAnswerHTML(game.currentQuestion) + '</div>';
+  }
+
+  // Shown to the objector once their own countdown ends and they tap
+  // "Check occurrences" - only ever reached when there are 2+ matches,
+  // since a <=1 result is resolved automatically before this can render.
+  function buildObjectionCheckHTML(){
+    const occ = game.objectionOccurrences;
+    let html = '<div class="buzz-status-note">This phrase occurs ' + occ.totalCount + ' time' + (occ.totalCount === 1 ? '' : 's') + ' in the selected portion.</div>';
+
+    if(occ.totalCount > game.matchListCap){
+      html += '<div class="buzz-status-note">Woah, very not unique \u2014 too many to list. Use the buttons to set how many different ayahs you actually named out loud:</div>';
+      html += '<div class="count-stepper">';
+      html += '<button type="button" class="btn-secondary" data-action="objection-count-step" data-step="-10">\u221210</button>';
+      html += '<button type="button" class="btn-secondary" data-action="objection-count-step" data-step="-1">\u22121</button>';
+      html += '<span class="stepper-value">' + game.objectionTypedCount + '</span>';
+      html += '<button type="button" class="btn-secondary" data-action="objection-count-step" data-step="1">+1</button>';
+      html += '<button type="button" class="btn-secondary" data-action="objection-count-step" data-step="10">+10</button>';
+      html += '</div>';
+      html += '<p class="field-help">Need at least 2 to score - you\u2019ll be awarded points equal to the number you\u2019re credited for.</p>';
+    }else{
+      html += '<div class="buzz-status-note">Tick every ayah you actually named out loud:</div>';
+      html += '<div class="objection-list">';
+      occ.uniqueAyahs.forEach(function(a, idx){
+        html += '<label class="objection-item">';
+        html += '<input type="checkbox" class="objection-tick" data-idx="' + idx + '">';
+        html += '<span class="objection-item-text">';
+        html += '<span class="objection-item-verse">' + escapeHTML(verseTextFor(a.sura, a.aya)) + '</span>';
+        html += '<span class="objection-item-ref">' + escapeHTML(suraNameOf(a.sura)) + ' \u2014 Ayah ' + a.aya + '</span>';
+        html += '</span>';
+        html += '</label>';
+      });
+      html += '</div>';
+      html += '<p class="field-help">Need at least 2 ticked to score - you\u2019ll be awarded points equal to however many you tick.</p>';
+    }
+    html += '<button type="button" class="btn-primary" data-action="confirm-objection">Confirm</button>';
+    return html;
+  }
+
+  // The single admin strip between the two halves in 3/4-player games - no
+  // scoreboard (already in each player's own box) and no reveal text
+  // (that's rendered separately, once per half, by buildRevealPhraseHTML).
+  function buildMiddleStripHTML(){
+    if(game.phase === "searchFailed"){
+      let html = '<div class="buzz-status-note">' + escapeHTML(game.searchFailMessage) + '</div>';
+      html += '<div class="button-group">';
+      html += '<button type="button" class="btn-primary" data-action="next-round">Try Again</button>';
+      html += buildChangeSettingsButtonHTML("btn-secondary");
+      html += '</div>';
+      return html;
+    }
+
+    if(game.phase === "countdown"){
+      return '<div class="buzz-countdown">' + game.countdownRemaining + '</div><div class="buzz-status-note">Get ready\u2026</div>';
+    }
+
+    if(game.phase === "roundOver" || game.phase === "gameOver"){
+      let html = '';
+      if(game.phase === "gameOver"){
+        html += '<div class="win-message">\ud83c\udfc6 ' + escapeHTML(game.winnerName) + ' wins!</div>';
+      }else{
+        html += '<div class="win-message">' + escapeHTML(game.roundOverMessage) + '</div>';
+      }
+      if(!game.skipAnswerReveal) html += buildAnswerBlockHTML();
+      if(game.phase === "gameOver"){
+        html += '<div class="button-group">';
+        html += '<button type="button" class="btn-primary" data-action="play-again">Play Again</button>';
+        html += buildChangeSettingsButtonHTML("btn-secondary");
+        html += '</div>';
+      }else{
+        html += '<button type="button" class="btn-primary" data-action="next-round">Next Round \u25b6</button>';
+      }
+      html += buildChangeSettingsButtonHTML("end-game-link");
+      return html;
+    }
+
+    let html = '';
+    if(game.phase === "revealing"){
+      if(game.eliminationCountdownTimerId){
+        html += '<div class="buzz-status-note">\u23f1 ' + game.eliminationCountdownRemaining + 's left to buzz</div>';
+      }
+      html += '<button type="button" class="btn-secondary" data-action="reveal-fallback">No one\u2019s got it \u2014 reveal answer</button>';
+    }else if(game.phase === "answering"){
+      html += '<div class="buzz-status-note">' + escapeHTML(game.players[game.activeBuzzerId].name) + ' is answering\u2026</div>';
+    }else if(game.phase === "checking"){
+      html += '<div class="buzz-status-note">Round paused while ' + escapeHTML(game.players[game.activeBuzzerId].name) + ' answers.</div>';
+    }
+
+    html += buildChangeSettingsButtonHTML("end-game-link");
+    return html;
+  }
+
+  // ---------- Restored exactly as the 2-player layout originally had it ----------
+
+  function buildZoneHTML(player){
+    const isBuzzer = game.activeBuzzerId === player.id;
+    let html = '<div class="zone-player-name">' + escapeHTML(player.name) + '</div>';
+    html += '<div class="zone-score">' + player.score + ' point' + (player.score === 1 ? '' : 's') + '</div>';
+
+    if(game.phase === "searchFailed"){
+      html += '<div class="buzz-status-note">See the centre for details.</div>';
+      return html;
+    }
+
+    if(game.phase === "countdown"){
+      html += '<div class="buzz-countdown">' + game.countdownRemaining + '</div>';
+      html += '<div class="buzz-status-note">Get ready\u2026</div>';
+      return html;
+    }
+
+    if(game.phase === "roundOver" || game.phase === "gameOver"){
+      if(game.revealTargetPlayerId !== null && game.revealTargetPlayerId !== player.id){
+        html += '<div class="buzz-status-note">Nice! Waiting for the round to continue\u2026</div>';
+      }else if(!game.skipAnswerReveal){
+        html += buildAnswerBlockHTML();
+      }
+      return html;
+    }
+
+    if(player.eliminatedThisRound){
+      html += '<div class="zone-eliminated-tag">Out this round</div>';
+      html += buildRevealPhraseHTML();
+      return html;
+    }
+
+    if(game.phase === "revealing"){
+      html += buildRevealPhraseHTML();
+      html += '<div class="buzz-hint">\ud83d\udc46 Tap anywhere in this zone to buzz</div>';
+      return html;
+    }
+
+    if(game.phase === "answering"){
+      if(isBuzzer){
+        html += '<div class="buzz-countdown">' + Math.max(game.answerRemaining, 0) + '</div>';
+        html += '<div class="buzz-status-note">Say your answer now!</div>';
+      }else{
+        html += buildRevealPhraseHTML();
+        html += '<div class="buzz-status-note">' + escapeHTML(game.players[game.activeBuzzerId].name) + ' is answering\u2026</div>';
+        if(game.objectionsEnabled && !game.objectionCooldownActive){
+          html += '<div class="objection-hint">\u26a0\ufe0f Tap anywhere to object if not enough was shown</div>';
+        }
+      }
+      return html;
+    }
+
+    if(game.phase === "objecting"){
+      if(player.id === game.objectorId){
+        html += '<div class="buzz-countdown">' + Math.max(game.objectionRemaining, 0) + '</div>';
+        html += '<div class="buzz-status-note">Name at least 2 ayahs where this appears!</div>';
+        html += '<div class="objection-hint">\ud83d\udc46 Tap anywhere when you\u2019re finished</div>';
+      }else{
+        html += '<div class="buzz-status-note">\u26a0\ufe0f ' + escapeHTML(game.players[game.objectorId].name) + ' is objecting\u2026</div>';
+      }
+      return html;
+    }
+
+    if(game.phase === "objectingChecking"){
+      if(player.id === game.objectorId){
+        if(!game.objectionRevealed){
+          html += '<div class="buzz-status-note">Ready to check?</div>';
+          html += '<button type="button" class="btn-primary" data-action="check-objection">Check occurrences</button>';
+        }else{
+          html += buildObjectionCheckHTML();
+        }
+      }else{
+        html += '<div class="buzz-status-note">\ud83d\ude48 ' + escapeHTML(game.players[game.objectorId].name) + ' is checking their objection \u2014 look away!</div>';
+      }
+      return html;
+    }
+
+    if(game.phase === "checking"){
+      if(isBuzzer){
+        if(!game.revealedToBuzzer){
+          html += '<div class="buzz-status-note">Ready to check?</div>';
+          html += '<button type="button" class="btn-primary" data-action="check-answer">Check my answer</button>';
+        }else{
+          html += buildAnswerBlockHTML();
+          html += '<div class="button-group">';
+          html += '<button type="button" class="btn-success" data-action="mark-correct">\u2705 I got it right</button>';
+          html += '<button type="button" class="btn-secondary" data-action="mark-wrong">\u274c I was wrong</button>';
+          html += '</div>';
+        }
+      }else{
+        html += '<div class="buzz-status-note">\ud83d\ude48 ' + escapeHTML(game.players[game.activeBuzzerId].name) + ' is checking \u2014 look away!</div>';
+      }
+      return html;
+    }
+
+    return html;
+  }
+
+  function buildGameBarHTML(){
+    let html = '';
+
+    if(game.phase === "revealing"){
+      if(game.eliminationCountdownTimerId){
+        html += '<div class="game-bar-message">\u23f1 ' + game.eliminationCountdownRemaining + 's left to buzz</div>';
+      }
+      html += '<button type="button" class="btn-secondary" data-action="reveal-fallback">No one\u2019s got it \u2014 reveal answer</button>';
+    }else if(game.phase === "countdown"){
+      html += '<div class="game-bar-message">Next round starting\u2026</div>';
+    }else if(game.phase === "answering" || game.phase === "checking"){
+      html += '<div class="game-bar-message">Round paused while ' + escapeHTML(game.players[game.activeBuzzerId].name) + ' answers.</div>';
+    }else if(game.phase === "objecting" || game.phase === "objectingChecking"){
+      html += '<div class="game-bar-message">Round paused while ' + escapeHTML(game.players[game.objectorId].name) + '\u2019s objection is resolved.</div>';
+    }else if(game.phase === "roundOver"){
+      html += '<div class="game-bar-message win-message">' + escapeHTML(game.roundOverMessage) + '</div>';
+      html += '<button type="button" class="btn-primary" data-action="next-round">Next Round \u25b6</button>';
+    }else if(game.phase === "searchFailed"){
+      html += '<div class="game-bar-message">' + escapeHTML(game.searchFailMessage) + '</div>';
+      html += '<div class="button-group">';
+      html += '<button type="button" class="btn-primary" data-action="next-round">Try Again</button>';
+      html += buildChangeSettingsButtonHTML("btn-secondary");
+      html += '</div>';
+    }else if(game.phase === "gameOver"){
+      html += '<div class="game-bar-message win-message">\ud83c\udfc6 ' + escapeHTML(game.winnerName) + ' wins!</div>';
+      html += '<div class="button-group">';
+      html += '<button type="button" class="btn-primary" data-action="play-again">Play Again</button>';
+      html += buildChangeSettingsButtonHTML("btn-secondary");
+      html += '</div>';
+    }
+
+    if(game.phase !== "gameOver"){
+      html += buildChangeSettingsButtonHTML("end-game-link");
+    }
+    return html;
+  }
+
+  // Renders the "end game" control as either its normal label or, once
+  // tapped once, a "tap again to confirm" state - avoids window.confirm(),
+  // which some mobile browsers won't display properly (or auto-dismiss)
+  // while the page is in fullscreen mode, making the button look broken.
+  function buildChangeSettingsButtonHTML(cssClass){
+    const label = confirmingEndGame ? "Tap again to confirm ending the game" : (cssClass === "end-game-link" ? "End game / change settings" : "Change Settings");
+    return '<button type="button" class="' + cssClass + '" data-action="change-settings">' + label + '</button>';
+  }
+
+  // ---------- Event delegation for both zones and the game bar ----------
+  function handleGameClick(e){
+    const target = e.target.closest("[data-action]");
+    if(!target || !game) return;
+    const action = target.dataset.action;
+    const playerId = target.dataset.player !== undefined ? parseInt(target.dataset.player, 10) : null;
+
+    if(action !== "change-settings" && confirmingEndGame){
+      confirmingEndGame = false;
+    }
+
+    if(action === "buzz-zone") buzz(playerId);
+    else if(action === "check-answer") checkAnswer();
+    else if(action === "mark-correct") markCorrect();
+    else if(action === "mark-wrong") markWrong();
+    else if(action === "raise-objection") raiseObjection(playerId);
+    else if(action === "finish-objecting") finishObjecting();
+    else if(action === "check-objection") checkObjection();
+    else if(action === "confirm-objection") confirmObjectionTicks();
+    else if(action === "objection-count-step") stepObjectionCount(parseInt(target.dataset.step, 10));
+    else if(action === "reveal-fallback") manualReveal();
+    else if(action === "next-round") nextRound();
+    else if(action === "play-again") playAgain();
+    else if(action === "change-settings") requestEndGame();
+  }
+  arena.addEventListener("click", handleGameClick);
+  fullscreenCheck.addEventListener("click", handleGameClick);
+
+  // ---------- Wire up static UI ----------
+  // ---------- How To Play modal ----------
+  const howToPlayModal = document.getElementById("how-to-play-modal");
+  document.getElementById("how-to-play-btn").addEventListener("click", function(){ howToPlayModal.hidden = false; });
+  document.getElementById("how-to-play-close").addEventListener("click", function(){ howToPlayModal.hidden = true; });
+  howToPlayModal.addEventListener("click", function(e){
+    if(e.target === howToPlayModal) howToPlayModal.hidden = true;
+  });
+
+  QuranPicker.wireCorePickerUI({ portionTypeName: 'portion-type' });
+  // Not (yet) added to quran-picker.js's shared APPS list - see project notes.
+  QuranPicker.wireSideMenu("minimaltest-competitive", "en");
+
+  document.getElementById("start-game-btn").addEventListener("click", startGame);
+
+  // ---------- Start ----------
+  loadData().catch(function(){ /* status already set by loadData */ });
+
+})();
+</script>
+</body>
+</html>
