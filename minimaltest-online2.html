@@ -121,6 +121,31 @@
   .score-chip.eliminated{ text-decoration:line-through; color:var(--text-muted); }
   .win-message{ font-size:1.1rem; font-weight:700; color:var(--accent); }
 
+  .modal-overlay{
+    position:fixed; inset:0; z-index:2000;
+    background:rgba(0,0,0,0.5);
+    display:flex; align-items:center; justify-content:center;
+    padding:1.2rem;
+  }
+  .modal-box{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:1.4rem;
+    max-width:480px;
+    width:100%;
+    max-height:80vh;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    position:relative;
+  }
+  .modal-close{
+    position:absolute; top:0.6rem; right:0.8rem;
+    background:none; border:none; font-size:1.6rem; line-height:1;
+    color:var(--text-muted); cursor:pointer; padding:0.2rem 0.4rem;
+  }
+  .modal-close:hover{ color:var(--text); }
+
   .end-game-link{ background:none; border:none; padding:0; margin:0; font:inherit; font-size:0.78rem; color:var(--text-muted); text-decoration:underline; cursor:pointer; }
 </style>
 </head>
@@ -130,7 +155,28 @@
   <header>
     <h1>Smallest Phrase Hifdh-Tester &mdash; Online</h1>
     <p>Same buzzer game as the local pass-the-phone version, but everyone plays from their own device.</p>
+    <button type="button" class="btn-secondary" id="how-to-play-btn" style="margin-top:0.8rem;">How To Play</button>
   </header>
+
+  <div id="how-to-play-modal" class="modal-overlay" hidden>
+    <div class="modal-box">
+      <button type="button" class="modal-close" id="how-to-play-close" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0;">How To Play</h2>
+      <div id="how-to-play-content">
+      A part of the Qur'an will be revealed on the screen, appearing one word at a time. This can be from anywhere in the Qur'an, not just the beginning of an ayah. Players should have their fingers ready to buzz in their screen. Once the phrase (portion of the Quran) shown becomes unique (only comes once in the Qur'an - this could even be just the first word), the first player to (mentally) find the beginning of the ayah should buzz and recite it. There is no time to buzz and then think - the answer must be given immediately after buzzing, and the ayah should be recited at least from its beginning up until the displayed phrase (concession can be given for very long ayaat). If the player buzzes when the displayed phrase is unique and recites the ayah, they win one point.
+        <br><br>
+      However, if a player buzzes whilst the shown phrase is not yet unique (it comes more than once in the Qur'an), then what happens next depends on whether there are 2 players or more:
+      <br><br>
+      <b>2 players:</b> The opponent may 'object' immediately by tapping their screen. They then have a few seconds to name at least 2 places where the shown phrase comes in the Qur'an. If they are successful, then they receive points equal to the number of ayaat they recited where the phrase appears. If the phrase shown was not unique, but the player who objected did not manage to recite at least 2 ayaat, then no one gets the point. If the objection was false (the phrase was indeed unique), then the one who objected loses, and the other wins a point.
+      <br>
+      <b>3 or 4 players:</b> The point is lost, and the player who buzzed early is eliminated from the next round.
+        <br><br>
+      Both of the above (objection and round elimination) can be turned off, in which case early buzzing has no penalty.
+        <br><br>
+      The first player to reach the set point threshold wins.
+      </div>
+    </div>
+  </div>
 
   <div id="status" class="status hidden"></div>
 
@@ -334,6 +380,7 @@
     getDatabase, ref, set, get, update, remove, push, onValue, onChildAdded,
     serverTimestamp, onDisconnect, runTransaction
   } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDxvhV0iL8JOeDlQI59-LfY2TBWRNwDDHY",
@@ -345,13 +392,19 @@
     appId: "1:423141219944:web:3522d3373e2f169743e5dd"
   };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
+  window.fbReady = (async function(){
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const userCredential = await signInAnonymously(auth);
+    const db = getDatabase(app);
+    const authUserId = userCredential.user.uid;
 
-  // Exposed for the classic script below - keeps this file's game logic in
-  // the same plain-script style as the rest of the project instead of
-  // converting the whole thing to a module.
-  window.fb = { db, ref, set, get, update, remove, push, onValue, onChildAdded, serverTimestamp, onDisconnect, runTransaction };
+    // Exposed for the classic script below - keeps this file's game logic in
+    // the same plain-script style as the rest of the project instead of
+    // converting the whole thing to a module.
+    window.fb = { db, ref, set, get, update, remove, push, onValue, onChildAdded, serverTimestamp, onDisconnect, runTransaction, authUserId };
+    return window.fb;
+  })();
 </script>
 
 <script src="quran-picker.js"></script>
@@ -359,7 +412,6 @@
 (function(){
   "use strict";
 
-  const fb = window.fb;
   const PLAYER_COLORS = ['#c9a15a', '#5aa9d6', '#6abf6a', '#d6708a'];
 
   // ---------- Local identity (persists across reloads on this device) ----------
@@ -372,11 +424,22 @@
     }
     return id;
   }
-  const myId = getOrCreateDeviceId();
+  let fb = window.fb || null;
+  let myId = fb && fb.authUserId ? fb.authUserId : null;
   let myName = "";
   let roomCode = null;
   let isHost = false;
   let myIndex = null;
+
+  async function ensureFirebaseReady(){
+    if(!fb){
+      fb = await window.fbReady;
+    }
+    if(!myId){
+      myId = fb.authUserId || getOrCreateDeviceId();
+    }
+    return fb;
+  }
 
   // ---------- DOM refs ----------
   const statusEl = document.getElementById("status");
@@ -396,6 +459,11 @@
     statusEl.classList.remove("hidden");
   }
   function hideStatus(){ statusEl.classList.add("hidden"); }
+
+  const howToPlayModal = document.getElementById("how-to-play-modal");
+  document.getElementById("how-to-play-btn").addEventListener("click", function(){ howToPlayModal.hidden = false; });
+  document.getElementById("how-to-play-close").addEventListener("click", function(){ howToPlayModal.hidden = true; });
+  howToPlayModal.addEventListener("click", function(e){ if(e.target === howToPlayModal) howToPlayModal.hidden = true; });
 
   document.getElementById("choose-host").addEventListener("click", function(){ showScreen("hostSetup"); ensureQuranDataLoading(); });
   document.getElementById("choose-join").addEventListener("click", function(){ showScreen("join"); });
@@ -758,6 +826,13 @@
   async function createRoom(){
     clearFieldErrors();
     setSettingsStatus("", false);
+    try{
+      await ensureFirebaseReady();
+    }catch(err){
+      console.error("Firebase sign-in failed:", err);
+      setSettingsStatus("Could not connect to Firebase. Check that Anonymous Auth is enabled, then try again.", true);
+      return;
+    }
 
     const hostName = (document.getElementById("host-name").value || "").trim() || "Host";
     const pointsToWin = validatePositiveNumber(document.getElementById("points-to-win"), "points-error", 1, true);
@@ -846,6 +921,14 @@
 
     if(code.length !== 4){ statusEl2.textContent = "Enter the 4-letter room code."; statusEl2.classList.add("error"); return; }
     if(!name){ statusEl2.textContent = "Enter your name."; statusEl2.classList.add("error"); return; }
+    try{
+      await ensureFirebaseReady();
+    }catch(err){
+      console.error("Firebase sign-in failed:", err);
+      statusEl2.textContent = "Could not connect to Firebase. Check that Anonymous Auth is enabled, then try again.";
+      statusEl2.classList.add("error");
+      return;
+    }
 
     const roomSnap = await fb.get(fb.ref(fb.db, 'rooms/' + code));
     if(!roomSnap.exists()){ statusEl2.textContent = "No room found with that code."; statusEl2.classList.add("error"); return; }
@@ -882,8 +965,15 @@
       renderLobbyRoster(players);
     });
 
-    fb.onValue(fb.ref(fb.db, 'rooms/' + roomCode + '/status'), function(snap){
-      if(snap.val() === 'playing') enterGame();
+    const lobbyCode = roomCode;
+    fb.onValue(fb.ref(fb.db, 'rooms/' + lobbyCode + '/status'), function(snap){
+      if(roomCode !== lobbyCode) return;
+      if(snap.val() === 'playing' && screens.game.hidden) enterGame();
+      else if(!snap.exists() || snap.val() === 'ended'){
+        roomCode = null; isHost = false; myIndex = null; latestState = null;
+        showScreen("landing");
+        setStatus("The host ended the game.", false);
+      }
     });
 
     if(isHost){
@@ -1084,7 +1174,10 @@
     if(hg.phase !== "revealing") return;
     const player = hg.players[playerId];
     if(!player || player.eliminatedThisRound) return;
-    if(hg.players.length > 2 && hg.penalizeEarlyBuzz){
+    // Match Competitive: only a 3/4-player game with this option enabled
+    // penalizes a buzz, and only when the visible phrase is not unique yet.
+    // The penalty applies to the following round, never the current one.
+    if((hg.players.length === 3 || hg.players.length === 4) && hg.penalizeEarlyBuzz){
       const occ = findPortionOccurrences(hg.displayedWords);
       if(occ.totalCount > 1){
         stopRevealTimer(); stopEliminationCountdown();
@@ -1094,7 +1187,7 @@
         return;
       }
     }
-    stopRevealTimer();
+    stopRevealTimer(); stopEliminationCountdown();
     hg.phase = "answering"; hg.activeBuzzerId = playerId; hg.answerRemaining = hg.answerTimeSeconds;
     hg.objectionCooldownActive = true;
     hg.objectionCooldownTimerId = setTimeout(function(){
@@ -1214,8 +1307,9 @@
 
   async function endGameAsHost(){
     stopRevealTimer(); stopAnswerTimer(); stopObjectionTimer(); stopObjectionCooldownTimer(); stopCountdownTimer(); stopEliminationCountdown();
-    await fb.remove(fb.ref(fb.db, 'rooms/' + roomCode));
-    hg = null; roomCode = null; isHost = false; myIndex = null;
+    const code = roomCode;
+    await fb.remove(fb.ref(fb.db, 'rooms/' + code));
+    hg = null; roomCode = null; isHost = false; myIndex = null; latestState = null;
     showScreen("landing");
   }
 
@@ -1319,10 +1413,10 @@
     else if(type === "mark-wrong") markWrong();
     else if(type === "check-objection") checkObjection();
     else if(type === "confirm-objection") confirmObjection(data && data.claimedCount);
-    else if(type === "reveal-fallback") manualReveal();
-    else if(type === "next-round") nextRound();
-    else if(type === "play-again") playAgain();
-    else if(type === "end-game") endGameAsHost();
+    else if(type === "reveal-fallback" && playerUid === myId) manualReveal();
+    else if(type === "next-round" && playerUid === myId) nextRound();
+    else if(type === "play-again" && playerUid === myId) playAgain();
+
   }
 
   // =====================================================================
@@ -1382,14 +1476,16 @@
 
     if(state.phase === "searchFailed"){
       html += '<div class="buzz-status-note">' + escapeHTML(state.searchFailMessage) + '</div>';
-      html += buildActionButtons(['next-round:Try Again:btn-primary']);
+      if(isHost) html += buildActionButtons(['next-round:Try Again:btn-primary']);
     }else if(state.phase === "countdown"){
       html += '<div class="buzz-countdown">' + state.countdownRemaining + '</div><div class="buzz-status-note">Get ready\u2026</div>';
     }else if(state.phase === "roundOver" || state.phase === "gameOver"){
       html += '<div class="win-message">' + (state.phase === "gameOver" ? ('\ud83c\udfc6 ' + escapeHTML(state.winnerName) + ' wins!') : escapeHTML(state.roundOverMessage)) + '</div>';
       if(state.answerHTML) html += state.answerHTML;
-      if(state.phase === "gameOver") html += buildActionButtons(['play-again:Play Again:btn-primary']);
-      else html += buildActionButtons(['next-round:Next Round \u25b6:btn-primary']);
+      if(isHost){
+        if(state.phase === "gameOver") html += buildActionButtons(['play-again:Play Again:btn-primary']);
+        else html += buildActionButtons(['next-round:Next Round \u25b6:btn-primary']);
+      }
     }else if(state.phase === "revealing"){
       html += buildRevealHTML(state);
       const eliminated = me && me.eliminatedThisRound;
@@ -1399,7 +1495,7 @@
         html += '<div class="buzz-status-note">Out this round \u2014 waiting\u2026</div>';
       }
       if(state.eliminationActive) html += '<div class="buzz-status-note">\u23f1 ' + state.eliminationCountdownRemaining + 's left to buzz</div>';
-      html += '<button type="button" class="end-game-link" data-action="reveal-fallback">No one\u2019s got it \u2014 reveal answer</button>';
+      if(isHost) html += '<button type="button" class="end-game-link" data-action="reveal-fallback">No one\u2019s got it \u2014 reveal answer</button>';
     }else if(state.phase === "answering"){
       const isBuzzer = myIndex === state.activeBuzzerId;
       if(isBuzzer){
@@ -1539,16 +1635,19 @@
       const ticked = gameScreenEl.querySelectorAll(".objection-tick:checked").length;
       sendIntent("confirm-objection", { claimedCount: ticked });
     }
-    else if(action === "reveal-fallback") sendIntent("reveal-fallback");
-    else if(action === "next-round") sendIntent("next-round");
-    else if(action === "play-again") sendIntent("play-again");
+    else if(action === "reveal-fallback" && isHost) manualReveal();
+    else if(action === "next-round" && isHost) nextRound();
+    else if(action === "play-again" && isHost) playAgain();
     else if(action === "end-game"){
       if(!confirmingEndGame){ confirmingEndGame = true; renderGameScreen(latestState); return; }
       confirmingEndGame = false;
-      if(isHost) sendIntent("end-game");
-      fb.remove(fb.ref(fb.db, 'rooms/' + roomCode + '/players/' + myId));
-      roomCode = null; isHost = false; myIndex = null;
-      showScreen("landing");
+      if(isHost){
+        endGameAsHost().catch(function(err){ console.error("Failed to end game:", err); setStatus("Could not end the game. Please try again.", true); });
+      }else{
+        fb.remove(fb.ref(fb.db, 'rooms/' + roomCode + '/players/' + myId));
+        roomCode = null; isHost = false; myIndex = null; latestState = null;
+        showScreen("landing");
+      }
     }
   });
 
