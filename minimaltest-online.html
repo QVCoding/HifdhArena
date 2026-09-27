@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<script>(function(){try{var t=localStorage.getItem('quranTester:theme');if(t&&t!=='gold')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Smallest Phrase Hifdh-Tester - Online</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&amp;family=Spectral:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* =====================================================================
+     This is the online sibling of minimaltest-competitive.html. Since each
+     player now has their own screen, the whole rotated-arena/fullscreen-
+     takeover apparatus from that file is gone - there's nothing to rotate
+     toward and no "look away" privacy to fake, since everyone already has
+     their own device. What's left is close to a single-player view per
+     person, driven by state a Firebase-connected host pushes out.
+     ===================================================================== */
+
+  body{ padding:1.5rem 1.1rem 3rem; }
+  #app{ max-width:520px; margin:0 auto; }
+  header{ margin-bottom:1.5rem; border-bottom:1px solid var(--border); padding-bottom:1.1rem; }
+  h1{ font-size:1.5rem; margin:0 0 0.35rem; }
+  header p{ margin:0; color:var(--text-muted); font-size:0.9rem; }
+
+  h2{ font-family:"Spectral",Georgia,serif; font-weight:500; font-size:1.05rem; margin:0 0 0.9rem; }
+  h2.section-heading{ margin-top:1.7rem; padding-top:1.3rem; border-top:1px solid var(--border); }
+  h2.section-heading:first-child{ margin-top:0; padding-top:0; border-top:none; }
+
+  .panel{ background:var(--panel); border:1px solid var(--border); border-radius:4px; padding:1.4rem; }
+  .status{ padding:0.85rem 1rem; border:1px solid var(--border); border-radius:4px; background:var(--panel); color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem; }
+  .status.error{ border-color:var(--danger); color:var(--danger); }
+  .status.hidden{ display:none; }
+
+  .field{ margin-bottom:1.3rem; }
+  .field:last-child{ margin-bottom:0; }
+  .field-label{ display:block; font-size:0.9rem; font-weight:600; margin-bottom:0.4rem; }
+  .range-row{ display:flex; gap:1rem; align-items:center; flex-wrap:wrap; }
+  .range-row label{ font-size:0.85rem; color:var(--text-muted); display:flex; align-items:center; gap:0.5rem; }
+  input[type="number"]{ width:5.5rem; }
+  input[type="text"].wide{ width:100%; }
+
+  .checkbox-group{ margin-top:10px; }
+  .checkbox-group input{ margin-right:8px; }
+  .checkbox-group label{ display:inline; font-weight:normal; }
+
+  .info-icon{ display:inline-block; width:18px; height:18px; line-height:18px; text-align:center; background:var(--accent); color:var(--accent-text); border-radius:50%; font-size:12px; font-weight:bold; cursor:pointer; margin-left:5px; vertical-align:middle; }
+  .info-tooltip{ display:none; background:var(--panel-alt); border:1px solid var(--border); border-radius:4px; padding:10px; margin-top:5px; font-size:13px; color:var(--text-muted); line-height:1.5; }
+  .info-tooltip.show{ display:block; }
+
+  .more-settings-toggle{ display:flex; align-items:center; gap:0.4rem; background:none; border:none; color:var(--text-muted); font-family:inherit; font-size:0.88rem; cursor:pointer; padding:0.4rem 0; margin-bottom:0.5rem; }
+  .more-settings-toggle .chevron{ display:inline-block; transition:transform 0.15s ease; font-size:1.1rem; line-height:1; }
+  .more-settings-toggle[aria-expanded="true"] .chevron{ transform:rotate(90deg); }
+  #more-settings{ border-top:1px solid var(--border); padding-top:1.3rem; margin-bottom:1.3rem; }
+
+  .segmented{ display:inline-flex; border:1px solid var(--border); border-radius:4px; overflow:hidden; flex-wrap:wrap; }
+  .segment-btn{ background:var(--panel-alt); border:none; color:var(--text-muted); padding:0.45rem 1.1rem; font-size:0.88rem; font-family:inherit; cursor:pointer; }
+  .segment-btn + .segment-btn{ border-inline-start:1px solid var(--border); }
+  .segment-btn.active{ background:var(--accent); color:var(--accent-text); font-weight:600; }
+
+  .lobby-settings{ margin:1.2rem 0; padding:1rem; border:1px solid var(--border); border-radius:4px; background:var(--panel-alt); font-size:0.88rem; }
+  .lobby-settings h3{ margin:0 0 0.7rem; font-size:1rem; }
+  .lobby-settings p{ margin:0.4rem 0; }
+  .settings-status{ font-size:0.88rem; color:var(--text-muted); margin:0 0 0.85rem; }
+  .settings-status.error{ color:var(--danger); }
+  .settings-status:empty{ display:none; }
+
+  [hidden]{ display:none !important; }
+
+  /* ---------- Landing / role choice ---------- */
+  .role-cards{ display:flex; flex-direction:column; gap:1rem; }
+  .role-card{ background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:1.2rem; text-align:center; cursor:pointer; }
+  .role-card:hover{ border-color:var(--accent); }
+  .role-card h3{ margin:0 0 0.4rem; font-family:"Spectral",Georgia,serif; font-weight:500; }
+  .role-card p{ margin:0; font-size:0.85rem; color:var(--text-muted); }
+
+  /* ---------- Lobby ---------- */
+  .room-code{ font-size:2.2rem; font-weight:700; letter-spacing:0.3em; text-align:center; padding:1rem; background:var(--panel-alt); border-radius:6px; margin-bottom:1rem; }
+  .player-roster{ display:flex; flex-direction:column; gap:0.5rem; margin:1rem 0; }
+  .player-row{ display:flex; align-items:center; gap:0.6rem; padding:0.6rem 0.8rem; border:1px solid var(--border); border-radius:4px; background:var(--panel-alt); }
+  .player-row .dot{ width:12px; height:12px; border-radius:50%; flex:none; }
+  .player-row .you-tag{ margin-left:auto; font-size:0.75rem; color:var(--text-muted); }
+
+  /* ---------- Game screen ---------- */
+  #game-screen{ display:flex; flex-direction:column; align-items:center; gap:1.1rem; text-align:center; min-height:60vh; justify-content:center; }
+  .my-name-score{ font-size:0.95rem; color:var(--text-muted); }
+  .reveal-phrase{ font-family:var(--quran-font); font-size:1.75rem; direction:rtl; line-height:1.9; }
+  .reveal-meta{ font-size:0.78rem; color:var(--text-muted); }
+  .buzz-hint{ font-size:0.85rem; color:var(--accent); font-weight:700; }
+  .objection-hint{ font-size:0.8rem; color:#e0a83a; font-weight:700; }
+
+  .tap-surface{ width:100%; min-height:40vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1rem; border:3px dashed var(--border); border-radius:10px; padding:1rem; cursor:pointer; }
+  .tap-surface.buzzable{ border-color:var(--danger); animation:pulse-red 1.6s ease-in-out infinite; cursor:pointer; }
+  .tap-surface.objectable{ border-color:#e0a83a; animation:pulse-amber 1.6s ease-in-out infinite; cursor:pointer; }
+  @keyframes pulse-red{ 0%,100%{ box-shadow:0 0 0 0 rgba(220,53,69,0.35); } 50%{ box-shadow:0 0 0 12px transparent; } }
+  @keyframes pulse-amber{ 0%,100%{ box-shadow:0 0 0 0 rgba(224,168,58,0.35); } 50%{ box-shadow:0 0 0 12px transparent; } }
+
+  .buzz-countdown{ font-size:3.2rem; font-weight:700; color:var(--accent); line-height:1; }
+  .buzz-status-note{ font-size:0.95rem; color:var(--text-muted); }
+
+  .zone-answer{ font-family:var(--quran-font); font-size:1.2rem; direction:rtl; line-height:1.9; width:100%; }
+  .zone-answer .answer-verse{ padding:0.6rem 0.7rem; background:var(--panel-alt); border-inline-start:3px solid var(--accent); border-radius:4px; margin-bottom:0.6rem; }
+  .zone-answer .answer-metadata{ font-family:"Spectral",Georgia,serif; font-size:0.8rem; color:var(--text-muted); direction:ltr; text-align:center; }
+  .zone-answer .answer-metadata div{ margin-bottom:0.2rem; }
+  .zone-answer .answer-match{ margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px dashed var(--border); }
+  .zone-answer .answer-match:last-child{ margin-bottom:0; padding-bottom:0; border-bottom:none; }
+
+  .objection-list{ text-align:start; direction:ltr; font-family:"Spectral",Georgia,serif; font-size:0.85rem; width:100%; display:flex; flex-direction:column; gap:0.5rem; }
+  .objection-item{ display:flex; align-items:flex-start; gap:0.6rem; padding:0.55rem 0.7rem; border:1px solid var(--border); border-radius:4px; background:var(--panel-alt); cursor:pointer; text-align:start; }
+  .objection-item input{ flex:none; margin-top:0.35rem; }
+  .objection-item-text{ display:flex; flex-direction:column; gap:0.2rem; }
+  .objection-item-verse{ font-family:var(--quran-font); font-size:1.15rem; direction:rtl; line-height:1.7; }
+  .objection-item-ref{ font-family:"Spectral",Georgia,serif; font-size:0.75rem; color:var(--text-muted); direction:ltr; }
+  .count-stepper{ display:flex; align-items:center; justify-content:center; gap:0.5rem; margin:0.4rem 0; }
+  .count-stepper .stepper-value{ font-size:2rem; font-weight:700; min-width:3rem; text-align:center; }
+
+  .scoreboard{ display:flex; flex-wrap:wrap; gap:0.4rem; justify-content:center; }
+  .score-chip{ font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:999px; border:1px solid var(--border); background:var(--panel-alt); white-space:nowrap; }
+  .score-chip.eliminated{ text-decoration:line-through; color:var(--text-muted); }
+  .win-message{ font-size:1.1rem; font-weight:700; color:var(--accent); }
+
+  .end-game-link{ background:none; border:none; padding:0; margin:0; font:inherit; font-size:0.78rem; color:var(--text-muted); text-decoration:underline; cursor:pointer; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <h1>Smallest Phrase Hifdh-Tester &mdash; Online</h1>
+    <p>Same buzzer game as the local pass-the-phone version, but everyone plays from their own device.</p>
+  </header>
+
+  <div id="status" class="status hidden"></div>
+
+  <!-- ================= Landing ================= -->
+  <section id="screen-landing" class="panel">
+    <h2>Play Online</h2>
+    <div class="role-cards">
+      <div class="role-card" id="choose-host">
+        <h3>Host a Game</h3>
+        <p>Configure the settings, get a room code, wait for others to join.</p>
+      </div>
+      <div class="role-card" id="choose-join">
+        <h3>Join a Game</h3>
+        <p>Enter a room code someone shared with you.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= Join form ================= -->
+  <section id="screen-join" class="panel" hidden>
+    <h2>Join a Game</h2>
+    <div class="field">
+      <span class="field-label">Room Code</span>
+      <input type="text" class="wide" id="join-code" maxlength="4" placeholder="e.g. ABCD" style="text-transform:uppercase; letter-spacing:0.3em; text-align:center; font-size:1.3rem;">
+    </div>
+    <div class="field">
+      <span class="field-label">Your Name</span>
+      <input type="text" class="wide" id="join-name" placeholder="Your name">
+    </div>
+    <p class="settings-status" id="join-status"></p>
+    <div class="button-group">
+      <button type="button" class="btn-primary" id="join-submit-btn">Join</button>
+      <button type="button" class="btn-secondary" id="join-back-btn">Back</button>
+    </div>
+  </section>
+
+  <!-- ================= Host setup ================= -->
+  <section id="screen-host-setup" class="panel" hidden>
+    <h2 class="section-heading">Game Setup</h2>
+
+    <div class="field">
+      <label><strong>Select Portion for Testing:</strong></label>
+      <div style="margin-top: 10px;">
+        <input type="radio" id="entire-quran" name="portion-type" value="entire" checked>
+        <label for="entire-quran" style="display: inline; font-weight: normal;">Entire Qur'an (default)</label>
+      </div>
+      <div style="margin-top: 5px;">
+        <input type="radio" id="select-portion" name="portion-type" value="select">
+        <label for="select-portion" style="display: inline; font-weight: normal;">Select Portion</label>
+      </div>
+    </div>
+
+    <div id="filter-options" class="filter-options-box" style="display: none;">
+      <div class="tabs">
+        <button type="button" class="tab-btn active" data-tab="surah">Surah</button>
+        <button type="button" class="tab-btn" data-tab="juz">Juz</button>
+        <button type="button" class="tab-btn" data-tab="page">Page</button>
+      </div>
+
+      <div class="tab-panel active" id="tab-surah">
+        <div class="select-all-row">
+          <input type="checkbox" id="surah-select-all" checked>
+          <label for="surah-select-all">Select all surahs</label>
+        </div>
+        <div class="checkbox-list" id="surah-list"><div class="list-loading">Loading Qur'an data<span class="loading-dots">.</span></div></div>
+      </div>
+
+      <div class="tab-panel" id="tab-juz">
+        <div class="select-all-row">
+          <input type="checkbox" id="juz-select-all" checked>
+          <label for="juz-select-all">Select all juz</label>
+        </div>
+        <div class="checkbox-list" id="juz-list"><div class="list-loading">Loading Qur'an data<span class="loading-dots">.</span></div></div>
+      </div>
+
+      <div class="tab-panel" id="tab-page">
+        <label for="page-range">Page ranges</label>
+        <input type="text" class="wide" id="page-range" placeholder="e.g. 1-100, 150-200">
+        <p class="field-help">Comma-separated page ranges (1-604). Leave blank to include every page.</p>
+        <p class="field-error" id="page-range-error"></p>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Number of Players (room cap)</span>
+      <div class="segmented" id="player-count-toggle">
+        <button type="button" class="segment-btn active" data-players="2">2</button>
+        <button type="button" class="segment-btn" data-players="3">3</button>
+        <button type="button" class="segment-btn" data-players="4">4</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Your Name</span>
+      <input type="text" class="wide" id="host-name" placeholder="Your name">
+    </div>
+
+    <div class="field">
+      <span class="field-label">Timing</span>
+      <div class="range-row">
+        <label>Starting words shown <input type="number" id="start-words" min="1" step="1" value="1"></label>
+        <label>Seconds between reveals <input type="number" id="reveal-delay" min="1" step="0.5" value="3"></label>
+      </div>
+      <p class="field-error" id="timing-error"></p>
+    </div>
+    <div class="field" id="objections-field">
+      <div class="checkbox-group">
+        <input type="checkbox" id="enable-objections" checked>
+        <label for="enable-objections">Hide word-count progress and allow objections (2-player rooms only)</label>
+        <span class="info-icon" data-tooltip="objections-tooltip">i</span>
+        <div id="objections-tooltip" class="info-tooltip">
+          While a player is answering, the other player can tap their own screen to object that not enough has been revealed yet. They then get their own time limit to name at least two ayahs where the shown words occur. Points scored equal how many they're credited for; a false objection costs them a point and auto-wins the point for their opponent.
+        </div>
+      </div>
+      <div class="range-row" id="objection-time-row" style="margin-top:10px;">
+        <label>Objection answer time (s) <input type="number" id="objection-time" min="1" step="1" value="8"></label>
+      </div>
+    </div>
+
+    <button type="button" class="more-settings-toggle" id="more-settings-toggle" aria-expanded="false">
+      <span class="chevron">&rsaquo;</span> More settings
+    </button>
+    <div id="more-settings" hidden>
+    <div class="field">
+      <span class="field-label">Points to Win</span>
+      <input type="number" id="points-to-win" min="1" step="1" value="5">
+      <p class="field-error" id="points-error"></p>
+    </div>
+
+    <div class="field">
+      <span class="field-label">More Timing</span>
+      <div class="range-row">
+        <label>Answer time after buzzing (s) <input type="number" id="answer-time" min="1" step="1" value="3"></label>
+        <label>Time limit after an elimination (s) <input type="number" id="elimination-time-limit" min="1" step="1" value="20"></label>
+      </div>
+    </div>
+
+      <div class="field" id="early-buzz-penalty-field" hidden>
+        <div class="checkbox-group">
+          <input type="checkbox" id="penalize-early-buzz" checked>
+          <label for="penalize-early-buzz">Eliminate early buzzers from the next round (3/4 players)</label>
+          <span class="info-icon" data-tooltip="early-buzz-tooltip">i</span>
+          <div id="early-buzz-tooltip" class="info-tooltip">If someone buzzes while the shown phrase still matches more than one ayah, the round ends immediately and that player sits out the following round.</div>
+        </div>
+      </div>
+    <div class="checkbox-group">
+      <input type="checkbox" id="single-verse-only" checked>
+      <label for="single-verse-only">Keep questions within one ayah</label>
+    </div>
+
+    <div class="checkbox-group">
+      <input type="checkbox" id="start-of-ayah">
+      <label for="start-of-ayah">Keep questions at the beginning of an ayah</label>
+    </div>
+
+    <div class="checkbox-group">
+      <input type="checkbox" id="show-ayah-marker" checked>
+      <label for="show-ayah-marker">Show ayah marker while revealing</label>
+    </div>
+
+      <div class="field">
+        <span class="field-label">Maximum matches to list</span>
+        <input type="number" id="match-list-cap" min="1" step="1" value="10">
+        <p class="field-help">Past this many matches, the answer view just shows the total count, and an objector types how many they found instead of ticking a long list.</p>
+        <p class="field-error" id="match-list-cap-error"></p>
+      </div>
+    </div>
+
+    <p class="settings-status" id="settings-status"></p>
+    <div class="button-group">
+      <button class="btn-primary" id="create-room-btn" disabled>Create Room</button>
+      <span class="loading-note" id="create-room-loading">Loading Qur'an data<span class="loading-dots">.</span></span>
+      <button type="button" class="btn-secondary" id="host-back-btn">Back</button>
+    </div>
+  </section>
+
+  <!-- ================= Lobby ================= -->
+  <section id="screen-lobby" class="panel" hidden>
+    <h2>Waiting for Players</h2>
+    <div class="room-code" id="lobby-room-code">----</div>
+    <p style="text-align:center; color:var(--text-muted); font-size:0.85rem;">Share this code with the other players.</p>
+    <div class="player-roster" id="lobby-roster"></div>
+    <div id="lobby-settings" class="lobby-settings" aria-live="polite"></div>
+    <p class="settings-status" id="lobby-status"></p>
+    <div class="button-group" id="lobby-host-controls" hidden>
+      <button type="button" class="btn-primary" id="start-game-btn" disabled>Start Game</button>
+    </div>
+    <button type="button" class="end-game-link" id="lobby-leave-btn">Leave</button>
+  </section>
+
+  <!-- ================= Game screen ================= -->
+  <section id="game-screen" hidden></section>
+
+</div>
+
+<script type="module">
+  // Firebase - modular CDN import, no bundler/npm needed. Pinned to the
+  // version the console registered this app with.
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+  import {
+    getDatabase, ref, set, get, update, remove, push, onValue, onChildAdded,
+    serverTimestamp, onDisconnect, runTransaction
+  } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDxvhV0iL8JOeDlQI59-LfY2TBWRNwDDHY",
+    authDomain: "qurantester-4e466.firebaseapp.com",
+    databaseURL: "https://qurantester-4e466-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "qurantester-4e466",
+    storageBucket: "qurantester-4e466.firebasestorage.app",
+    messagingSenderId: "423141219944",
+    appId: "1:423141219944:web:3522d3373e2f169743e5dd"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  // Exposed for the classic script below - keeps this file's game logic in
+  // the same plain-script style as the rest of the project instead of
+  // converting the whole thing to a module.
+  window.fb = { db, ref, set, get, update, remove, push, onValue, onChildAdded, serverTimestamp, onDisconnect, runTransaction };
+</script>
+
+<script src="quran-picker.js"></script>
+<script type="module">
+(function(){
+  "use strict";
+
+  const fb = window.fb;
+  const PLAYER_COLORS = ['#c9a15a', '#5aa9d6', '#6abf6a', '#d6708a'];
+
+  // ---------- Local identity (persists across reloads on this device) ----------
+  function getOrCreateDeviceId(){
+    let id = null;
+    try{ id = localStorage.getItem('quranTester:onlineDeviceId'); }catch(e){}
+    if(!id){
+      id = 'p' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+      try{ localStorage.setItem('quranTester:onlineDeviceId', id); }catch(e){}
+    }
+    return id;
+  }
+  const myId = getOrCreateDeviceId();
+  let myName = "";
+  let roomCode = null;
+  let isHost = false;
+  let myIndex = null;
+
+  // ---------- DOM refs ----------
+  const statusEl = document.getElementById("status");
+  const screens = {
+    landing: document.getElementById("screen-landing"),
+    join: document.getElementById("screen-join"),
+    hostSetup: document.getElementById("screen-host-setup"),
+    lobby: document.getElementById("screen-lobby"),
+    game: document.getElementById("game-screen")
+  };
+  function showScreen(name){
+    Object.keys(screens).forEach(function(k){ screens[k].hidden = (k !== name); });
+  }
+  function setStatus(msg, isError){
+    statusEl.textContent = msg;
+    statusEl.classList.toggle("error", !!isError);
+    statusEl.classList.remove("hidden");
+  }
+  function hideStatus(){ statusEl.classList.add("hidden"); }
+
+  document.getElementById("choose-host").addEventListener("click", function(){ showScreen("hostSetup"); ensureQuranDataLoading(); });
+  document.getElementById("choose-join").addEventListener("click", function(){ showScreen("join"); });
+  document.getElementById("join-back-btn").addEventListener("click", function(){ showScreen("landing"); });
+  document.getElementById("host-back-btn").addEventListener("click", function(){ showScreen("landing"); });
+
+  // =====================================================================
+  // Qur'an data - ONLY the host ever loads this. Guests just render
+  // whatever fully-resolved text the host puts in the synced game state,
+  // so they never need the dataset at all.
+  // =====================================================================
+  let quranWords = [];
+  let quranWordMap = {};
+  let metadata = null;
+  let quranDataLoading = false;
+  let quranDataReady = false;
+
+  function ensureQuranDataLoading(){
+    if(quranDataLoading || quranDataReady) return;
+    quranDataLoading = true;
+    loadQuranData().catch(function(err){
+      console.error(err);
+      setStatus("Couldn't load Qur'an data. Please try refreshing the page.", true);
+      document.getElementById("create-room-loading").textContent = "Data unavailable.";
+    });
+  }
+
+  async function loadQuranData(){
+    QuranPicker.startLoadingAnimation();
+    await loadCSV();
+    await loadXML();
+    precomputeJuzAndPage();
+    populateSettingsUI();
+    quranDataReady = true;
+    QuranPicker.stopLoadingAnimation();
+    document.getElementById("create-room-btn").disabled = false;
+    document.getElementById("create-room-loading").hidden = true;
+    hideStatus();
+  }
+
+  async function loadCSV(){
+    const response = await fetch('quran_words.csv');
+    if(!response.ok) throw new Error('Could not fetch quran_words.csv (HTTP ' + response.status + ')');
+    const text = await response.text();
+    const lines = text.trim().split('\n');
+    for(let i = 0; i < lines.length; i++){
+      const line = lines[i].replace(/\r$/, '');
+      const parts = line.split(',');
+      if(parts.length >= 5){
+        const word = {
+          globalWordNumber: parseInt(parts[0]),
+          sura: parseInt(parts[1]),
+          aya: parseInt(parts[2]),
+          wordInAya: parseInt(parts[3]),
+          text: parts.slice(4).join(','),
+          juz: null,
+          page: null
+        };
+        quranWords.push(word);
+        quranWordMap[word.globalWordNumber] = word;
+      }
+    }
+  }
+  async function loadXML(){
+    metadata = await QuranPicker.loadMetadataXML('app_quran_metadata.xml');
+  }
+  function precomputeJuzAndPage(){
+    quranWords.forEach(function(word){
+      word.juz = QuranPicker.findJuz(metadata, word.sura, word.aya);
+      word.page = QuranPicker.findPage(metadata, word.sura, word.aya);
+    });
+  }
+  function populateSettingsUI(){
+    QuranPicker.populateSurahAndJuzLists(metadata, {
+      surahLabelHTML: function(sura){ return '<span>' + sura.index + '. </span><span class="arabic-name" dir="rtl">' + sura.name + '</span>'; }
+    });
+  }
+
+  // ---------- Host settings UI wiring ----------
+  let moreSettingsOpen = false;
+  document.getElementById("more-settings-toggle").addEventListener("click", function(){
+    moreSettingsOpen = !moreSettingsOpen;
+    document.getElementById("more-settings").hidden = !moreSettingsOpen;
+    document.getElementById("more-settings-toggle").setAttribute("aria-expanded", moreSettingsOpen ? "true" : "false");
+  });
+  document.querySelectorAll(".info-icon").forEach(function(icon){
+    icon.addEventListener("click", function(e){
+      e.stopPropagation();
+      const tip = document.getElementById(icon.dataset.tooltip);
+      if(tip) tip.classList.toggle("show");
+    });
+  });
+  document.addEventListener("click", function(e){
+    if(!e.target.closest(".info-icon")){
+      document.querySelectorAll(".info-tooltip").forEach(function(t){ t.classList.remove("show"); });
+    }
+  });
+  document.querySelectorAll("#player-count-toggle .segment-btn").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      document.querySelectorAll("#player-count-toggle .segment-btn").forEach(function(b){ b.classList.remove("active"); });
+      btn.classList.add("active");
+      const count = parseInt(btn.dataset.players, 10);
+      document.getElementById("objections-field").hidden = (count !== 2);
+      document.getElementById("early-buzz-penalty-field").hidden = (count === 2);
+    });
+  });
+  function getMaxPlayers(){
+    const btn = document.querySelector("#player-count-toggle .segment-btn.active");
+    return btn ? parseInt(btn.dataset.players, 10) : 2;
+  }
+  document.getElementById("enable-objections").addEventListener("change", function(e){
+    document.getElementById("objection-time-row").style.display = e.target.checked ? "flex" : "none";
+  });
+  QuranPicker.wireCorePickerUI({ portionTypeName: 'portion-type' });
+
+  const INT_RE = /^\d+$/;
+  const NUM_RE = /^\d+(\.\d+)?$/;
+  function clearFieldErrors(){
+    ["page-range-error", "points-error", "timing-error", "match-list-cap-error"].forEach(function(id){
+      const el = document.getElementById(id);
+      el.textContent = ""; el.style.display = "none";
+    });
+  }
+  function showFieldError(id, msg){
+    const el = document.getElementById(id);
+    el.textContent = msg; el.style.display = "block";
+  }
+  function validatePositiveNumber(el, errId, floor, mustBeInteger){
+    const raw = el.value.trim();
+    const re = mustBeInteger ? INT_RE : NUM_RE;
+    if(!re.test(raw)){ showFieldError(errId, mustBeInteger ? "Enter a whole number." : "Enter a positive number."); return null; }
+    const val = mustBeInteger ? parseInt(raw, 10) : parseFloat(raw);
+    if(val < floor){ showFieldError(errId, "Must be at least " + floor + "."); return null; }
+    return val;
+  }
+  function setSettingsStatus(msg, isError){
+    const el = document.getElementById("settings-status");
+    el.textContent = msg;
+    el.classList.toggle("error", !!isError);
+  }
+
+  // =====================================================================
+  // Core search/render logic - ported unchanged from the local competitive
+  // version. Host-only: these all assume quranWords/quranWordMap/metadata
+  // are loaded, which only the host's device ever does.
+  // =====================================================================
+
+  function normalizeForComparison(text){
+    if(text.length >= 2 && text.charCodeAt(1) === 0x0651) return text.charAt(0) + text.substring(2);
+    return text;
+  }
+  function buildStartIndexMap(checkAgainst){
+    const map = new Map();
+    for(let i = 0; i < checkAgainst.length; i++){
+      const key = normalizeForComparison(checkAgainst[i].text);
+      let positions = map.get(key);
+      if(!positions){ positions = []; map.set(key, positions); }
+      positions.push(i);
+    }
+    return map;
+  }
+  function narrowCandidates(candidates, checkAgainst, wordOffset, wordText){
+    const next = [];
+    for(let i = 0; i < candidates.length; i++){
+      const pos = candidates[i];
+      const checkWord = checkAgainst[pos + wordOffset];
+      if(checkWord && checkWord.text === wordText) next.push(pos);
+    }
+    return next;
+  }
+  function shuffleArray(arr){
+    for(let i = arr.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+    return arr;
+  }
+  function isBasmalahWord(word){
+    return word.aya === 1 && word.wordInAya <= 4 && word.sura !== 1 && word.sura !== 9;
+  }
+  function findUniquePhraseFromIndex(startIndex, filteredWords, singleVerseOnly, checkAgainst, startIndexMap){
+    const startWord = filteredWords[startIndex];
+    const firstWordKey = normalizeForComparison(startWord.text);
+    let candidates = startIndexMap.get(firstWordKey) || [];
+    let length = 1;
+    while(startIndex + length <= filteredWords.length){
+      if(length > 1){
+        const currentWord = filteredWords[startIndex + length - 1];
+        const previousWord = filteredWords[startIndex + length - 2];
+        if(currentWord.globalWordNumber !== previousWord.globalWordNumber + 1) return null;
+        if(singleVerseOnly && (currentWord.sura !== startWord.sura || currentWord.aya !== startWord.aya)) return null;
+        candidates = narrowCandidates(candidates, checkAgainst, length - 1, currentWord.text);
+        if(candidates.length === 0) return null;
+      }
+      if(candidates.length === 1){
+        const phrase = [];
+        for(let i = 0; i < length; i++) phrase.push(filteredWords[startIndex + i]);
+        return { words: phrase, startIndex: startIndex, length: length };
+      }
+      length++;
+    }
+    return null;
+  }
+  function getFilteredWords(){
+    return QuranPicker.getFilteredByPortion(quranWords, { portionTypeName: 'portion-type' });
+  }
+  function generateQuestion(settings){
+    const filteredWords = getFilteredWords();
+    if(filteredWords.length === 0) return { ok: false, message: 'No words available with current filter settings.' };
+
+    let startPositions = [];
+    if(settings.startOfAyah){
+      filteredWords.forEach(function(word, idx){ if(word.wordInAya === 1 && !isBasmalahWord(word)) startPositions.push(idx); });
+      if(startPositions.length === 0) return { ok: false, message: 'No words at the beginning of ayahs available with current filter settings.' };
+    }else{
+      filteredWords.forEach(function(word, idx){ if(!isBasmalahWord(word)) startPositions.push(idx); });
+      if(startPositions.length === 0) return { ok: false, message: 'No words available with current filter settings.' };
+    }
+    shuffleArray(startPositions);
+
+    const checkAgainst = filteredWords;
+    const startIndexMap = buildStartIndexMap(checkAgainst);
+
+    let uniquePhrase = null;
+    for(let p = 0; p < startPositions.length; p++){
+      uniquePhrase = findUniquePhraseFromIndex(startPositions[p], filteredWords, settings.singleVerseOnly, checkAgainst, startIndexMap);
+      if(uniquePhrase) break;
+    }
+    if(!uniquePhrase) return { ok: false, message: 'No results found. Try widening your filter settings.' };
+    return { ok: true, uniquePhrase: uniquePhrase };
+  }
+
+  function findPortionOccurrences(words){
+    const checkAgainst = getFilteredWords();
+    const startIndexMap = buildStartIndexMap(checkAgainst);
+    let candidates = startIndexMap.get(normalizeForComparison(words[0].text)) || [];
+    for(let offset = 1; offset < words.length && candidates.length; offset++){
+      candidates = narrowCandidates(candidates, checkAgainst, offset, words[offset].text);
+    }
+    const matches = candidates.map(function(pos){
+      const seenAyah = new Set(); const ayahs = [];
+      for(let i = 0; i < words.length; i++){
+        const w = checkAgainst[pos + i];
+        const key = w.sura + ':' + w.aya;
+        if(!seenAyah.has(key)){ seenAyah.add(key); ayahs.push({ sura: w.sura, aya: w.aya }); }
+      }
+      return { firstWord: checkAgainst[pos], lastWord: checkAgainst[pos + words.length - 1], ayahs: ayahs };
+    });
+    const seenOverall = new Set(); const uniqueAyahs = [];
+    matches.forEach(function(m){
+      m.ayahs.forEach(function(a){
+        const key = a.sura + ':' + a.aya;
+        if(!seenOverall.has(key)){ seenOverall.add(key); uniqueAyahs.push(a); }
+      });
+    });
+    return { totalCount: candidates.length, uniqueAyahs: uniqueAyahs, matches: matches };
+  }
+
+  function containsCompleteAyah(words){
+    const seenAyah = new Set();
+    for(let i = 0; i < words.length; i++){
+      const w = words[i];
+      const key = w.sura + ':' + w.aya;
+      if(seenAyah.has(key)) continue;
+      seenAyah.add(key);
+      const hasFirstWord = words.some(function(x){ return x.sura === w.sura && x.aya === w.aya && x.wordInAya === 1; });
+      if(!hasFirstWord) continue;
+      const hasLastWord = words.some(function(x){
+        if(x.sura !== w.sura || x.aya !== w.aya) return false;
+        const next = quranWordMap[x.globalWordNumber + 1];
+        return !next || next.sura !== x.sura || next.aya !== x.aya;
+      });
+      if(hasLastWord) return true;
+    }
+    return false;
+  }
+
+  function escapeHTML(s){
+    const div = document.createElement("div");
+    div.textContent = s;
+    return div.innerHTML;
+  }
+  function suraNameOf(idx){
+    const s = metadata.suras.find(function(s){ return s.index === idx; });
+    return s ? s.name : ("Surah " + idx);
+  }
+  function verseTextFor(sura, aya){
+    const verseWords = quranWords.filter(function(w){ return w.sura === sura && w.aya === aya; });
+    return verseWords.map(function(w){ return w.text; }).join(' ');
+  }
+  function buildPhraseText(words, showMarker){
+    if(!showMarker) return words.map(function(w){ return w.text; }).join(' ');
+    let text = '';
+    for(let i = 0; i < words.length; i++){
+      text += words[i].text;
+      if(i < words.length - 1){
+        const cur = words[i], next = words[i + 1];
+        if(cur.sura !== next.sura || cur.aya !== next.aya) text += ' \u06DD';
+        text += ' ';
+      }
+    }
+    return text;
+  }
+  function buildAyahSpanHTML(ayahs, firstWord, lastWord){
+    let html = '';
+    ayahs.forEach(function(a){ html += '<div class="answer-verse">' + escapeHTML(verseTextFor(a.sura, a.aya)) + '</div>'; });
+    const surahName = suraNameOf(firstWord.sura);
+    let ayahDisplay;
+    if(ayahs.length > 1){
+      ayahDisplay = (firstWord.sura !== lastWord.sura)
+        ? (surahName + ' ' + firstWord.aya + ' \u2013 ' + suraNameOf(lastWord.sura) + ' ' + lastWord.aya)
+        : (firstWord.aya + ' \u2013 ' + lastWord.aya);
+    }else{ ayahDisplay = String(firstWord.aya); }
+    html += '<div class="answer-metadata">';
+    html += '<div><strong>Surah:</strong> ' + escapeHTML(surahName) + ' (' + firstWord.sura + ')</div>';
+    html += '<div><strong>Ayah:</strong> ' + escapeHTML(ayahDisplay) + '</div>';
+    html += '<div><strong>Juz:</strong> ' + firstWord.juz + '</div>';
+    html += '<div><strong>Page:</strong> ' + firstWord.page + '</div>';
+    html += '</div>';
+    return html;
+  }
+  function buildAnswerHTML(question){
+    const words = question.uniquePhrase.words;
+    const ayahs = []; const seen = new Set();
+    words.forEach(function(w){ const k = w.sura + ':' + w.aya; if(!seen.has(k)){ seen.add(k); ayahs.push({ sura: w.sura, aya: w.aya }); } });
+    return buildAyahSpanHTML(ayahs, words[0], words[words.length - 1]);
+  }
+  function buildMatchAnswerHTML(match){
+    return '<div class="answer-match">' + buildAyahSpanHTML(match.ayahs, match.firstWord, match.lastWord) + '</div>';
+  }
+  function buildAnswerBlockHTML(gameState){
+    const occ = gameState.checkOccurrences || gameState.objectionOccurrences;
+    if(occ && occ.totalCount > 1){
+      let html = '<div class="zone-answer">';
+      if(occ.totalCount > gameState.matchListCap){
+        html += '<div class="buzz-status-note">Woah, comes ' + occ.totalCount + ' times, very not unique.</div>';
+      }else{
+        html += '<div class="buzz-status-note">This phrase wasn\u2019t unique yet when it was checked \u2014 it matched ' + occ.totalCount + ' place' + (occ.totalCount === 1 ? '' : 's') + ':</div>';
+        occ.matches.forEach(function(m){ html += buildMatchAnswerHTML(m); });
+      }
+      html += '</div>';
+      return html;
+    }
+    return '<div class="zone-answer">' + buildAnswerHTML(gameState.currentQuestion) + '</div>';
+  }
+
+  // =====================================================================
+  // HOST: room creation
+  // =====================================================================
+
+  document.getElementById("create-room-btn").addEventListener("click", createRoom);
+
+  function makeRoomCode(){
+    const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ"; // no I/O to avoid confusion
+    let code = "";
+    for(let i = 0; i < 4; i++) code += letters[Math.floor(Math.random() * letters.length)];
+    return code;
+  }
+
+  async function createRoom(){
+    clearFieldErrors();
+    setSettingsStatus("", false);
+
+    const hostName = (document.getElementById("host-name").value || "").trim() || "Host";
+    const pointsToWin = validatePositiveNumber(document.getElementById("points-to-win"), "points-error", 1, true);
+    const startWords = validatePositiveNumber(document.getElementById("start-words"), "timing-error", 1, true);
+    const revealDelay = validatePositiveNumber(document.getElementById("reveal-delay"), "timing-error", 1, false);
+    const answerTime = validatePositiveNumber(document.getElementById("answer-time"), "timing-error", 1, true);
+    const eliminationTimeLimit = validatePositiveNumber(document.getElementById("elimination-time-limit"), "timing-error", 1, true);
+    const matchListCap = validatePositiveNumber(document.getElementById("match-list-cap"), "match-list-cap-error", 1, true);
+    const maxPlayers = getMaxPlayers();
+    const objectionsWanted = document.getElementById("enable-objections").checked;
+    let objectionTimeSeconds = null;
+    if(maxPlayers === 2 && objectionsWanted){
+      objectionTimeSeconds = validatePositiveNumber(document.getElementById("objection-time"), "timing-error", 1, true);
+      if(objectionTimeSeconds === null) return;
+    }
+
+    const portionType = document.querySelector('input[name="portion-type"]:checked').value;
+    const activeTab = portionType === 'select' ? document.querySelector('.tab-btn.active').dataset.tab : null;
+    if(activeTab === 'page'){
+      const pages = QuranPicker.parsePageRange(document.getElementById('page-range').value);
+      if(pages === undefined){ showFieldError('page-range-error', 'Invalid range.'); return; }
+    }
+
+    if(pointsToWin === null || startWords === null || revealDelay === null || answerTime === null || eliminationTimeLimit === null || matchListCap === null) return;
+    if(!quranDataReady){ setSettingsStatus("Still loading Qur'an data - try again in a moment.", true); return; }
+
+    const questionSettings = {
+      singleVerseOnly: document.getElementById('single-verse-only').checked,
+      startOfAyah: document.getElementById('start-of-ayah').checked
+    };
+    const portionWordNumbers = new Set(getFilteredWords().map(function(w){ return w.globalWordNumber; }));
+    const testResult = generateQuestion(questionSettings);
+    if(!testResult.ok){ setSettingsStatus(testResult.message, true); return; }
+
+    myName = hostName;
+    isHost = true;
+    myIndex = 0;
+    roomCode = makeRoomCode();
+
+    hostState = {
+      pointsToWin: pointsToWin, startWords: startWords, revealDelayMs: revealDelay * 1000,
+      answerTimeSeconds: answerTime, eliminationTimeLimitSeconds: eliminationTimeLimit,
+      matchListCap: matchListCap, objectionsWanted: objectionsWanted, objectionTimeSeconds: objectionTimeSeconds,
+      showAyahMarker: document.getElementById('show-ayah-marker').checked,
+      questionSettings: questionSettings, portionWordNumbers: portionWordNumbers,
+      maxPlayers: maxPlayers, penalizeEarlyBuzz: maxPlayers > 2 && document.getElementById("penalize-early-buzz").checked
+    };
+    const selectedSurahs = Array.from(document.querySelectorAll("#surah-list input[type=checkbox]:checked")).map(function(el){ return el.closest("label")?.textContent.trim() || el.value; });
+    const selectedJuz = Array.from(document.querySelectorAll("#juz-list input[type=checkbox]:checked")).map(function(el){ return el.closest("label")?.textContent.trim() || el.value; });
+    const publicSettings = {
+      portion: portionType === "entire" ? "Entire Qur’an" : activeTab === "page" ? "Pages: " + (document.getElementById("page-range").value.trim() || "all") : (activeTab === "juz" ? "Juz: " + selectedJuz.join(", ") : "Surahs: " + selectedSurahs.join(", ")),
+      maxPlayers: maxPlayers, pointsToWin: pointsToWin, startWords: startWords, revealDelay: revealDelay,
+      answerTime: answerTime, eliminationTimeLimit: eliminationTimeLimit,
+      objections: maxPlayers === 2 && objectionsWanted, objectionTime: objectionTimeSeconds,
+      penalizeEarlyBuzz: hostState.penalizeEarlyBuzz,
+      singleVerseOnly: questionSettings.singleVerseOnly, startOfAyah: questionSettings.startOfAyah,
+      showAyahMarker: hostState.showAyahMarker, matchListCap: matchListCap
+    };
+
+    await fb.set(fb.ref(fb.db, 'rooms/' + roomCode), {
+      status: 'lobby',
+      hostId: myId,
+      maxPlayers: maxPlayers,
+      settings: publicSettings,
+      createdAt: fb.serverTimestamp(),
+      players: {
+        [myId]: { name: hostName, joinedAt: fb.serverTimestamp() }
+      }
+    });
+    fb.onDisconnect(fb.ref(fb.db, 'rooms/' + roomCode + '/players/' + myId)).remove();
+
+    enterLobby();
+  }
+
+  // =====================================================================
+  // GUEST: joining
+  // =====================================================================
+
+  document.getElementById("join-submit-btn").addEventListener("click", joinRoom);
+
+  async function joinRoom(){
+    const code = document.getElementById("join-code").value.trim().toUpperCase();
+    const name = (document.getElementById("join-name").value || "").trim();
+    const statusEl2 = document.getElementById("join-status");
+    statusEl2.textContent = ""; statusEl2.classList.remove("error");
+
+    if(code.length !== 4){ statusEl2.textContent = "Enter the 4-letter room code."; statusEl2.classList.add("error"); return; }
+    if(!name){ statusEl2.textContent = "Enter your name."; statusEl2.classList.add("error"); return; }
+
+    const roomSnap = await fb.get(fb.ref(fb.db, 'rooms/' + code));
+    if(!roomSnap.exists()){ statusEl2.textContent = "No room found with that code."; statusEl2.classList.add("error"); return; }
+    const room = roomSnap.val();
+    if(room.status !== 'lobby'){ statusEl2.textContent = "That game has already started."; statusEl2.classList.add("error"); return; }
+    const currentCount = room.players ? Object.keys(room.players).length : 0;
+    if(currentCount >= room.maxPlayers){ statusEl2.textContent = "That room is full."; statusEl2.classList.add("error"); return; }
+
+    myName = name;
+    isHost = false;
+    roomCode = code;
+
+    await fb.set(fb.ref(fb.db, 'rooms/' + code + '/players/' + myId), { name: name, joinedAt: fb.serverTimestamp() });
+    fb.onDisconnect(fb.ref(fb.db, 'rooms/' + code + '/players/' + myId)).remove();
+
+    enterLobby();
+  }
+
+  // =====================================================================
+  // Lobby (shared by host and guests)
+  // =====================================================================
+
+  function enterLobby(){
+    showScreen("lobby");
+    document.getElementById("lobby-room-code").textContent = roomCode;
+    document.getElementById("lobby-host-controls").hidden = !isHost;
+
+    fb.onValue(fb.ref(fb.db, 'rooms/' + roomCode + '/settings'), function(snap){
+      renderLobbySettings(snap.val());
+    });
+
+    fb.onValue(fb.ref(fb.db, 'rooms/' + roomCode + '/players'), function(snap){
+      const players = snap.val() || {};
+      renderLobbyRoster(players);
+    });
+
+    fb.onValue(fb.ref(fb.db, 'rooms/' + roomCode + '/status'), function(snap){
+      if(snap.val() === 'playing') enterGame();
+    });
+
+    if(isHost){
+      document.getElementById("start-game-btn").addEventListener("click", startGameAsHost);
+    }
+  }
+
+  function renderLobbySettings(settings){
+    const el = document.getElementById("lobby-settings");
+    if(!settings){ el.textContent = "Waiting for room settings…"; return; }
+    const row = function(label, value){ return '<p><strong>' + label + ':</strong> ' + escapeHTML(String(value)) + '</p>'; };
+    const yesNo = function(value){ return value ? "Yes" : "No"; };
+    el.innerHTML = '<h3>Game Setup</h3>' +
+      row("Portion", settings.portion) + row("Number of Players", settings.maxPlayers) +
+      row("Starting words shown", settings.startWords) + row("Seconds between reveals", settings.revealDelay) +
+      (settings.maxPlayers === 2 ? row("Objections", yesNo(settings.objections)) + (settings.objections ? row("Objection answer time (s)", settings.objectionTime) : "") : "") +
+      '<details><summary>More settings</summary>' + row("Points to Win", settings.pointsToWin) +
+      row("Answer time after buzzing (s)", settings.answerTime) + row("Time limit after an elimination (s)", settings.eliminationTimeLimit) +
+      (settings.maxPlayers > 2 ? row("Eliminate early buzzers from the next round", yesNo(settings.penalizeEarlyBuzz)) : "") +
+      row("Keep questions within one ayah", yesNo(settings.singleVerseOnly)) +
+      row("Keep questions at the beginning of an ayah", yesNo(settings.startOfAyah)) +
+      row("Show ayah marker while revealing", yesNo(settings.showAyahMarker)) +
+      row("Maximum matches to list", settings.matchListCap) + '</details>';
+  }
+
+  function renderLobbyRoster(players){
+    const ids = Object.keys(players).sort(function(a, b){
+      return (players[a].joinedAt || 0) - (players[b].joinedAt || 0);
+    });
+    const roster = document.getElementById("lobby-roster");
+    roster.innerHTML = ids.map(function(id, idx){
+      return '<div class="player-row"><span class="dot" style="background:' + PLAYER_COLORS[idx % 4] + '"></span>' +
+        escapeHTML(players[id].name) + (id === myId ? '<span class="you-tag">you</span>' : '') + '</div>';
+    }).join('');
+    if(isHost){
+      document.getElementById("start-game-btn").disabled = ids.length < 2;
+      document.getElementById("lobby-status").textContent = ids.length < 2 ? "Need at least 2 players to start." : "";
+    }else{
+      document.getElementById("lobby-status").textContent = "Waiting for the host to start the game\u2026";
+    }
+  }
+
+  document.getElementById("lobby-leave-btn").addEventListener("click", async function(){
+    if(roomCode){
+      await fb.remove(fb.ref(fb.db, 'rooms/' + roomCode + '/players/' + myId));
+      if(isHost) await fb.remove(fb.ref(fb.db, 'rooms/' + roomCode));
+    }
+    roomCode = null; isHost = false; myIndex = null;
+    showScreen("landing");
+  });
+
+  // =====================================================================
+  // HOST: game state machine - this is the same shape of logic as the
+  // local competitive version's game object and functions, just pushing
+  // to Firebase instead of calling renderArena() directly. Only ever runs
+  // on the host's device.
+  // =====================================================================
+
+  let hostState = null; // settings captured at room-creation time
+  let hg = null;         // the live host-side game object
+
+  async function startGameAsHost(){
+    const snap = await fb.get(fb.ref(fb.db, 'rooms/' + roomCode + '/players'));
+    const players = snap.val() || {};
+    const ids = Object.keys(players).sort(function(a, b){ return (players[a].joinedAt || 0) - (players[b].joinedAt || 0); });
+
+    const updates = {};
+    const rosterById = {};
+    ids.forEach(function(id, idx){
+      updates['players/' + id + '/index'] = idx;
+      rosterById[id] = idx;
+      if(id === myId) myIndex = idx;
+    });
+    await fb.update(fb.ref(fb.db, 'rooms/' + roomCode), updates);
+
+    const playerCount = ids.length;
+    const objectionsEnabled = playerCount === 2 && hostState.objectionsWanted;
+
+    hg = {
+      players: ids.map(function(id, idx){ return { id: idx, uid: id, name: players[id].name, color: PLAYER_COLORS[idx], score: 0, eliminatedThisRound: false, eliminatedNextRound: false }; }),
+      pointsToWin: hostState.pointsToWin,
+      startWords: hostState.startWords,
+      revealDelayMs: hostState.revealDelayMs,
+      answerTimeSeconds: hostState.answerTimeSeconds,
+      eliminationTimeLimitSeconds: hostState.eliminationTimeLimitSeconds,
+      matchListCap: hostState.matchListCap,
+      objectionsEnabled: objectionsEnabled,
+      penalizeEarlyBuzz: playerCount > 2 && hostState.penalizeEarlyBuzz,
+      objectionTimeSeconds: hostState.objectionTimeSeconds,
+      portionWordNumbers: hostState.portionWordNumbers,
+      showAyahMarker: hostState.showAyahMarker,
+      questionSettings: hostState.questionSettings,
+      currentQuestion: null, displayedWords: [], phraseTotal: 0, leftGlobal: null, rightGlobal: null,
+      expandNextDirection: "forward", expansionExhausted: false,
+      phase: "revealing", activeBuzzerId: null, revealedToBuzzer: false, answerRemaining: 0, checkOccurrences: null,
+      objectorId: null, objectionRemaining: 0, objectionOccurrences: null, objectionRevealed: false,
+      objectionTypedCount: 0, objectionCooldownActive: false, roundOverMessage: null, winnerName: null,
+      searchFailMessage: null, countdownRemaining: 0, eliminationCountdownRemaining: 0,
+      revealTimerId: null, answerTimerId: null, objectionTimerId: null, objectionCooldownTimerId: null,
+      countdownTimerId: null, eliminationCountdownTimerId: null
+    };
+
+    await fb.update(fb.ref(fb.db, 'rooms/' + roomCode), { status: 'playing' });
+    listenForIntents();
+    listenForBuzzClaims();
+    startRound();
+  }
+
+  function stopRevealTimer(){ if(hg.revealTimerId){ clearInterval(hg.revealTimerId); hg.revealTimerId = null; } }
+  function stopAnswerTimer(){ if(hg.answerTimerId){ clearInterval(hg.answerTimerId); hg.answerTimerId = null; } }
+  function stopObjectionTimer(){ if(hg.objectionTimerId){ clearInterval(hg.objectionTimerId); hg.objectionTimerId = null; } }
+  function stopObjectionCooldownTimer(){ if(hg.objectionCooldownTimerId){ clearTimeout(hg.objectionCooldownTimerId); hg.objectionCooldownTimerId = null; } }
+  function stopCountdownTimer(){ if(hg.countdownTimerId){ clearInterval(hg.countdownTimerId); hg.countdownTimerId = null; } }
+  function stopEliminationCountdown(){ if(hg.eliminationCountdownTimerId){ clearInterval(hg.eliminationCountdownTimerId); hg.eliminationCountdownTimerId = null; } }
+
+  function resetBuzzClaim(){
+    fb.set(fb.ref(fb.db, 'rooms/' + roomCode + '/buzzClaim'), null);
+  }
+
+  function startRound(){
+    stopRevealTimer(); stopAnswerTimer(); stopObjectionTimer(); stopObjectionCooldownTimer(); stopCountdownTimer(); stopEliminationCountdown();
+    resetBuzzClaim();
+
+    const result = generateQuestion(hg.questionSettings);
+    if(!result.ok){
+      hg.phase = "searchFailed";
+      hg.searchFailMessage = result.message;
+      syncState();
+      return;
+    }
+    const phraseWords = result.uniquePhrase.words;
+    hg.currentQuestion = result;
+    hg.phraseTotal = phraseWords.length;
+    const initialCount = Math.min(hg.startWords, phraseWords.length);
+    hg.displayedWords = phraseWords.slice(0, initialCount);
+    hg.leftGlobal = hg.displayedWords[0].globalWordNumber;
+    hg.rightGlobal = hg.displayedWords[hg.displayedWords.length - 1].globalWordNumber;
+    hg.expandNextDirection = "forward"; hg.expansionExhausted = false;
+    hg.phase = "revealing"; hg.activeBuzzerId = null; hg.revealedToBuzzer = false;
+    hg.checkOccurrences = null; hg.objectorId = null; hg.objectionRemaining = 0;
+    hg.objectionOccurrences = null; hg.objectionRevealed = false; hg.objectionTypedCount = 0;
+    hg.objectionCooldownActive = false; hg.roundOverMessage = null;
+    hg.players.forEach(function(p){ p.eliminatedThisRound = p.eliminatedNextRound; p.eliminatedNextRound = false; });
+
+    if(endRoundIfCompleteAyahShown()) return;
+    hg.revealTimerId = setInterval(tickReveal, hg.revealDelayMs);
+    syncState();
+  }
+
+  function endRoundIfCompleteAyahShown(){
+    if(!containsCompleteAyah(hg.displayedWords)) return false;
+    stopRevealTimer(); stopEliminationCountdown();
+    hg.checkOccurrences = findPortionOccurrences(hg.displayedWords);
+    finishRound("A full ayah was revealed \u2014 no one got it in time.");
+    return true;
+  }
+
+  function tickReveal(){
+    const phraseWords = hg.currentQuestion.uniquePhrase.words;
+    if(hg.displayedWords.length < phraseWords.length){
+      hg.displayedWords.push(phraseWords[hg.displayedWords.length]);
+      hg.rightGlobal = hg.displayedWords[hg.displayedWords.length - 1].globalWordNumber;
+      if(endRoundIfCompleteAyahShown()) return;
+      syncState();
+      return;
+    }
+    const tryForward = function(){
+      const next = quranWordMap[hg.rightGlobal + 1];
+      if(!next || !hg.portionWordNumbers.has(next.globalWordNumber)) return false;
+      hg.displayedWords.push(next); hg.rightGlobal++; return true;
+    };
+    const tryBackward = function(){
+      const prev = quranWordMap[hg.leftGlobal - 1];
+      if(!prev || !hg.portionWordNumbers.has(prev.globalWordNumber)) return false;
+      hg.displayedWords.unshift(prev); hg.leftGlobal--; return true;
+    };
+    let extended;
+    if(hg.expandNextDirection === "forward"){ extended = tryForward() || tryBackward(); hg.expandNextDirection = "backward"; }
+    else{ extended = tryBackward() || tryForward(); hg.expandNextDirection = "forward"; }
+    if(!extended){ hg.expansionExhausted = true; stopRevealTimer(); syncState(); return; }
+    if(endRoundIfCompleteAyahShown()) return;
+    syncState();
+  }
+
+  function resumeRevealIfNeeded(){
+    if(!hg.expansionExhausted && !hg.revealTimerId) hg.revealTimerId = setInterval(tickReveal, hg.revealDelayMs);
+  }
+
+  function finishRound(message){
+    hg.roundOverMessage = message;
+    const winner = hg.players.find(function(p){ return p.score >= hg.pointsToWin; });
+    if(winner){ hg.phase = "gameOver"; hg.winnerName = winner.name; }
+    else{ hg.phase = "roundOver"; }
+    syncState();
+  }
+
+  function buzz(playerId){
+    if(hg.phase !== "revealing") return;
+    const player = hg.players[playerId];
+    if(!player || player.eliminatedThisRound) return;
+    if(hg.players.length > 2 && hg.penalizeEarlyBuzz){
+      const occ = findPortionOccurrences(hg.displayedWords);
+      if(occ.totalCount > 1){
+        stopRevealTimer(); stopEliminationCountdown();
+        hg.checkOccurrences = occ;
+        player.eliminatedNextRound = true;
+        finishRound(player.name + " buzzed before it was unique — they’ll sit out next round.");
+        return;
+      }
+    }
+    stopRevealTimer();
+    hg.phase = "answering"; hg.activeBuzzerId = playerId; hg.answerRemaining = hg.answerTimeSeconds;
+    hg.objectionCooldownActive = true;
+    hg.objectionCooldownTimerId = setTimeout(function(){
+      hg.objectionCooldownTimerId = null; hg.objectionCooldownActive = false;
+      if(hg.phase === "answering") syncState();
+    }, 300);
+    syncState();
+    hg.answerTimerId = setInterval(function(){
+      hg.answerRemaining--;
+      if(hg.answerRemaining <= 0){
+        stopAnswerTimer(); hg.phase = "checking"; hg.revealedToBuzzer = false;
+      }
+      syncState();
+    }, 1000);
+  }
+
+  function checkAnswer(){
+    if(hg.phase !== "checking") return;
+    hg.checkOccurrences = findPortionOccurrences(hg.displayedWords);
+    hg.revealedToBuzzer = true;
+    syncState();
+  }
+
+  function markCorrect(){
+    if(hg.phase !== "checking" || hg.activeBuzzerId === null) return;
+    hg.players[hg.activeBuzzerId].score++;
+    finishRound(hg.players[hg.activeBuzzerId].name + " scores a point!");
+  }
+
+  function markWrong(){
+    if(hg.phase !== "checking" || hg.activeBuzzerId === null) return;
+    hg.players[hg.activeBuzzerId].eliminatedThisRound = true;
+    hg.activeBuzzerId = null; hg.revealedToBuzzer = false;
+    const allEliminated = hg.players.every(function(p){ return p.eliminatedThisRound; });
+    if(allEliminated){ finishRound("No one got it this time."); }
+    else{ hg.phase = "revealing"; resetBuzzClaim(); resumeRevealIfNeeded(); startEliminationCountdown(); syncState(); }
+  }
+
+  function manualReveal(){
+    if(hg.phase !== "revealing") return;
+    stopRevealTimer(); stopAnswerTimer(); stopEliminationCountdown();
+    hg.checkOccurrences = findPortionOccurrences(hg.displayedWords);
+    finishRound("No one got it this time.");
+  }
+
+  function startEliminationCountdown(){
+    stopEliminationCountdown();
+    hg.eliminationCountdownRemaining = hg.eliminationTimeLimitSeconds;
+    hg.eliminationCountdownTimerId = setInterval(function(){
+      hg.eliminationCountdownRemaining--;
+      if(hg.eliminationCountdownRemaining <= 0){
+        stopEliminationCountdown(); stopRevealTimer(); stopAnswerTimer();
+        hg.checkOccurrences = findPortionOccurrences(hg.displayedWords);
+        finishRound("Time\u2019s up \u2014 no one got it this time.");
+        return;
+      }
+      syncState();
+    }, 1000);
+  }
+
+  function raiseObjection(playerId){
+    if(!hg.objectionsEnabled || hg.phase !== "answering") return;
+    if(playerId === hg.activeBuzzerId) return;
+    stopAnswerTimer();
+    hg.objectorId = playerId; hg.objectionRemaining = hg.objectionTimeSeconds; hg.phase = "objecting";
+    syncState();
+    hg.objectionTimerId = setInterval(function(){
+      hg.objectionRemaining--;
+      if(hg.objectionRemaining <= 0){ stopObjectionTimer(); hg.phase = "objectingChecking"; hg.objectionRevealed = false; }
+      syncState();
+    }, 1000);
+  }
+  function finishObjecting(){
+    if(hg.phase !== "objecting") return;
+    stopObjectionTimer(); hg.phase = "objectingChecking"; hg.objectionRevealed = false;
+    syncState();
+  }
+  function checkObjection(){
+    if(hg.phase !== "objectingChecking" || hg.objectionRevealed) return;
+    hg.objectionOccurrences = findPortionOccurrences(hg.displayedWords);
+    hg.objectionRevealed = true; hg.objectionTypedCount = 0;
+    if(hg.objectionOccurrences.totalCount <= 1){ resolveObjectionOutcome(false); return; }
+    syncState();
+  }
+  function confirmObjection(claimedCountRaw){
+    if(hg.phase !== "objectingChecking" || !hg.objectionRevealed) return;
+    const occ = hg.objectionOccurrences;
+    const claimedCount = Math.max(0, Math.min(parseInt(claimedCountRaw, 10) || 0, occ.totalCount));
+    if(claimedCount >= 2){ resolveObjectionOutcome(true, claimedCount); }
+    else{ finishRound(hg.players[hg.objectorId].name + "\u2019s objection was valid, but they didn\u2019t claim at least two ayahs \u2014 no points awarded."); }
+  }
+  function resolveObjectionOutcome(wasCorrect, awardedCount){
+    const objector = hg.players[hg.objectorId];
+    const buzzer = hg.players[hg.activeBuzzerId];
+    if(wasCorrect){
+      objector.score += awardedCount;
+      finishRound(objector.name + " correctly objects and scores " + awardedCount + " point" + (awardedCount === 1 ? "" : "s") + "!");
+    }else{
+      objector.score -= 1; buzzer.score += 1;
+      finishRound("Objection failed \u2014 the phrase was already unique. " + objector.name + " loses a point, " + buzzer.name + " wins the point!");
+    }
+  }
+
+  const NEXT_ROUND_COUNTDOWN_SECONDS = 3;
+  function beginCountdownThenStartRound(){
+    stopCountdownTimer();
+    hg.phase = "countdown"; hg.countdownRemaining = NEXT_ROUND_COUNTDOWN_SECONDS;
+    syncState();
+    hg.countdownTimerId = setInterval(function(){
+      hg.countdownRemaining--;
+      if(hg.countdownRemaining <= 0){ stopCountdownTimer(); startRound(); return; }
+      syncState();
+    }, 1000);
+  }
+  function nextRound(){ if(hg.phase === "roundOver" || hg.phase === "searchFailed") beginCountdownThenStartRound(); }
+  function playAgain(){ hg.players.forEach(function(p){ p.score = 0; }); beginCountdownThenStartRound(); }
+
+  async function endGameAsHost(){
+    stopRevealTimer(); stopAnswerTimer(); stopObjectionTimer(); stopObjectionCooldownTimer(); stopCountdownTimer(); stopEliminationCountdown();
+    await fb.remove(fb.ref(fb.db, 'rooms/' + roomCode));
+    hg = null; roomCode = null; isHost = false; myIndex = null;
+    showScreen("landing");
+  }
+
+  // Serialises the host's in-memory game object into plain, display-ready
+  // data (no functions, no timer IDs) and pushes it to Firebase. Every
+  // player's client (including the host's own) renders purely from this.
+  function syncState(){
+    if(!hg) return;
+    const payload = {
+      phase: hg.phase,
+      pointsToWin: hg.pointsToWin,
+      matchListCap: hg.matchListCap,
+      objectionsEnabled: hg.objectionsEnabled,
+      players: hg.players.map(function(p){ return { id: p.id, name: p.name, color: p.color, score: p.score, eliminatedThisRound: p.eliminatedThisRound }; }),
+      activeBuzzerId: hg.activeBuzzerId,
+      objectorId: hg.objectorId,
+      answerRemaining: hg.answerRemaining,
+      objectionRemaining: hg.objectionRemaining,
+      countdownRemaining: hg.countdownRemaining,
+      eliminationCountdownRemaining: hg.eliminationCountdownRemaining,
+      eliminationActive: !!hg.eliminationCountdownTimerId,
+      objectionCooldownActive: hg.objectionCooldownActive,
+      revealedToBuzzer: hg.revealedToBuzzer,
+      objectionRevealed: hg.objectionRevealed,
+      roundOverMessage: hg.roundOverMessage,
+      winnerName: hg.winnerName,
+      searchFailMessage: hg.searchFailMessage,
+      revealText: hg.displayedWords && hg.displayedWords.length ? buildPhraseText(hg.displayedWords, hg.showAyahMarker) : "",
+      revealMeta: (hg.displayedWords && !hg.objectionsEnabled)
+        ? (hg.displayedWords.length <= hg.phraseTotal ? (hg.displayedWords.length + ' of ' + hg.phraseTotal + ' words shown') : (hg.displayedWords.length + ' words shown (extra context added)'))
+        : null,
+      answerHTML: (hg.phase === "roundOver" || hg.phase === "gameOver" || (hg.phase === "checking" && hg.revealedToBuzzer)) ? buildAnswerBlockHTML(hg) : null,
+      objectionData: (hg.phase === "objectingChecking" && hg.objectionRevealed && hg.objectionOccurrences && hg.objectionOccurrences.totalCount > 1)
+        ? {
+            totalCount: hg.objectionOccurrences.totalCount,
+            overCap: hg.objectionOccurrences.totalCount > hg.matchListCap,
+            uniqueAyahs: hg.objectionOccurrences.uniqueAyahs.map(function(a){ return { sura: a.sura, aya: a.aya, verseText: verseTextFor(a.sura, a.aya), surahName: suraNameOf(a.sura) }; })
+          }
+        : null,
+      updatedAt: fb.serverTimestamp()
+    };
+    // Defensive: Firebase's set() rejects the ENTIRE write if any field is
+    // undefined, and fails silently unless the promise is handled - this
+    // is exactly what caused the blank game screen bug. Coercing any
+    // stray undefined to null means a future oversight degrades instead
+    // of quietly breaking every client's screen, and logging a failure
+    // means it's at least visible in devtools instead of invisible.
+    const safePayload = JSON.parse(JSON.stringify(payload, function(key, value){
+      return value === undefined ? null : value;
+    }));
+    // Render our own screen only once the server has acknowledged this
+    // write, not from the instant local-cache echo Firebase would
+    // otherwise deliver to our own onValue listener - that instant echo
+    // is exactly what let the host see new words before anyone else's
+    // connection had a chance to receive them, the same underlying issue
+    // as the buzz-fairness bug. This doesn't make delivery perfectly
+    // simultaneous for every guest (each has its own connection latency),
+    // but it removes the host's structural, guaranteed head start.
+    fb.set(fb.ref(fb.db, 'rooms/' + roomCode + '/game'), safePayload).then(function(){
+      latestState = safePayload;
+      renderGameScreen(safePayload);
+    }).catch(function(err){
+      console.error('Failed to sync game state:', err);
+    });
+  }
+
+  function listenForIntents(){
+    fb.onChildAdded(fb.ref(fb.db, 'rooms/' + roomCode + '/intents'), function(snap){
+      const intent = snap.val();
+      if(!intent) return;
+      handleIntent(intent.type, intent.playerId, intent.data);
+      fb.remove(snap.ref);
+    });
+  }
+
+  // Buzzing bypasses the intents queue entirely and uses a transaction
+  // instead - see the write-up on why: routing it through "whichever
+  // intent the host's onChildAdded fires for first" gave the host's own
+  // taps an unfair edge, since a client's own writes reach its own
+  // listeners through Firebase's local optimistic cache almost instantly,
+  // while a remote player's write has to make a real round trip to the
+  // server and back down to the host first. A transaction is resolved by
+  // the server itself - whichever write the server actually receives
+  // first wins, regardless of which device (host or guest) sent it.
+  function listenForBuzzClaims(){
+    fb.onValue(fb.ref(fb.db, 'rooms/' + roomCode + '/buzzClaim'), function(snap){
+      const claim = snap.val();
+      if(!claim || !claim.playerId) return;
+      const player = hg.players.find(function(p){ return p.uid === claim.playerId; });
+      if(player) buzz(player.id);
+    });
+  }
+
+  function handleIntent(type, playerUid, data){
+    const player = hg.players.find(function(p){ return p.uid === playerUid; });
+    const playerId = player ? player.id : null;
+    if(type === "raise-objection") raiseObjection(playerId);
+    else if(type === "finish-objecting") finishObjecting();
+    else if(type === "check-answer") checkAnswer();
+    else if(type === "mark-correct") markCorrect();
+    else if(type === "mark-wrong") markWrong();
+    else if(type === "check-objection") checkObjection();
+    else if(type === "confirm-objection") confirmObjection(data && data.claimedCount);
+    else if(type === "reveal-fallback") manualReveal();
+    else if(type === "next-round") nextRound();
+    else if(type === "play-again") playAgain();
+    else if(type === "end-game") endGameAsHost();
+  }
+
+  // =====================================================================
+  // EVERY CLIENT (host included): render from synced state + send intents
+  // =====================================================================
+
+  let latestState = null;
+  let myUidToIndex = {};
+
+  function enterGame(){
+    showScreen("game");
+    fb.onValue(fb.ref(fb.db, 'rooms/' + roomCode + '/players'), function(snap){
+      const players = snap.val() || {};
+      if(players[myId] && typeof players[myId].index === "number"){
+        const changed = myIndex !== players[myId].index;
+        myIndex = players[myId].index;
+        if(changed && latestState) renderGameScreen(latestState);
+      }
+    });
+    // The host deliberately does NOT attach this listener - it already
+    // has the freshest truth locally in hg, and reading it back through
+    // onValue would fire instantly from Firebase's local optimistic
+    // cache, reintroducing the same head-start problem syncState()'s
+    // post-acknowledgment render is specifically avoiding.
+    if(!isHost){
+      fb.onValue(fb.ref(fb.db, 'rooms/' + roomCode + '/game'), function(snap){
+        latestState = snap.val();
+        if(latestState) renderGameScreen(latestState);
+      });
+    }
+  }
+
+  function sendIntent(type, data){
+    fb.push(fb.ref(fb.db, 'rooms/' + roomCode + '/intents'), {
+      type: type, playerId: myId, data: data || null, ts: fb.serverTimestamp()
+    });
+  }
+
+  // Every player (host included) races this same transaction directly
+  // rather than going through the intents queue - see listenForBuzzClaims
+  // for why. runTransaction() only ever commits for whichever write the
+  // server actually receives first; a losing client's transaction is
+  // reported back as failed/aborted rather than quietly winning locally.
+  function attemptBuzz(){
+    fb.runTransaction(fb.ref(fb.db, 'rooms/' + roomCode + '/buzzClaim'), function(current){
+      if(current !== null) return; // already claimed - abort without overwriting
+      return { playerId: myId, ts: Date.now() };
+    });
+  }
+
+  const gameScreenEl = document.getElementById("game-screen");
+
+  function renderGameScreen(state){
+    const me = state.players[myIndex];
+    let html = '';
+    if(me) html += '<div class="my-name-score">' + escapeHTML(me.name) + ' \u2014 ' + me.score + ' point' + (me.score === 1 ? '' : 's') + '</div>';
+
+    if(state.phase === "searchFailed"){
+      html += '<div class="buzz-status-note">' + escapeHTML(state.searchFailMessage) + '</div>';
+      html += buildActionButtons(['next-round:Try Again:btn-primary']);
+    }else if(state.phase === "countdown"){
+      html += '<div class="buzz-countdown">' + state.countdownRemaining + '</div><div class="buzz-status-note">Get ready\u2026</div>';
+    }else if(state.phase === "roundOver" || state.phase === "gameOver"){
+      html += '<div class="win-message">' + (state.phase === "gameOver" ? ('\ud83c\udfc6 ' + escapeHTML(state.winnerName) + ' wins!') : escapeHTML(state.roundOverMessage)) + '</div>';
+      if(state.answerHTML) html += state.answerHTML;
+      if(state.phase === "gameOver") html += buildActionButtons(['play-again:Play Again:btn-primary']);
+      else html += buildActionButtons(['next-round:Next Round \u25b6:btn-primary']);
+    }else if(state.phase === "revealing"){
+      html += buildRevealHTML(state);
+      const eliminated = me && me.eliminatedThisRound;
+      if(!eliminated){
+        html += '<div class="tap-surface buzzable" data-tap="buzz"><div class="buzz-hint">\ud83d\udc46 Tap anywhere to buzz</div></div>';
+      }else{
+        html += '<div class="buzz-status-note">Out this round \u2014 waiting\u2026</div>';
+      }
+      if(state.eliminationActive) html += '<div class="buzz-status-note">\u23f1 ' + state.eliminationCountdownRemaining + 's left to buzz</div>';
+      html += '<button type="button" class="end-game-link" data-action="reveal-fallback">No one\u2019s got it \u2014 reveal answer</button>';
+    }else if(state.phase === "answering"){
+      const isBuzzer = myIndex === state.activeBuzzerId;
+      if(isBuzzer){
+        html += '<div class="buzz-countdown">' + Math.max(state.answerRemaining, 0) + '</div><div class="buzz-status-note">Say your answer now!</div>';
+      }else{
+        html += buildRevealHTML(state);
+        html += '<div class="buzz-status-note">' + escapeHTML(state.players[state.activeBuzzerId].name) + ' is answering\u2026</div>';
+        if(state.objectionsEnabled && !state.objectionCooldownActive && me && !me.eliminatedThisRound){
+          html += '<div class="tap-surface objectable" data-tap="raise-objection"><div class="objection-hint">\u26a0\ufe0f Tap to object if not enough was shown</div></div>';
+        }
+      }
+    }else if(state.phase === "objecting"){
+      const isObjector = myIndex === state.objectorId;
+      if(isObjector){
+        html += '<div class="buzz-countdown">' + Math.max(state.objectionRemaining, 0) + '</div>';
+        html += '<div class="tap-surface objectable" data-tap="finish-objecting"><div class="objection-hint">Name at least 2 ayahs! \ud83d\udc46 Tap when finished</div></div>';
+      }else{
+        html += '<div class="buzz-status-note">\u26a0\ufe0f ' + escapeHTML(state.players[state.objectorId].name) + ' is objecting\u2026</div>';
+      }
+    }else if(state.phase === "checking"){
+      const isBuzzer = myIndex === state.activeBuzzerId;
+      if(isBuzzer){
+        if(!state.revealedToBuzzer){
+          html += '<div class="buzz-status-note">Ready to check?</div>';
+          html += buildActionButtons(['check-answer:Check my answer:btn-primary']);
+        }else{
+          html += state.answerHTML || '';
+          html += buildActionButtons(['mark-correct:\u2705 I got it right:btn-success', 'mark-wrong:\u274c I was wrong:btn-secondary']);
+        }
+      }else{
+        html += '<div class="buzz-status-note">' + escapeHTML(state.players[state.activeBuzzerId].name) + ' is checking their answer\u2026</div>';
+      }
+    }else if(state.phase === "objectingChecking"){
+      const isObjector = myIndex === state.objectorId;
+      if(isObjector){
+        if(!state.objectionRevealed){
+          html += '<div class="buzz-status-note">Ready to check?</div>';
+          html += buildActionButtons(['check-objection:Check occurrences:btn-primary']);
+        }else if(state.objectionData){
+          html += buildObjectionCheckHTML(state.objectionData);
+        }else{
+          html += '<div class="buzz-status-note">Resolving\u2026</div>';
+        }
+      }else{
+        html += '<div class="buzz-status-note">' + escapeHTML(state.players[state.objectorId].name) + ' is checking their objection\u2026</div>';
+      }
+    }
+
+    html += '<div class="scoreboard">' + state.players.map(function(p){
+      return '<span class="score-chip' + (p.eliminatedThisRound && state.phase !== "roundOver" && state.phase !== "gameOver" ? ' eliminated' : '') + '" style="border-color:' + p.color + '">' + escapeHTML(p.name) + ': ' + p.score + '</span>';
+    }).join('') + '</div>';
+
+    if(state.phase !== "gameOver"){
+      html += buildEndGameButtonHTML();
+    }
+
+    gameScreenEl.innerHTML = html;
+  }
+
+  function buildRevealHTML(state){
+    let html = '<div class="reveal-phrase">' + escapeHTML(state.revealText) + '</div>';
+    if(state.revealMeta) html += '<div class="reveal-meta">' + escapeHTML(state.revealMeta) + '</div>';
+    return html;
+  }
+
+  function buildActionButtons(defs){
+    return '<div class="button-group">' + defs.map(function(d){
+      const parts = d.split(':');
+      return '<button type="button" class="' + parts[2] + '" data-action="' + parts[0] + '">' + parts[1] + '</button>';
+    }).join('') + '</div>';
+  }
+
+  let confirmingEndGame = false;
+  function buildEndGameButtonHTML(){
+    const label = confirmingEndGame ? "Tap again to confirm ending the game" : (isHost ? "End game for everyone" : "Leave game");
+    return '<button type="button" class="end-game-link" data-action="end-game">' + label + '</button>';
+  }
+
+  function buildObjectionCheckHTML(occData){
+    let html = '<div class="buzz-status-note">This phrase occurs ' + occData.totalCount + ' time' + (occData.totalCount === 1 ? '' : 's') + ' in the selected portion.</div>';
+    if(occData.overCap){
+      html += '<div class="buzz-status-note">Woah, very not unique \u2014 too many to list. Use the buttons to set how many different ayahs you actually named out loud:</div>';
+      html += '<div class="count-stepper">';
+      html += '<button type="button" class="btn-secondary" data-action="objection-count-step" data-step="-10">\u221210</button>';
+      html += '<button type="button" class="btn-secondary" data-action="objection-count-step" data-step="-1">\u22121</button>';
+      html += '<span class="stepper-value" id="objection-count-value">' + myObjectionTypedCount + '</span>';
+      html += '<button type="button" class="btn-secondary" data-action="objection-count-step" data-step="1">+1</button>';
+      html += '<button type="button" class="btn-secondary" data-action="objection-count-step" data-step="10">+10</button>';
+      html += '</div>';
+      html += '<p class="field-help">Need at least 2 to score - you\u2019ll be awarded points equal to the number you\u2019re credited for.</p>';
+      html += buildActionButtons(['confirm-objection-typed:Confirm:btn-primary']);
+    }else{
+      html += '<div class="buzz-status-note">Tick every ayah you actually named out loud:</div>';
+      html += '<div class="objection-list">';
+      occData.uniqueAyahs.forEach(function(a, idx){
+        html += '<label class="objection-item"><input type="checkbox" class="objection-tick" data-idx="' + idx + '">';
+        html += '<span class="objection-item-text"><span class="objection-item-verse">' + escapeHTML(a.verseText) + '</span>';
+        html += '<span class="objection-item-ref">' + escapeHTML(a.surahName) + ' \u2014 Ayah ' + a.aya + '</span></span></label>';
+      });
+      html += '</div>';
+      html += '<p class="field-help">Need at least 2 ticked to score - you\u2019ll be awarded points equal to however many you tick.</p>';
+      html += buildActionButtons(['confirm-objection-ticks:Confirm:btn-primary']);
+    }
+    return html;
+  }
+
+  // Local-only (not synced) state for the objector's own in-progress tick/type input.
+  let myObjectionTypedCount = 0;
+
+  gameScreenEl.addEventListener("click", function(e){
+    const target = e.target.closest("[data-action],[data-tap]");
+    if(!target || !latestState) return;
+
+    if(target.dataset.tap){
+      const tap = target.dataset.tap;
+      if(tap === "buzz") attemptBuzz();
+      else if(tap === "raise-objection") sendIntent("raise-objection");
+      else if(tap === "finish-objecting") sendIntent("finish-objecting");
+      return;
+    }
+
+    const action = target.dataset.action;
+    if(action !== "end-game" && confirmingEndGame){ confirmingEndGame = false; }
+
+    if(action === "check-answer") sendIntent("check-answer");
+    else if(action === "mark-correct") sendIntent("mark-correct");
+    else if(action === "mark-wrong") sendIntent("mark-wrong");
+    else if(action === "check-objection"){ myObjectionTypedCount = 0; sendIntent("check-objection"); }
+    else if(action === "objection-count-step"){
+      const max = latestState.objectionData ? latestState.objectionData.totalCount : 0;
+      myObjectionTypedCount = Math.max(0, Math.min(max, myObjectionTypedCount + parseInt(target.dataset.step, 10)));
+      const valueEl = document.getElementById("objection-count-value");
+      if(valueEl) valueEl.textContent = myObjectionTypedCount;
+    }
+    else if(action === "confirm-objection-typed") sendIntent("confirm-objection", { claimedCount: myObjectionTypedCount });
+    else if(action === "confirm-objection-ticks"){
+      const ticked = gameScreenEl.querySelectorAll(".objection-tick:checked").length;
+      sendIntent("confirm-objection", { claimedCount: ticked });
+    }
+    else if(action === "reveal-fallback") sendIntent("reveal-fallback");
+    else if(action === "next-round") sendIntent("next-round");
+    else if(action === "play-again") sendIntent("play-again");
+    else if(action === "end-game"){
+      if(!confirmingEndGame){ confirmingEndGame = true; renderGameScreen(latestState); return; }
+      confirmingEndGame = false;
+      if(isHost) sendIntent("end-game");
+      fb.remove(fb.ref(fb.db, 'rooms/' + roomCode + '/players/' + myId));
+      roomCode = null; isHost = false; myIndex = null;
+      showScreen("landing");
+    }
+  });
+
+})();
+</script>
+</body>
+</html>
