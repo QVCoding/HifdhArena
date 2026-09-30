@@ -7,5 +7,9 @@
 # Khatmah Clock
 khatmahclock.html
 
+#apk files
+apk-*
+fonts/
+
 # Documentation
 *.md
