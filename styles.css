@@ -1,5 +1,5 @@
 /* =====================================================================
-   Quran Tester - shared stylesheet
+   Hifdh Arena - shared stylesheet
    =====================================================================
    Used by: minimaltest.html, commonphrase.html, irab.html, occurrencetest.html
    (and their -ar.html Arabic counterparts, where they exist)
@@ -512,6 +512,25 @@ button:disabled {
     background: var(--accent-soft);
     color: var(--accent);
     font-weight: 700;
+}
+
+.side-menu-group > details > summary {
+    padding: 9px 10px;
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.side-menu-group > details > summary:hover,
+.side-menu-group > details > summary:focus-visible {
+    background: var(--panel-alt);
+}
+
+.side-menu-sublist {
+    list-style: none;
+    margin: 0;
+    padding-inline-start: 14px;
 }
 
 .side-menu-github {

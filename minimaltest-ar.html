@@ -16,8 +16,6 @@
            buttons, field-help/error, and loading indicator live in styles.css. */
 
         body {
-            font-family: 'Amiri', 'Traditional Arabic', serif;
-            line-height: 1.7;
             padding: 70px 20px 20px;
             max-width: 800px;
             margin: 0 auto;
@@ -41,7 +39,7 @@
         }
 
         .checkbox-group input {
-            margin-inline-end: 8px;
+            margin-right: 8px;
         }
 
         .checkbox-group label {
@@ -61,7 +59,7 @@
             font-size: 12px;
             font-weight: bold;
             cursor: pointer;
-            margin-inline-start: 5px;
+            margin-left: 5px;
             vertical-align: middle;
         }
 
@@ -84,7 +82,7 @@
         #new-question-loading {
             color: var(--text-muted);
             font-size: 14px;
-            margin-inline-start: 4px;
+            margin-left: 4px;
             display: none;
         }
 
@@ -138,24 +136,6 @@
             margin-bottom: 5px;
         }
 
-        .page-image-container {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .page-image-container img {
-            max-width: 100%;
-            height: auto;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-        }
-
-        .page-image-container .image-label {
-            margin-bottom: 10px;
-            font-weight: 500;
-            color: var(--text);
-        }
-
         /* styles.css provides the base flex layout for .button-group; this
            app centres its buttons, which the other apps don't. */
         .button-group {
@@ -202,7 +182,7 @@
             .nav-buttons .word-nav-btn {
                 padding: 8px 10px;
                 font-size: 12.5px;
-                margin-inline-end: 0;
+                margin-right: 0;
             }
         }
     </style>
@@ -295,11 +275,6 @@
                     <div id="ayah-marker-tooltip" class="info-tooltip">
                         عند التفعيل، ستظهر علامة نهاية الآية. عند التعطيل، لن تظهر أي علامة.
                     </div>
-                </div>
-
-                <div class="checkbox-group">
-                    <input type="checkbox" id="show-page-image" checked>
-                    <label for="show-page-image">إظهار صورة الصفحة عند إظهار الإجابة</label>
                 </div>
 
                 <div class="checkbox-group">
@@ -575,7 +550,6 @@
             { key: 'singleVerseOnly', type: 'checkbox', id: 'single-verse-only' },
             { key: 'startOfAyah', type: 'checkbox', id: 'start-of-ayah' },
             { key: 'showAyahMarker', type: 'checkbox', id: 'show-ayah-marker' },
-            { key: 'showPageImage', type: 'checkbox', id: 'show-page-image' },
             { key: 'restrictLength', type: 'checkbox', id: 'restrict-length' },
             { key: 'minLength', type: 'text', id: 'min-length' },
             { key: 'maxLength', type: 'text', id: 'max-length' }
@@ -642,7 +616,8 @@
 
         function populateSurahAndJuzLists() {
             QuranPicker.populateSurahAndJuzLists(metadata, {
-                surahLabelHTML: sura => '<span>' + sura.index + '. ' + sura.name + '</span>'
+                surahLabelHTML: sura => '<span>' + sura.index + '. ' + sura.name + '</span>',
+      juzLabelHTML: function(i){ return '<span>الجزء ' + i + '</span>'; }
             });
         }
 
@@ -988,33 +963,6 @@
                 <div><strong>الصفحة:</strong> ${page}</div>
             `;
             answerDiv.appendChild(metadataDiv);
-
-            const showPageImage = document.getElementById('show-page-image').checked;
-            if (showPageImage) {
-                const pageImageContainer = document.createElement('div');
-                pageImageContainer.className = 'page-image-container';
-
-                const imageLabel = document.createElement('div');
-                imageLabel.className = 'image-label';
-                imageLabel.textContent = `الصفحة ${page} - ${surahName}`;
-                pageImageContainer.appendChild(imageLabel);
-
-                const pageNumber = String(page).padStart(3, '0');
-                const img = document.createElement('img');
-                img.src = `images/${pageNumber}.png`;
-                img.alt = `الصفحة ${page}`;
-                img.onerror = function() {
-                    this.style.display = 'none';
-                    const errorMsg = document.createElement('div');
-                    errorMsg.style.color = 'var(--danger)';
-                    errorMsg.style.fontSize = '14px';
-                    errorMsg.textContent = `تعذّر العثور على الصورة: images/${pageNumber}.png`;
-                    pageImageContainer.appendChild(errorMsg);
-                };
-                pageImageContainer.appendChild(img);
-
-                answerDiv.appendChild(pageImageContainer);
-            }
 
             answerDiv.style.display = 'block';
             document.getElementById('show-more-btn').style.display = 'none';

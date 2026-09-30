@@ -25,36 +25,24 @@
             padding: 70px 24px 60px;
         }
 
-        /* ---------------------------------------------------------------
-           Hero: the verse this whole suite exists to serve.
-           --------------------------------------------------------------- */
+        /* Homepage heading and introduction. */
 
         .hero {
             text-align: center;
             margin-bottom: 64px;
         }
 
-        .hero-ayah {
-            font-family: var(--quran-font);
-            direction: rtl;
-            font-size: 2.1rem;
-            line-height: 1.9;
-            color: var(--accent);
-        }
-
-        .hero-ref {
-            margin-top: 14px;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            letter-spacing: 0.02em;
-        }
-
         .hero-lede {
-            margin-top: 34px;
+            margin: 0;
             font-family: "Spectral", Georgia, serif;
-            font-size: 1.3rem;
-            line-height: 1.55;
+            font-size: clamp(2.6rem, 7vw, 4rem);
+            font-weight: 600;
+            line-height: 1.2;
             color: var(--text);
+        }
+
+        html[lang="ar"] .hero-lede {
+            font-family: var(--quran-font);
         }
 
         .hero-sub {
@@ -78,6 +66,23 @@
             flex-direction: column;
             gap: 2px;
         }
+
+        .section-title {
+            font-family: "Spectral", Georgia, serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--accent);
+            background: var(--panel-alt);
+            border-inline-start: 4px solid var(--accent);
+            padding: 12px 16px;
+            margin: 42px 0 14px;
+        }
+
+        html[lang="ar"] .section-title {
+            font-family: var(--quran-font);
+        }
+
+        section:first-of-type .section-title { margin-top: 0; }
 
         .app-entry {
             padding: 26px 4px;
@@ -141,26 +146,40 @@
             .home-wrap {
                 padding: 64px 18px 48px;
             }
-
-            .hero-ayah {
-                font-size: 1.7rem;
-            }
-
-            .hero-lede {
-                font-size: 1.1rem;
-            }
         }
     </style>
 </head>
 <body>
     <div class="home-wrap">
         <div class="hero">
-            <div class="hero-ayah">إِنَّا نَحْنُ نَزَّلْنَا الذِّكْرَ وَإِنَّا لَهُ لَحَافِظُونَ</div>
-            <div class="hero-ref">Al-Hijr 15:9</div>
-            <p class="hero-lede">Hifdh Arena</p>
+            <h1 class="hero-lede">Hifdh Arena</h1>
             <p class="hero-sub">A small suite of tools for testing and sharpening Qur'an memorisation. The apps here are all unique, not just another version of typical Qur'an apps.</p>
         </div>
 
+        <section aria-labelledby="head-to-head-title">
+            <h2 class="section-title" id="head-to-head-title">Head To Head</h2>
+            <div class="app-list">
+                <div class="app-entry">
+                    <div class="app-name">Smallest Phrase Hifdh-Tester</div>
+                    <p class="app-desc">Race to identify the ayah from a phrase revealed word by word.</p>
+                    <div class="app-links">
+                        <a href="minimaltest-competitive.html">Play on One Device</a>
+                        <a href="minimaltest-online.html">Play Online</a>
+                    </div>
+                </div>
+                <div class="app-entry">
+                    <div class="app-name">Common Phrase</div>
+                    <p class="app-desc">Race to find the phrase shared by the revealed surahs or juz.</p>
+                    <div class="app-links">
+                        <a href="commonphrase-competitive.html">Play on One Device</a>
+                        <a href="commonphrase-online.html">Play Online</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section aria-labelledby="solo-title">
+        <h2 class="section-title" id="solo-title">Solo</h2>
         <div class="app-list">
             <div class="app-entry">
                 <div class="app-name">Smallest Phrase Hifdh-Tester</div>
@@ -168,8 +187,6 @@
                 <div class="app-links">
                     <a href="minimaltest.html">English</a>
                     <a class="ar" href="minimaltest-ar.html">العربية</a>
-                    <a href="minimaltest-competitive.html">Competitive (Same Device)</a>
-                    <a href="minimaltest-online.html">Competitive (Online)</a>
                 </div>
             </div>
 
@@ -199,9 +216,10 @@
                 </div>
             </div>
         </div>
+        </section>
 
         <div class="home-footer">
-            <a href="https://github.com/QVCoding/Quran_Tester" target="_blank" rel="noopener">GitHub Repository</a>
+            <a href="https://github.com/QVCoding/HifdhArena" target="_blank" rel="noopener">GitHub Repository</a>
         </div>
     </div>
 

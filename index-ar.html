@@ -6,7 +6,7 @@
          theme choice doesn't flash the default gold theme first. -->
     <script>(function(){try{var t=localStorage.getItem('quranTester:theme');if(t&&t!=='gold')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اختبار القرآن</title>
+    <title>ميدان الحفظ</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Spectral:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -16,8 +16,6 @@
            live in styles.css. */
 
         body {
-            font-family: 'Amiri', 'Traditional Arabic', serif;
-            line-height: 1.7;
             padding: 0;
         }
 
@@ -27,40 +25,30 @@
             padding: 70px 24px 60px;
         }
 
-        /* ---------------------------------------------------------------
-           Hero: the verse this whole suite exists to serve.
-           --------------------------------------------------------------- */
+        /* Homepage heading and introduction. */
 
         .hero {
             text-align: center;
             margin-bottom: 64px;
         }
 
-        .hero-ayah {
-            font-family: var(--quran-font);
-            font-size: 2.1rem;
-            line-height: 1.9;
-            color: var(--accent);
-        }
-
-        .hero-ref {
-            margin-top: 14px;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
         .hero-lede {
-            margin-top: 34px;
-            font-size: 1.4rem;
-            font-weight: 700;
-            line-height: 1.55;
+            margin: 0;
+            font-family: "Spectral", Georgia, serif;
+            font-size: clamp(2.6rem, 7vw, 4rem);
+            font-weight: 600;
+            line-height: 1.2;
             color: var(--text);
+        }
+
+        html[lang="ar"] .hero-lede {
+            font-family: var(--quran-font);
         }
 
         .hero-sub {
             margin-top: 14px;
-            font-size: 1rem;
-            line-height: 1.75;
+            font-size: 0.98rem;
+            line-height: 1.6;
             color: var(--text-muted);
             max-width: 46em;
             margin-left: auto;
@@ -79,6 +67,23 @@
             gap: 2px;
         }
 
+        .section-title {
+            font-family: "Spectral", Georgia, serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--accent);
+            background: var(--panel-alt);
+            border-inline-start: 4px solid var(--accent);
+            padding: 12px 16px;
+            margin: 42px 0 14px;
+        }
+
+        html[lang="ar"] .section-title {
+            font-family: var(--quran-font);
+        }
+
+        section:first-of-type .section-title { margin-top: 0; }
+
         .app-entry {
             padding: 26px 4px;
             border-block-start: 1px solid var(--border);
@@ -89,15 +94,16 @@
         }
 
         .app-name {
-            font-weight: 700;
-            font-size: 1.3rem;
+            font-family: "Spectral", Georgia, serif;
+            font-weight: 600;
+            font-size: 1.25rem;
             color: var(--text);
         }
 
         .app-desc {
             margin-top: 8px;
-            font-size: 1rem;
-            line-height: 1.7;
+            font-size: 0.95rem;
+            line-height: 1.55;
             color: var(--text-muted);
             max-width: 40em;
         }
@@ -116,9 +122,8 @@
             border: 1px solid var(--border);
             color: var(--text);
             text-decoration: none;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             background: var(--panel-alt);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
         .app-links a:hover {
@@ -128,7 +133,7 @@
 
         .app-links a.ar {
             font-family: var(--quran-font);
-            font-size: 1rem;
+            font-size: 0.95rem;
         }
 
         /* ---------------------------------------------------------------
@@ -141,65 +146,80 @@
             .home-wrap {
                 padding: 64px 18px 48px;
             }
-
-            .hero-ayah {
-                font-size: 1.7rem;
-            }
-
-            .hero-lede {
-                font-size: 1.2rem;
-            }
         }
     </style>
 </head>
 <body>
     <div class="home-wrap">
         <div class="hero">
-            <div class="hero-ayah">إِنَّا نَحْنُ نَزَّلْنَا الذِّكْرَ وَإِنَّا لَهُ لَحَافِظُونَ</div>
-            <div class="hero-ref">سورة الحجر، الآية 9</div>
-            <p class="hero-lede">اختبار القرآن</p>
-            <p class="hero-sub">مجموعة صغيرة من الأدوات لاختبار حفظ القرآن الكريم وصقله — مصمَّمة للتطبيق الفعلي في التلاوة، لا للاختيار من متعدد فحسب. اختر أحد التطبيقات أدناه للبدء.</p>
+            <h1 class="hero-lede">ميدان الحفظ</h1>
+            <p class="hero-sub">مجموعة صغيرة من الأدوات لاختبار حفظ القرآن الكريم وإتقانه. لكل تطبيق هنا فكرته الخاصة، وليس مجرد نسخة أخرى من التطبيقات القرآنية المعتادة.</p>
         </div>
 
+        <section aria-labelledby="head-to-head-title">
+            <h2 class="section-title" id="head-to-head-title">مواجهة بين اللاعبين</h2>
+            <div class="app-list">
+                <div class="app-entry">
+                    <div class="app-name">اختبار أقصر عبارة</div>
+                    <p class="app-desc">تسابقوا لتحديد الآية من عبارة تُكشف كلمةً كلمةً.</p>
+                    <div class="app-links">
+                        <a href="minimaltest-competitive-ar.html">العب على جهاز واحد</a>
+                        <a href="minimaltest-online-ar.html">العب عبر الإنترنت</a>
+                    </div>
+                </div>
+                <div class="app-entry">
+                    <div class="app-name">العبارة المشتركة</div>
+                    <p class="app-desc">تسابقوا للعثور على العبارة المشتركة بين السور أو الأجزاء التي تظهر تباعًا.</p>
+                    <div class="app-links">
+                        <a href="commonphrase-competitive-ar.html">العب على جهاز واحد</a>
+                        <a href="commonphrase-online-ar.html">العب عبر الإنترنت</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section aria-labelledby="solo-title">
+        <h2 class="section-title" id="solo-title">اللعب الفردي</h2>
         <div class="app-list">
             <div class="app-entry">
-                <div class="app-name">اختبار أقصر عبارة للحفظ</div>
-                <p class="app-desc">يعرض أصغر جزء من الآية يلزم لتحديدها — اختبار دقيق لمدى معرفتك بموضع كل كلمة.</p>
+                <div class="app-name">اختبار أقصر عبارة</div>
+                <p class="app-desc">يعرض أصغر مقطع من القرآن يكفي لتحديد موضعه، وعليك معرفة الآية أو الآيات التي يرد فيها.</p>
                 <div class="app-links">
-                    <a class="ar" href="minimaltest-ar.html">العربية</a>
                     <a href="minimaltest.html">English</a>
+                    <a class="ar" href="minimaltest-ar.html">العربية</a>
                 </div>
             </div>
 
             <div class="app-entry">
-                <div class="app-name">الباحث عن العبارات المشتركة</div>
-                <p class="app-desc">يبحث عن عبارات مكررة حرفيًا عبر سور مختلفة، ويختبر معرفتك بكل سورة تظهر فيها.</p>
+                <div class="app-name">الباحث عن العبارة المشتركة</div>
+                <p class="app-desc">اعثر على عبارة قرآنية من السور أو الأجزاء التي ترد فيها. يختبر معرفتك بمواضع المتشابهات.</p>
                 <div class="app-links">
-                    <a class="ar" href="commonphrase-ar.html">العربية</a>
                     <a href="commonphrase.html">English</a>
+                    <a class="ar" href="commonphrase-ar.html">العربية</a>
                 </div>
             </div>
 
             <div class="app-entry">
-                <div class="app-name">اختبار مواضع تكرار العبارات</div>
-                <p class="app-desc">يختبر معرفتك بعدد مرات تكرار عبارة في القرآن، وموضعها — بالسورة أو الجزء أو الموضع الدقيق.</p>
+                <div class="app-name">اختبار عدد مرات التكرار</div>
+                <p class="app-desc">حدّد عدد مرات ورود عبارة معينة في القرآن.</p>
                 <div class="app-links">
-                    <a class="ar" href="occurrencetest-ar.html">العربية</a>
                     <a href="occurrencetest.html">English</a>
+                    <a class="ar" href="occurrencetest-ar.html">العربية</a>
                 </div>
             </div>
 
             <div class="app-entry">
-                <div class="app-name">اختبار الإعراب كلمة كلمة</div>
-                <p class="app-desc">إعراب كل كلمة من القرآن الكريم، مخفية خلف كل كلمة حتى تكشفها.</p>
+                <div class="app-name">اختبار الإعراب (بالعربية فقط)</div>
+                <p class="app-desc">حدّد الآية اعتمادًا على إعرابها وحده.</p>
                 <div class="app-links">
-                    <a class="ar" href="irab.html">فتح التطبيق</a>
+                    <a class="ar" href="irab.html">اختبار الإعراب كلمة كلمة</a>
                 </div>
             </div>
         </div>
+        </section>
 
         <div class="home-footer">
-            <a href="https://github.com/QVCoding/Quran_Tester" target="_blank" rel="noopener">مستودع GitHub</a>
+            <a href="https://github.com/QVCoding/HifdhArena" target="_blank" rel="noopener">مستودع GitHub</a>
         </div>
     </div>
 

@@ -136,24 +136,6 @@
             margin-bottom: 5px;
         }
 
-        .page-image-container {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .page-image-container img {
-            max-width: 100%;
-            height: auto;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-        }
-
-        .page-image-container .image-label {
-            margin-bottom: 10px;
-            font-weight: 500;
-            color: var(--text);
-        }
-
         /* styles.css provides the base flex layout for .button-group; this
            app centres its buttons, which the other apps don't. */
         .button-group {
@@ -293,11 +275,6 @@
                     <div id="ayah-marker-tooltip" class="info-tooltip">
                         If selected, the ayah marker will be shown at the end of ayahs. If deselected, there will be no ayah marker.
                     </div>
-                </div>
-
-                <div class="checkbox-group">
-                    <input type="checkbox" id="show-page-image" checked>
-                    <label for="show-page-image">Show page image when revealing answer</label>
                 </div>
 
                 <div class="checkbox-group">
@@ -573,7 +550,6 @@
             { key: 'singleVerseOnly', type: 'checkbox', id: 'single-verse-only' },
             { key: 'startOfAyah', type: 'checkbox', id: 'start-of-ayah' },
             { key: 'showAyahMarker', type: 'checkbox', id: 'show-ayah-marker' },
-            { key: 'showPageImage', type: 'checkbox', id: 'show-page-image' },
             { key: 'restrictLength', type: 'checkbox', id: 'restrict-length' },
             { key: 'minLength', type: 'text', id: 'min-length' },
             { key: 'maxLength', type: 'text', id: 'max-length' }
@@ -986,33 +962,6 @@
                 <div><strong>Page:</strong> ${page}</div>
             `;
             answerDiv.appendChild(metadataDiv);
-
-            const showPageImage = document.getElementById('show-page-image').checked;
-            if (showPageImage) {
-                const pageImageContainer = document.createElement('div');
-                pageImageContainer.className = 'page-image-container';
-
-                const imageLabel = document.createElement('div');
-                imageLabel.className = 'image-label';
-                imageLabel.textContent = `Page ${page} - ${surahName}`;
-                pageImageContainer.appendChild(imageLabel);
-
-                const pageNumber = String(page).padStart(3, '0');
-                const img = document.createElement('img');
-                img.src = `images/${pageNumber}.png`;
-                img.alt = `Page ${page}`;
-                img.onerror = function() {
-                    this.style.display = 'none';
-                    const errorMsg = document.createElement('div');
-                    errorMsg.style.color = 'var(--danger)';
-                    errorMsg.style.fontSize = '14px';
-                    errorMsg.textContent = `Image not found: images/${pageNumber}.png`;
-                    pageImageContainer.appendChild(errorMsg);
-                };
-                pageImageContainer.appendChild(img);
-
-                answerDiv.appendChild(pageImageContainer);
-            }
 
             answerDiv.style.display = 'block';
             document.getElementById('show-more-btn').style.display = 'none';

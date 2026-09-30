@@ -20,8 +20,6 @@
      hidden element JS toggles) - both are left as-is here. */
 
   body{
-    font-family:'Amiri','Traditional Arabic',serif;
-    line-height:1.7;
     padding:4.5rem 1.25rem 5rem;
   }
   #app{max-width:700px;margin:0 auto;}
@@ -131,7 +129,7 @@
     background:var(--panel-alt);border:none;color:var(--text-muted);
     padding:0.45rem 1.15rem;font-size:0.88rem;font-family:inherit;cursor:pointer;
   }
-  .segment-btn + .segment-btn{border-inline-start:1px solid var(--border);}
+  .segment-btn + .segment-btn{border-left:1px solid var(--border);}
   .segment-btn.active{background:var(--accent);color:#1a1408;font-weight:600;}
 
   .settings-status{font-size:0.88rem;color:var(--text-muted);margin:0 0 0.85rem;}
@@ -455,10 +453,7 @@
     const el = document.getElementById("pool-count-info");
     if(!el) return;
     const total = pool.length;
-    el.textContent =
-      QuranPicker.pluralize(total, { one: "{n} سؤال", two: "{n} سؤالان", few: "{n} أسئلة", many: "{n} سؤالاً", other: "{n} سؤال" }, "ar") +
-      "، " +
-      QuranPicker.pluralize(questionQueue.length, { one: "{n} جديد", two: "{n} جديدان", few: "{n} جديدة", many: "{n} جديدًا", other: "{n} جديد" }, "ar");
+    el.textContent = QuranPicker.pluralize(total, {one:"{n} سؤال",two:"{n} سؤالان",few:"{n} أسئلة",many:"{n} سؤالًا",other:"{n} سؤال"}, "ar") + "، " + QuranPicker.pluralize(questionQueue.length, {one:"{n} جديد",two:"{n} جديدان",few:"{n} جديدة",many:"{n} جديدًا",other:"{n} جديد"}, "ar");
   }
 
   // ---------- DOM refs ----------
@@ -668,7 +663,7 @@
   function updateUnitCountLabels(){
     const groupBy = getGroupByMode();
     const unitWord = groupBy === "juz" ? "الأجزاء" : "السور";
-    document.getElementById("unit-count-label").textContent = "عدد " + unitWord + " التي تظهر فيها العبارة";
+    document.getElementById("unit-count-label").textContent = "عدد " + unitWord + " التي ترد فيها العبارة";
     document.getElementById("unit-count-help").textContent =
       "سيتم استخدام العبارات التي تظهر في هذا العدد من " + unitWord + " المختلفة فقط كأسئلة.";
     document.getElementById("similar-help").textContent =

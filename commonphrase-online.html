@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <script>(function(){try{var t=localStorage.getItem('quranTester:theme');if(t&&t!=='gold')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Smallest Phrase Hifdh-Tester - Online</title>
+<title>Common Phrase — Online</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&amp;family=Spectral:wght@400;500;600&amp;display=swap" rel="stylesheet">
@@ -100,6 +100,7 @@
   .buzz-countdown{ font-size:3.2rem; font-weight:700; color:var(--accent); line-height:1; }
   .buzz-status-note{ font-size:0.95rem; color:var(--text-muted); }
 
+  .phrase-block{width:100%;text-align:left}.answer-phrase{font-family:var(--quran-font);font-size:1.5rem;direction:rtl;text-align:right}.unit-heading{font-weight:600;color:var(--accent)}.occurrence{padding:.65rem;margin:.4rem 0;background:var(--panel-alt);border-radius:4px}.occurrence-meta{font-size:.8rem;color:var(--text-muted);display:flex;gap:.6rem;flex-wrap:wrap}.ayah-text{font-family:var(--quran-font);font-size:1.2rem;direction:rtl;text-align:right;line-height:2}.ayah-text mark{background:var(--highlight-bg);color:var(--highlight-text)}
   .zone-answer{ font-family:var(--quran-font); font-size:1.2rem; direction:rtl; line-height:1.9; width:100%; }
   .zone-answer .answer-verse{ padding:0.6rem 0.7rem; background:var(--panel-alt); border-inline-start:3px solid var(--accent); border-radius:4px; margin-bottom:0.6rem; }
   .zone-answer .answer-metadata{ font-family:"Spectral",Georgia,serif; font-size:0.8rem; color:var(--text-muted); direction:ltr; text-align:center; }
@@ -153,8 +154,8 @@
 <div id="app">
 
   <header>
-    <h1>Smallest Phrase Hifdh-Tester &mdash; Online</h1>
-    <p>Same buzzer game as the local pass-the-phone version, but everyone plays from their own device.</p>
+    <h1>Common Phrase &mdash; Online</h1>
+    <p>Find the common phrase as surah or juz clues appear. Each player uses their own device.</p>
     <button type="button" class="btn-secondary" id="how-to-play-btn" style="margin-top:0.8rem;">How To Play</button>
   </header>
 
@@ -163,17 +164,12 @@
       <button type="button" class="modal-close" id="how-to-play-close" aria-label="Close">&times;</button>
       <h2 style="margin-top:0;">How To Play</h2>
       <div id="how-to-play-content">
-      A part of the Qur'an will be revealed on the screen, appearing one word at a time. This can be from anywhere in the Qur'an, not just the beginning of an ayah. Players should have their fingers ready to buzz in their screen. Once the phrase (portion of the Quran) shown becomes unique (only comes once in the Qur'an - this could even be just the first word), the first player to (mentally) find the beginning of the ayah should buzz and recite it. There is no time to buzz and then think - the answer must be given immediately after buzzing, and the ayah should be recited at least from its beginning up until the displayed phrase (concession can be given for very long ayaat). If the player buzzes when the displayed phrase is unique and recites the ayah, they win one point.
-        <br><br>
-      However, if a player buzzes whilst the shown phrase is not yet unique (it comes more than once in the Qur'an), then what happens next depends on whether there are 2 players or more:
-      <br><br>
-      <b>2 players:</b> The opponent may 'object' immediately by tapping their screen. They then have a few seconds to name at least 2 places where the shown phrase comes in the Qur'an. If they are successful, then they receive points equal to the number of ayaat they recited where the phrase appears. If the phrase shown was not unique, but the player who objected did not manage to recite at least 2 ayaat, then no one gets the point. If the objection was false (the phrase was indeed unique), then the one who objected loses, and the other wins a point.
-      <br>
-      <b>3 or 4 players:</b> The point is lost, and the player who buzzed early is eliminated from the next round.
-        <br><br>
-      Both of the above (objection and round elimination) can be turned off, in which case early buzzing has no penalty.
-        <br><br>
-      The first player to reach the set point threshold wins.
+      <p>Surah or juz names appear one at a time. Find a phrase that occurs in all the shown places. Tap your screen to buzz and recite the phrase immediately; checking is self-marked. A correct target answer earns one point.</p>
+      <p>The clues become unique when only one eligible answer fits them all. More names may appear afterwards as extra help. The selected minimum is a hard minimum for both targets and answers. The maximum limits question targets only; checking an answer or objection includes longer common phrases within an ayah. Exact shorter fragments of a matching longer phrase count as one answer; phrases which merely overlap stay separate. Longer wording containing the highlighted answer is acceptable.</p>
+      <p><b>Two players:</b> with objections enabled, the opponent may object during the answer timer and recite at least two different eligible phrases, each occurring in every shown place. Check and tick different answer groups you named (a shared shorter fragment cannot count twice): score one point per confirmed phrase, with at least two required. If the clues were already unique, the objector loses one point and the buzzer gains one.</p>
+      <p><b>Three or four players:</b> with early-buzz elimination enabled, buzzing before uniqueness ends the round and makes you sit out the next round. It does not subtract a point.</p>
+      <p>With these options disabled, early guesses are allowed, but must match the target answer. A wrong answer eliminates you for the current round while others continue. First to the chosen score wins. Targets do not repeat within a game. When the pool runs out, the highest score wins, with tied leaders drawing. Play Again resets the pool.</p>
+      <p>When all clues are visible, you can still buzz or use the host’s reveal-answer button.</p>
       </div>
     </div>
   </div>
@@ -275,72 +271,84 @@
     </div>
 
     <div class="field">
-      <span class="field-label">Timing</span>
-      <div class="range-row">
-        <label>Starting words shown <input type="number" id="start-words" min="1" step="1" value="1"></label>
-        <label>Seconds between reveals <input type="number" id="reveal-delay" min="1" step="0.5" value="3"></label>
+      <span class="field-label">Clues</span>
+      <div class="segmented" id="group-mode-toggle">
+        <button type="button" class="segment-btn active" data-mode="sura">Surahs</button>
+        <button type="button" class="segment-btn" data-mode="juz">Juz</button>
       </div>
-      <p class="field-error" id="timing-error"></p>
-    </div>
-    <div class="field" id="objections-field">
-      <div class="checkbox-group">
-        <input type="checkbox" id="enable-objections" checked>
-        <label for="enable-objections">Allow objections (2-player rooms only)</label>
-        <span class="info-icon" data-tooltip="objections-tooltip">i</span>
-        <div id="objections-tooltip" class="info-tooltip">
-          While a player is answering, the other player can tap their own screen to object that not enough has been revealed yet. They then get their own time limit to name at least two ayahs where the shown words occur. Points scored equal how many they're credited for; a false objection costs them a point and auto-wins the point for their opponent.
-        </div>
-      </div>
-      <div class="range-row" id="objection-time-row" style="margin-top:10px;">
-        <label>Objection answer time (s) <input type="number" id="objection-time" min="1" step="1" value="8"></label>
-      </div>
+      <input type="hidden" id="group-mode" value="sura">
     </div>
 
-    <button type="button" class="more-settings-toggle" id="more-settings-toggle" aria-expanded="false">
-      <span class="chevron">&rsaquo;</span> More settings
-    </button>
-    <div id="more-settings" hidden>
     <div class="field">
       <span class="field-label">Points to Win</span>
       <input type="number" id="points-to-win" min="1" step="1" value="5">
       <p class="field-error" id="points-error"></p>
     </div>
 
+    <button type="button" class="more-settings-toggle" id="more-settings-toggle" aria-expanded="false">
+      <span class="chevron">&rsaquo;</span> More settings
+    </button>
+
+    <div id="more-settings" hidden>
     <div class="field">
-      <span class="field-label">More Timing</span>
+      <span class="field-label">Timing</span>
       <div class="range-row">
-        <label>Answer time after buzzing (s) <input type="number" id="answer-time" min="1" step="1" value="3"></label>
-        <label>Time limit after an elimination (s) <input type="number" id="elimination-time-limit" min="1" step="1" value="20"></label>
+        <label>Starting clues shown <input type="number" id="start-words" min="1" step="1" value="1"></label>
+        <label>Seconds between reveals <input type="number" id="reveal-delay" min="1" step="0.5" value="3"></label>
+      </div>
+      <p class="field-error" id="timing-error"></p>
+    </div>
+
+
+    <div class="field">
+      <span class="field-label">Phrase length (words)</span>
+      <div class="range-row"><label>Min <input id="min-words" type="number" min="1" max="20" value="5"></label><label>Max <input id="max-words" type="number" min="1" max="20" value="8"></label></div>
+    </div>
+    <div class="field">
+      <span class="field-label">Total surahs / juz per question</span>
+      <div class="range-row"><label>Min <input id="min-units" type="number" min="2" max="10" value="2"></label><label>Max <input id="max-units" type="number" min="2" max="10" value="10"></label></div>
+      <p class="field-help">The word-length maximum and place-count limits select targets. Competing answers may be longer or occur in more places; the word-length minimum always applies.</p>
+      <p class="field-error" id="phrase-settings-error"></p>
+    </div>
+    <div class="field" id="objections-field">
+      <div class="checkbox-group">
+        <input type="checkbox" id="enable-objections" checked>
+        <label for="enable-objections">Allow objections (2-player games only)</label>
+        <span class="info-icon" data-tooltip="objections-tooltip">i</span>
+        <div id="objections-tooltip" class="info-tooltip">Object if more than one eligible phrase fits every shown clue. Name at least two different matching phrases. Score for those you actually recited; a false objection loses one point and gives the buzzer one.</div>
+      </div>
+      <div class="range-row" id="objection-time-row" style="margin-top:10px;">
+        <label>Objection answer time (s) <input type="number" id="objection-time" min="1" step="1" value="8"></label>
       </div>
     </div>
+
+      <div class="field">
+        <span class="field-label">More Timing</span>
+        <div class="range-row">
+          <label>Answer time after buzzing (s) <input type="number" id="answer-time" min="1" step="1" value="3"></label>
+          <label>Time limit after an elimination (s) <input type="number" id="elimination-time-limit" min="1" step="1" value="20"></label>
+        </div>
+      </div>
 
       <div class="field" id="early-buzz-penalty-field" hidden>
         <div class="checkbox-group">
           <input type="checkbox" id="penalize-early-buzz" checked>
           <label for="penalize-early-buzz">Eliminate early buzzers from the next round (3/4 players)</label>
           <span class="info-icon" data-tooltip="early-buzz-tooltip">i</span>
-          <div id="early-buzz-tooltip" class="info-tooltip">If someone buzzes while the shown phrase still matches more than one ayah, the round ends immediately and that player sits out the following round.</div>
+          <div id="early-buzz-tooltip" class="info-tooltip">If multiple eligible phrases still fit the shown clues, buzzing ends this round and eliminates the buzzer from the following round.</div>
         </div>
       </div>
-    <div class="checkbox-group">
-      <input type="checkbox" id="single-verse-only" checked>
-      <label for="single-verse-only">Keep questions within one ayah</label>
-    </div>
 
-    <div class="checkbox-group">
-      <input type="checkbox" id="start-of-ayah">
-      <label for="start-of-ayah">Keep questions at the beginning of an ayah</label>
-    </div>
 
-    <div class="checkbox-group">
-      <input type="checkbox" id="show-ayah-marker" checked>
-      <label for="show-ayah-marker">Show ayah marker while revealing</label>
-    </div>
 
-      <div class="field">
+
+
+
+
+      <div class="field" style="margin-top: 15px;">
         <span class="field-label">Maximum matches to list</span>
         <input type="number" id="match-list-cap" min="1" step="1" value="10">
-        <p class="field-help">Past this many matches, the answer view just shows the total count, and an objector types how many they found instead of ticking a long list.</p>
+        <p class="field-help">Above this number of competing phrases, show the count and let the objector report how many they named. Below it, tick the matching phrases.</p>
         <p class="field-error" id="match-list-cap-error"></p>
       </div>
     </div>
@@ -413,6 +421,8 @@
   "use strict";
 
   const PLAYER_COLORS = ['#c9a15a', '#5aa9d6', '#6abf6a', '#d6708a'];
+  const OBJECTION_COOLDOWN_MS = 300;
+  const NEXT_ROUND_COUNTDOWN_SECONDS = 3;
 
   // ---------- Local identity (persists across reloads on this device) ----------
   function getOrCreateDeviceId(){
@@ -475,71 +485,23 @@
   // whatever fully-resolved text the host puts in the synced game state,
   // so they never need the dataset at all.
   // =====================================================================
-  let quranWords = [];
-  let quranWordMap = {};
-  let metadata = null;
-  let quranDataLoading = false;
-  let quranDataReady = false;
-
+  let ayahs=[],candidates=[],questionPool=[],questionQueue=[],groupMode="sura";
+  let indexCache=null,indexCacheKey="",metadata=null,quranDataLoading=false,quranDataReady=false;
   function ensureQuranDataLoading(){
-    if(quranDataLoading || quranDataReady) return;
-    quranDataLoading = true;
-    loadQuranData().catch(function(err){
-      console.error(err);
-      setStatus("Couldn't load Qur'an data. Please try refreshing the page.", true);
-      document.getElementById("create-room-loading").textContent = "Data unavailable.";
-    });
+    if(quranDataLoading||quranDataReady)return;
+    quranDataLoading=true;
+    loadQuranData().catch(function(err){console.error(err);setStatus("Could not load Qur’an data. Refresh and try again.",true);document.getElementById("create-room-loading").textContent="Data unavailable.";});
   }
-
   async function loadQuranData(){
     QuranPicker.startLoadingAnimation();
-    await loadCSV();
-    await loadXML();
-    precomputeJuzAndPage();
-    populateSettingsUI();
-    quranDataReady = true;
-    QuranPicker.stopLoadingAnimation();
-    document.getElementById("create-room-btn").disabled = false;
-    document.getElementById("create-room-loading").hidden = true;
-    hideStatus();
-  }
-
-  async function loadCSV(){
-    const response = await fetch('quran_words.csv');
-    if(!response.ok) throw new Error('Could not fetch quran_words.csv (HTTP ' + response.status + ')');
-    const text = await response.text();
-    const lines = text.trim().split('\n');
-    for(let i = 0; i < lines.length; i++){
-      const line = lines[i].replace(/\r$/, '');
-      const parts = line.split(',');
-      if(parts.length >= 5){
-        const word = {
-          globalWordNumber: parseInt(parts[0]),
-          sura: parseInt(parts[1]),
-          aya: parseInt(parts[2]),
-          wordInAya: parseInt(parts[3]),
-          text: parts.slice(4).join(','),
-          juz: null,
-          page: null
-        };
-        quranWords.push(word);
-        quranWordMap[word.globalWordNumber] = word;
-      }
-    }
-  }
-  async function loadXML(){
-    metadata = await QuranPicker.loadMetadataXML('app_quran_metadata.xml');
-  }
-  function precomputeJuzAndPage(){
-    quranWords.forEach(function(word){
-      word.juz = QuranPicker.findJuz(metadata, word.sura, word.aya);
-      word.page = QuranPicker.findPage(metadata, word.sura, word.aya);
-    });
-  }
-  function populateSettingsUI(){
-    QuranPicker.populateSurahAndJuzLists(metadata, {
-      surahLabelHTML: function(sura){ return '<span>' + sura.index + '. </span><span class="arabic-name" dir="rtl">' + sura.name + '</span>'; }
-    });
+    const response=await fetch("quran-simple-plain_nobasmalah.sql");
+    if(!response.ok)throw new Error("Qur’an data: HTTP "+response.status);
+    ayahs=parseSQL(await response.text()).map(function(r){return {sura:r.sura,aya:r.aya,tokens:r.text.split(/\s+/).filter(Boolean)};});
+    metadata=await QuranPicker.loadMetadataXML("app_quran_metadata.xml");
+    ayahs.forEach(function(a){a.juz=QuranPicker.findJuz(metadata,a.sura,a.aya);a.page=QuranPicker.findPage(metadata,a.sura,a.aya);});
+    QuranPicker.populateSurahAndJuzLists(metadata,{surahLabelHTML:function(a){return '<span>'+a.index+'. </span><span class="arabic-name" dir="rtl">'+a.name+'</span>'; }});
+    quranDataReady=true;QuranPicker.stopLoadingAnimation();
+    document.getElementById("create-room-btn").disabled=false;document.getElementById("create-room-loading").hidden=true;hideStatus();
   }
 
   // ---------- Host settings UI wiring ----------
@@ -577,12 +539,18 @@
   document.getElementById("enable-objections").addEventListener("change", function(e){
     document.getElementById("objection-time-row").style.display = e.target.checked ? "flex" : "none";
   });
+  document.querySelectorAll("#group-mode-toggle .segment-btn").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      document.querySelectorAll("#group-mode-toggle .segment-btn").forEach(function(b){b.classList.remove("active");});
+      btn.classList.add("active");document.getElementById("group-mode").value=btn.dataset.mode;
+    });
+  });
   QuranPicker.wireCorePickerUI({ portionTypeName: 'portion-type' });
 
   const INT_RE = /^\d+$/;
   const NUM_RE = /^\d+(\.\d+)?$/;
   function clearFieldErrors(){
-    ["page-range-error", "points-error", "timing-error", "match-list-cap-error"].forEach(function(id){
+    ["page-range-error", "points-error", "timing-error", "match-list-cap-error", "phrase-settings-error"].forEach(function(id){
       const el = document.getElementById(id);
       el.textContent = ""; el.style.display = "none";
     });
@@ -605,34 +573,113 @@
     el.classList.toggle("error", !!isError);
   }
 
-  // =====================================================================
-  // Core search/render logic - ported unchanged from the local competitive
-  // version. Host-only: these all assume quranWords/quranWordMap/metadata
-  // are loaded, which only the host's device ever does.
-  // =====================================================================
+  function parseSQL(text){
+    // Matches tuples like: (6231, 114, 1, 'text with '' escaped quotes')
+    const rows = [];
+    const re = /\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*'((?:[^'\\]|\\.|'')*)'\s*\)/g;
+    let m;
+    while((m = re.exec(text)) !== null){
+      const sura = parseInt(m[2], 10);
+      const aya = parseInt(m[3], 10);
+      let t = m[4];
+      t = t.replace(/''/g, "'").replace(/\\'/g, "'");
+      rows.push({ sura: sura, aya: aya, text: t.trim() });
+    }
+    if(rows.length === 0){
+      throw new Error("No ayah rows could be parsed from " + 'Quran text' + ". The file format may not match what this app expects.");
+    }
+    return rows;
+  }
+  function buildPhraseIndex(minWords, maxWords){
+    const index = new Map(); // phrase -> occurrences[] (every occurrence, not deduped per surah)
+    for(let ai = 0; ai < ayahs.length; ai++){
+      const a = ayahs[ai];
+      const tokens = a.tokens;
+      const n = tokens.length;
+      for(let len = minWords; len <= maxWords; len++){
+        if(len > n) break;
+        for(let i = 0; i + len <= n; i++){
+          const key = tokens.slice(i, i + len).join(" ");
+          let occs = index.get(key);
+          if(!occs){
+            occs = [];
+            index.set(key, occs);
+          }
+          occs.push({ sura: a.sura, ayah: a.aya, page: a.page, juz: a.juz, tokens: tokens, startTok: i, endTok: i + len - 1 });
+        }
+      }
+    }
+    return index;
+  }
+  function unitOf(occurrence, groupBy){
+    return groupBy === "juz" ? occurrence.juz : occurrence.sura;
+  }
+  function buildPool(index, minUnits, maxUnits, portionSet, groupBy){
+    const result = [];
+    index.forEach(function(occurrences, phrase){
+      let allInPortion = true;
+      for(let i = 0; i < occurrences.length; i++){
+        const o = occurrences[i];
+        if(!portionSet.has(o.sura + "-" + o.ayah)){ allInPortion = false; break; }
+      }
+      if(!allInPortion) return;
 
-  function normalizeForComparison(text){
-    if(text.length >= 2 && text.charCodeAt(1) === 0x0651) return text.charAt(0) + text.substring(2);
-    return text;
+      const unitSet = new Set(occurrences.map(function(o){ return unitOf(o, groupBy); }));
+      if(unitSet.size < minUnits || unitSet.size > maxUnits) return;
+
+      result.push({ phrase: phrase, occurrences: occurrences });
+    });
+    return result;
   }
-  function buildStartIndexMap(checkAgainst){
-    const map = new Map();
-    for(let i = 0; i < checkAgainst.length; i++){
-      const key = normalizeForComparison(checkAgainst[i].text);
-      let positions = map.get(key);
-      if(!positions){ positions = []; map.set(key, positions); }
-      positions.push(i);
-    }
-    return map;
+  function dedupOverlappingPhrases(flatPool, groupBy){
+    const byUnitSet = new Map();
+    flatPool.forEach(function(entry){
+      const unitList = Array.from(new Set(entry.occurrences.map(function(o){ return unitOf(o, groupBy); }))).sort(function(a, b){ return a - b; });
+      const key = unitList.join(",");
+      if(!byUnitSet.has(key)) byUnitSet.set(key, []);
+      byUnitSet.get(key).push(entry);
+    });
+
+    const kept = [];
+    byUnitSet.forEach(function(group){
+      group.sort(function(a, b){
+        const la = a.phrase.split(" ").length, lb = b.phrase.split(" ").length;
+        if(lb !== la) return lb - la; // longer first
+        const minA = Math.min.apply(null, a.occurrences.map(function(o){ return o.startTok; }));
+        const minB = Math.min.apply(null, b.occurrences.map(function(o){ return o.startTok; }));
+        return minA - minB; // earlier position first, as a tiebreak
+      });
+
+      const survivors = [];
+      group.forEach(function(candidate){
+        const overlapsSurvivor = survivors.some(function(kept){
+          return candidate.occurrences.every(function(co){
+            return kept.occurrences.some(function(ko){
+              if(ko.sura !== co.sura || ko.ayah !== co.ayah) return false; // different verse: not the same physical span
+              return !(co.endTok < ko.startTok || co.startTok > ko.endTok); // ranges overlap
+            });
+          });
+        });
+        if(!overlapsSurvivor) survivors.push(candidate);
+      });
+      survivors.forEach(function(s){ kept.push(s); });
+    });
+
+    return kept;
   }
-  function narrowCandidates(candidates, checkAgainst, wordOffset, wordText){
-    const next = [];
-    for(let i = 0; i < candidates.length; i++){
-      const pos = candidates[i];
-      const checkWord = checkAgainst[pos + wordOffset];
-      if(checkWord && checkWord.text === wordText) next.push(pos);
-    }
-    return next;
+  function groupByUnitSet(flatPool, groupBy){
+    const groups = new Map(); // key (sorted unit list joined) -> {unitList, phrases}
+    flatPool.forEach(function(entry){
+      const unitList = Array.from(new Set(entry.occurrences.map(function(o){ return unitOf(o, groupBy); }))).sort(function(a, b){ return a - b; });
+      const key = unitList.join(",");
+      let group = groups.get(key);
+      if(!group){
+        group = { unitList: unitList, phrases: [] };
+        groups.set(key, group);
+      }
+      group.phrases.push(entry);
+    });
+    return Array.from(groups.values());
   }
   function shuffleArray(arr){
     for(let i = arr.length - 1; i > 0; i--){
@@ -641,180 +688,114 @@
     }
     return arr;
   }
-  function isBasmalahWord(word){
-    return word.aya === 1 && word.wordInAya <= 4 && word.sura !== 1 && word.sura !== 9;
-  }
-  function findUniquePhraseFromIndex(startIndex, filteredWords, singleVerseOnly, checkAgainst, startIndexMap){
-    const startWord = filteredWords[startIndex];
-    const firstWordKey = normalizeForComparison(startWord.text);
-    let candidates = startIndexMap.get(firstWordKey) || [];
-    let length = 1;
-    while(startIndex + length <= filteredWords.length){
-      if(length > 1){
-        const currentWord = filteredWords[startIndex + length - 1];
-        const previousWord = filteredWords[startIndex + length - 2];
-        if(currentWord.globalWordNumber !== previousWord.globalWordNumber + 1) return null;
-        if(singleVerseOnly && (currentWord.sura !== startWord.sura || currentWord.aya !== startWord.aya)) return null;
-        candidates = narrowCandidates(candidates, checkAgainst, length - 1, currentWord.text);
-        if(candidates.length === 0) return null;
-      }
-      if(candidates.length === 1){
-        const phrase = [];
-        for(let i = 0; i < length; i++) phrase.push(filteredWords[startIndex + i]);
-        return { words: phrase, startIndex: startIndex, length: length };
-      }
-      length++;
-    }
-    return null;
-  }
-  function getFilteredWords(){
-    return QuranPicker.getFilteredByPortion(quranWords, { portionTypeName: 'portion-type' });
-  }
-  function generateQuestion(settings){
-    const filteredWords = getFilteredWords();
-    if(filteredWords.length === 0) return { ok: false, message: 'No words available with current filter settings.' };
-
-    let startPositions = [];
-    if(settings.startOfAyah){
-      filteredWords.forEach(function(word, idx){ if(word.wordInAya === 1 && !isBasmalahWord(word)) startPositions.push(idx); });
-      if(startPositions.length === 0) return { ok: false, message: 'No words at the beginning of ayahs available with current filter settings.' };
-    }else{
-      filteredWords.forEach(function(word, idx){ if(!isBasmalahWord(word)) startPositions.push(idx); });
-      if(startPositions.length === 0) return { ok: false, message: 'No words available with current filter settings.' };
-    }
-    shuffleArray(startPositions);
-
-    const checkAgainst = filteredWords;
-    const startIndexMap = buildStartIndexMap(checkAgainst);
-
-    let uniquePhrase = null;
-    for(let p = 0; p < startPositions.length; p++){
-      uniquePhrase = findUniquePhraseFromIndex(startPositions[p], filteredWords, settings.singleVerseOnly, checkAgainst, startIndexMap);
-      if(uniquePhrase) break;
-    }
-    if(!uniquePhrase) return { ok: false, message: 'No results found. Try widening your filter settings.' };
-    return { ok: true, uniquePhrase: uniquePhrase };
-  }
-
-  function findPortionOccurrences(words){
-    const checkAgainst = getFilteredWords();
-    const startIndexMap = buildStartIndexMap(checkAgainst);
-    let candidates = startIndexMap.get(normalizeForComparison(words[0].text)) || [];
-    for(let offset = 1; offset < words.length && candidates.length; offset++){
-      candidates = narrowCandidates(candidates, checkAgainst, offset, words[offset].text);
-    }
-    const matches = candidates.map(function(pos){
-      const seenAyah = new Set(); const ayahs = [];
-      for(let i = 0; i < words.length; i++){
-        const w = checkAgainst[pos + i];
-        const key = w.sura + ':' + w.aya;
-        if(!seenAyah.has(key)){ seenAyah.add(key); ayahs.push({ sura: w.sura, aya: w.aya }); }
-      }
-      return { firstWord: checkAgainst[pos], lastWord: checkAgainst[pos + words.length - 1], ayahs: ayahs };
-    });
-    const seenOverall = new Set(); const uniqueAyahs = [];
-    matches.forEach(function(m){
-      m.ayahs.forEach(function(a){
-        const key = a.sura + ':' + a.aya;
-        if(!seenOverall.has(key)){ seenOverall.add(key); uniqueAyahs.push(a); }
-      });
-    });
-    return { totalCount: candidates.length, uniqueAyahs: uniqueAyahs, matches: matches };
-  }
-
-  function containsCompleteAyah(words){
-    const seenAyah = new Set();
-    for(let i = 0; i < words.length; i++){
-      const w = words[i];
-      const key = w.sura + ':' + w.aya;
-      if(seenAyah.has(key)) continue;
-      seenAyah.add(key);
-      const hasFirstWord = words.some(function(x){ return x.sura === w.sura && x.aya === w.aya && x.wordInAya === 1; });
-      if(!hasFirstWord) continue;
-      const hasLastWord = words.some(function(x){
-        if(x.sura !== w.sura || x.aya !== w.aya) return false;
-        const next = quranWordMap[x.globalWordNumber + 1];
-        return !next || next.sura !== x.sura || next.aya !== x.aya;
-      });
-      if(hasLastWord) return true;
-    }
-    return false;
-  }
-
   function escapeHTML(s){
-    const div = document.createElement("div");
-    div.textContent = s;
-    return div.innerHTML;
+    const div=document.createElement('div');div.textContent=String(s);return div.innerHTML;
   }
   function suraNameOf(idx){
     const s = metadata.suras.find(function(s){ return s.index === idx; });
     return s ? s.name : ("Surah " + idx);
   }
-  function verseTextFor(sura, aya){
-    const verseWords = quranWords.filter(function(w){ return w.sura === sura && w.aya === aya; });
-    return verseWords.map(function(w){ return w.text; }).join(' ');
+  function clueLabel(unit){ return groupMode === 'juz' ? 'Juz ' + unit : suraNameOf(unit); }
+  function matchesClues(clues){ return candidates.filter(function(p){ return clues.every(function(u){ return p.units.has(u); }); }); }
+  function findPortionOccurrences(clues){
+    const raw=matchesClues(clues);
+    const matches=raw.filter(function(p){return !raw.some(function(q){return q!==p && q.fragments.has(p.phrase);});});
+    return {totalCount:matches.length,matches:matches};
   }
-  function buildPhraseText(words, showMarker){
-    if(!showMarker) return words.map(function(w){ return w.text; }).join(' ');
-    let text = '';
-    for(let i = 0; i < words.length; i++){
-      text += words[i].text;
-      if(i < words.length - 1){
-        const cur = words[i], next = words[i + 1];
-        if(cur.sura !== next.sura || cur.aya !== next.aya) text += ' \u06DD';
-        text += ' ';
+  async function buildLongerCandidates(index, maxWords, portion, mode){
+    const result=[];
+    let frontier=[];
+    index.forEach(function(occurrences,phrase){
+      if(phrase.split(' ').length!==maxWords)return;
+      if(new Set(occurrences.map(function(o){return unitOf(o,mode);})).size>=2){
+        frontier.push({phrase:phrase,occurrences:occurrences});
       }
+    });
+    while(frontier.length){
+      const next=new Map();
+      frontier.forEach(function(entry){
+        entry.occurrences.forEach(function(o){
+          if(o.endTok+1>=o.tokens.length)return;
+          const phrase=entry.phrase+' '+o.tokens[o.endTok+1];
+          if(!next.has(phrase))next.set(phrase,[]);
+          next.get(phrase).push({sura:o.sura,ayah:o.ayah,page:o.page,juz:o.juz,tokens:o.tokens,startTok:o.startTok,endTok:o.endTok+1});
+        });
+      });
+      frontier=[];
+      next.forEach(function(occurrences,phrase){
+        if(new Set(occurrences.map(function(o){return unitOf(o,mode);})).size<2)return;
+        frontier.push({phrase:phrase,occurrences:occurrences});
+        if(occurrences.every(function(o){return portion.has(o.sura+'-'+o.ayah);})){
+          result.push({phrase:phrase,occurrences:occurrences});
+        }
+      });
+      await new Promise(function(resolve){setTimeout(resolve,0);});
     }
-    return text;
+    return result;
   }
-  function buildAyahSpanHTML(ayahs, firstWord, lastWord){
-    let html = '';
-    ayahs.forEach(function(a){ html += '<div class="answer-verse">' + escapeHTML(verseTextFor(a.sura, a.aya)) + '</div>'; });
-    const surahName = suraNameOf(firstWord.sura);
-    let ayahDisplay;
-    if(ayahs.length > 1){
-      ayahDisplay = (firstWord.sura !== lastWord.sura)
-        ? (surahName + ' ' + firstWord.aya + ' \u2013 ' + suraNameOf(lastWord.sura) + ' ' + lastWord.aya)
-        : (firstWord.aya + ' \u2013 ' + lastWord.aya);
-    }else{ ayahDisplay = String(firstWord.aya); }
-    html += '<div class="answer-metadata">';
-    html += '<div><strong>Surah:</strong> ' + escapeHTML(surahName) + ' (' + firstWord.sura + ')</div>';
-    html += '<div><strong>Ayah:</strong> ' + escapeHTML(ayahDisplay) + '</div>';
-    html += '<div><strong>Juz:</strong> ' + firstWord.juz + '</div>';
-    html += '<div><strong>Page:</strong> ' + firstWord.page + '</div>';
-    html += '</div>';
-    return html;
-  }
-  function buildAnswerHTML(question){
-    const words = question.uniquePhrase.words;
-    const ayahs = []; const seen = new Set();
-    words.forEach(function(w){ const k = w.sura + ':' + w.aya; if(!seen.has(k)){ seen.add(k); ayahs.push({ sura: w.sura, aya: w.aya }); } });
-    return buildAyahSpanHTML(ayahs, words[0], words[words.length - 1]);
-  }
-  function buildMatchAnswerHTML(match){
-    return '<div class="answer-match">' + buildAyahSpanHTML(match.ayahs, match.firstWord, match.lastWord) + '</div>';
-  }
-  function buildAnswerBlockHTML(gameState){
-    const occ = gameState.checkOccurrences || gameState.objectionOccurrences;
-    if(occ && occ.totalCount > 1){
-      let html = '<div class="zone-answer">';
-      if(occ.totalCount > gameState.matchListCap){
-        html += '<div class="buzz-status-note">Woah, comes ' + occ.totalCount + ' times, very not unique.</div>';
-      }else{
-        html += '<div class="buzz-status-note">This phrase wasn\u2019t unique yet when it was checked \u2014 it matched ' + occ.totalCount + ' place' + (occ.totalCount === 1 ? '' : 's') + ':</div>';
-        occ.matches.forEach(function(m){ html += buildMatchAnswerHTML(m); });
+  function resetQuestionQueue(){ questionQueue=questionPool.slice();shuffleArray(questionQueue); }
+  async function prepareQuestions(){
+    const num=function(id,min,max){const n=Number(document.getElementById(id).value);if(!Number.isInteger(n)||n<min||n>max)throw new Error('Check phrase settings: word lengths 1–20, clue counts 2–10.');return n;};
+    const lo=num('min-words',1,20),hi=num('max-words',1,20),min=num('min-units',2,10),max=num('max-units',2,10);
+    if(lo>hi || min>max) throw new Error('Minimum must not exceed maximum.');
+    groupMode=document.getElementById('group-mode').value;
+    const portion=new Set(QuranPicker.getFilteredByPortion(ayahs,{portionTypeName:'portion-type'}).map(function(a){return a.sura+'-'+a.aya;}));
+    if(!portion.size)throw new Error('Select at least one surah, juz or valid page range.');
+    const key=lo+':'+hi;
+    if(indexCacheKey!==key){indexCache=buildPhraseIndex(lo,hi);indexCacheKey=key;}
+    const targetPool=buildPool(indexCache,2,groupMode==='juz'?30:114,portion,groupMode);
+    candidates=targetPool.concat(await buildLongerCandidates(indexCache,hi,portion,groupMode));
+    const ids=new Map(candidates.map(function(p,i){return [p.phrase,i];}));
+    const postings={};
+    candidates.forEach(function(p,i){
+      p.units=new Set(p.occurrences.map(function(o){return unitOf(o,groupMode);}));
+      p.units.forEach(function(u){postings[u]=(postings[u]||0n)|(1n<<BigInt(i));});
+      p.fragments=new Set();p.fragmentMask=0n;
+      const words=p.phrase.split(' ');
+      for(let len=lo;len<=words.length;len++)for(let j=0;j+len<=words.length;j++){
+        const fragment=words.slice(j,j+len).join(' '),id=ids.get(fragment);
+        if(id!==undefined){p.fragments.add(fragment);p.fragmentMask|=1n<<BigInt(id);}
       }
-      html += '</div>';
-      return html;
+    });
+    const all=(1n<<BigInt(candidates.length))-1n;questionPool=[];
+    for(let i=0;i<targetPool.length;i++){
+      const p=targetPool[i],units=Array.from(p.units).sort(function(a,b){return a-b;});
+      if(units.length<min || units.length>max)continue;
+      const full=units.reduce(function(mask,u){return mask&postings[u];},all);
+      // A single maximal answer remains only when it contains every match.
+      if((full&~p.fragmentMask)===0n)questionPool.push({entry:p,units:units});
+      if(i%100===0)await new Promise(function(resolve){setTimeout(resolve,0);});
     }
-    return '<div class="zone-answer">' + buildAnswerHTML(gameState.currentQuestion) + '</div>';
+    if(!questionPool.length)throw new Error('No uniquely identifiable questions. Widen the portion or phrase settings.');
+    resetQuestionQueue();
   }
-
-  // =====================================================================
-  // HOST: room creation
-  // =====================================================================
-
-  document.getElementById("create-room-btn").addEventListener("click", createRoom);
+  function generateQuestion(){
+    if(!questionQueue.length)return {ok:false,exhausted:true};
+    const q=questionQueue.pop(),clues=q.units.slice();shuffleArray(clues);
+    let uniqueAt=clues.length;
+    for(let n=1;n<=clues.length;n++){
+      if(findPortionOccurrences(clues.slice(0,n)).totalCount===1){uniqueAt=n;break;}
+    }
+    return {ok:true,entry:q.entry,units:q.units,clues:clues,uniqueAt:uniqueAt};
+  }
+  function candidateHTML(entry){
+    let html='<div class="phrase-block"><div class="answer-phrase" dir="rtl">'+escapeHTML(entry.phrase)+'</div>';
+    const groups=new Map();
+    entry.occurrences.forEach(function(o){const u=unitOf(o,groupMode);if(!groups.has(u))groups.set(u,[]);groups.get(u).push(o);});
+    Array.from(groups.keys()).sort(function(a,b){return a-b;}).forEach(function(u){
+      html+='<p class="unit-heading"><span dir="auto">'+escapeHTML(clueLabel(u))+'</span></p>';
+      const verses=new Map();groups.get(u).forEach(function(o){const key=o.sura+':'+o.ayah;if(!verses.has(key))verses.set(key,[]);verses.get(key).push(o);});
+      Array.from(verses.values()).sort(function(a,b){return a[0].sura-b[0].sura||a[0].ayah-b[0].ayah;}).forEach(function(occs){
+        const o=occs[0];
+        html+='<div class="occurrence"><div class="occurrence-meta"><span class="surah-name" dir="rtl">'+escapeHTML(suraNameOf(o.sura))+'</span><span>Ayah '+o.ayah+'</span><span>Page '+o.page+'</span></div>';
+        html+='<div class="ayah-text" dir="rtl">'+o.tokens.map(function(t,i){const word=escapeHTML(t);return occs.some(function(x){return i>=x.startTok&&i<=x.endTok;})?'<mark>'+word+'</mark>':word;}).join(' ')+'</div></div>';
+      });
+    });
+    return html+'</div>';
+  }
+  function buildAnswerHTML(q){
+    return '<p>All clues: '+q.units.map(function(u){return escapeHTML(clueLabel(u));}).join(' · ')+'</p><p>Unique after clue '+q.uniqueAt+': '+q.clues.slice(0,q.uniqueAt).map(function(u){return escapeHTML(clueLabel(u));}).join(' · ')+'</p>'+candidateHTML(q.entry);
+  }
 
   function makeRoomCode(){
     const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ"; // no I/O to avoid confusion
@@ -822,6 +803,8 @@
     for(let i = 0; i < 4; i++) code += letters[Math.floor(Math.random() * letters.length)];
     return code;
   }
+
+  document.getElementById("create-room-btn").addEventListener("click", createRoom);
 
   async function createRoom(){
     clearFieldErrors();
@@ -859,13 +842,10 @@
     if(pointsToWin === null || startWords === null || revealDelay === null || answerTime === null || eliminationTimeLimit === null || matchListCap === null) return;
     if(!quranDataReady){ setSettingsStatus("Still loading Qur'an data - try again in a moment.", true); return; }
 
-    const questionSettings = {
-      singleVerseOnly: document.getElementById('single-verse-only').checked,
-      startOfAyah: document.getElementById('start-of-ayah').checked
-    };
-    const portionWordNumbers = new Set(getFilteredWords().map(function(w){ return w.globalWordNumber; }));
-    const testResult = generateQuestion(questionSettings);
-    if(!testResult.ok){ setSettingsStatus(testResult.message, true); return; }
+    document.getElementById("create-room-btn").disabled=true;
+    setSettingsStatus("Building unique clue questions…",false);
+    try{await prepareQuestions();}catch(err){setSettingsStatus(err.message,true);document.getElementById("create-room-btn").disabled=false;return;}
+    document.getElementById("create-room-btn").disabled=false;setSettingsStatus("",false);
 
     myName = hostName;
     isHost = true;
@@ -876,8 +856,9 @@
       pointsToWin: pointsToWin, startWords: startWords, revealDelayMs: revealDelay * 1000,
       answerTimeSeconds: answerTime, eliminationTimeLimitSeconds: eliminationTimeLimit,
       matchListCap: matchListCap, objectionsWanted: objectionsWanted, objectionTimeSeconds: objectionTimeSeconds,
-      showAyahMarker: document.getElementById('show-ayah-marker').checked,
-      questionSettings: questionSettings, portionWordNumbers: portionWordNumbers,
+      groupMode: groupMode,
+      minWords: Number(document.getElementById("min-words").value), maxWords: Number(document.getElementById("max-words").value),
+      minUnits: Number(document.getElementById("min-units").value), maxUnits: Number(document.getElementById("max-units").value),
       maxPlayers: maxPlayers, penalizeEarlyBuzz: maxPlayers > 2 && document.getElementById("penalize-early-buzz").checked
     };
     const selectedSurahs = Array.from(document.querySelectorAll("#surah-list input[type=checkbox]:checked")).map(function(el){ return el.closest("label")?.textContent.trim() || el.value; });
@@ -888,12 +869,13 @@
       answerTime: answerTime, eliminationTimeLimit: eliminationTimeLimit,
       objections: maxPlayers === 2 && objectionsWanted, objectionTime: objectionTimeSeconds,
       penalizeEarlyBuzz: hostState.penalizeEarlyBuzz,
-      singleVerseOnly: questionSettings.singleVerseOnly, startOfAyah: questionSettings.startOfAyah,
-      showAyahMarker: hostState.showAyahMarker, matchListCap: matchListCap
+      groupMode: groupMode, minWords: hostState.minWords, maxWords: hostState.maxWords,
+      minUnits: hostState.minUnits, maxUnits: hostState.maxUnits, matchListCap: matchListCap
     };
 
-    await fb.set(fb.ref(fb.db, 'rooms/' + roomCode), {
+    try{await fb.set(fb.ref(fb.db, 'rooms/' + roomCode), {
       status: 'lobby',
+      gameType: 'commonphrase',
       hostId: myId,
       maxPlayers: maxPlayers,
       settings: publicSettings,
@@ -902,7 +884,17 @@
         [myId]: { name: hostName, joinedAt: fb.serverTimestamp() }
       }
     });
-    fb.onDisconnect(fb.ref(fb.db, 'rooms/' + roomCode + '/players/' + myId)).remove();
+    }catch(err){console.error("Room creation failed:",err);roomCode=null;isHost=false;myIndex=null;setSettingsStatus("Could not create room: "+err.message,true);return;}
+    // Register server-side cleanup before allowing the host to start a game.
+    try{
+      await fb.onDisconnect(fb.ref(fb.db, 'rooms/' + roomCode)).remove();
+    }catch(err){
+      await fb.remove(fb.ref(fb.db, 'rooms/' + roomCode));
+      roomCode = null; isHost = false; myIndex = null;
+      setSettingsStatus("Could not enable disconnect handling. Please try creating the room again.", true);
+      console.error("Room disconnect setup failed:", err);
+      return;
+    }
 
     enterLobby();
   }
@@ -933,6 +925,7 @@
     const roomSnap = await fb.get(fb.ref(fb.db, 'rooms/' + code));
     if(!roomSnap.exists()){ statusEl2.textContent = "No room found with that code."; statusEl2.classList.add("error"); return; }
     const room = roomSnap.val();
+    if(room.gameType !== 'commonphrase'){ statusEl2.textContent = 'That code is for a different game.'; statusEl2.classList.add('error'); return; }
     if(room.status !== 'lobby'){ statusEl2.textContent = "That game has already started."; statusEl2.classList.add("error"); return; }
     const currentCount = room.players ? Object.keys(room.players).length : 0;
     if(currentCount >= room.maxPlayers){ statusEl2.textContent = "That room is full."; statusEl2.classList.add("error"); return; }
@@ -966,14 +959,26 @@
     });
 
     const lobbyCode = roomCode;
+    function roomClosed(){
+      if(roomCode !== lobbyCode) return;
+      if(isHost && hg){
+        stopRevealTimer(); stopAnswerTimer(); stopObjectionTimer(); stopObjectionCooldownTimer(); stopCountdownTimer(); stopEliminationCountdown();
+        hg = null;
+      }
+      roomCode = null; isHost = false; myIndex = null; latestState = null;
+      showScreen("landing");
+      setStatus("The host ended the game or disconnected.", false);
+    }
     fb.onValue(fb.ref(fb.db, 'rooms/' + lobbyCode + '/status'), function(snap){
       if(roomCode !== lobbyCode) return;
       if(snap.val() === 'playing' && screens.game.hidden) enterGame();
       else if(!snap.exists() || snap.val() === 'ended'){
-        roomCode = null; isHost = false; myIndex = null; latestState = null;
-        showScreen("landing");
-        setStatus("The host ended the game.", false);
+        roomClosed();
       }
+    }, function(err){
+      // Membership-based read access disappears when the room is deleted.
+      if(err.code === "PERMISSION_DENIED" || err.code === "permission-denied") roomClosed();
+      else console.error("Room status listener failed:", err);
     });
 
     if(isHost){
@@ -987,16 +992,15 @@
     const row = function(label, value){ return '<p><strong>' + label + ':</strong> ' + escapeHTML(String(value)) + '</p>'; };
     const yesNo = function(value){ return value ? "Yes" : "No"; };
     el.innerHTML = '<h3>Game Setup</h3>' +
-      row("Portion", settings.portion) + row("Number of Players", settings.maxPlayers) +
-      row("Starting words shown", settings.startWords) + row("Seconds between reveals", settings.revealDelay) +
-      (settings.maxPlayers === 2 ? row("Objections", yesNo(settings.objections)) + (settings.objections ? row("Objection answer time (s)", settings.objectionTime) : "") : "") +
-      '<details><summary>More settings</summary>' + row("Points to Win", settings.pointsToWin) +
-      row("Answer time after buzzing (s)", settings.answerTime) + row("Time limit after an elimination (s)", settings.eliminationTimeLimit) +
-      (settings.maxPlayers > 2 ? row("Eliminate early buzzers from the next round", yesNo(settings.penalizeEarlyBuzz)) : "") +
-      row("Keep questions within one ayah", yesNo(settings.singleVerseOnly)) +
-      row("Keep questions at the beginning of an ayah", yesNo(settings.startOfAyah)) +
-      row("Show ayah marker while revealing", yesNo(settings.showAyahMarker)) +
-      row("Maximum matches to list", settings.matchListCap) + '</details>';
+      row("Portion",settings.portion)+row("Number of Players",settings.maxPlayers)+
+      row("Clues",settings.groupMode==="juz"?"Juz":"Surahs")+row("Points to Win",settings.pointsToWin)+
+      '<details><summary>More settings</summary>'+row("Starting clues shown",settings.startWords)+
+      row("Seconds between reveals",settings.revealDelay)+row("Phrase length",settings.minWords+"–"+settings.maxWords+" words")+
+      row("Places per question",settings.minUnits+"–"+settings.maxUnits)+row("Answer time (s)",settings.answerTime)+
+      row("Time after elimination (s)",settings.eliminationTimeLimit)+
+      (settings.maxPlayers===2?row("Objections",yesNo(settings.objections))+
+        (settings.objections?row("Objection time (s)",settings.objectionTime):""):row("Early buzzer elimination",yesNo(settings.penalizeEarlyBuzz)))+
+      row("Maximum objection matches to list",settings.matchListCap)+'</details>';
   }
 
   function renderLobbyRoster(players){
@@ -1063,142 +1067,136 @@
       objectionsEnabled: objectionsEnabled,
       penalizeEarlyBuzz: playerCount > 2 && hostState.penalizeEarlyBuzz,
       objectionTimeSeconds: hostState.objectionTimeSeconds,
-      portionWordNumbers: hostState.portionWordNumbers,
-      showAyahMarker: hostState.showAyahMarker,
-      questionSettings: hostState.questionSettings,
-      currentQuestion: null, displayedWords: [], phraseTotal: 0, leftGlobal: null, rightGlobal: null,
-      expandNextDirection: "forward", expansionExhausted: false,
+      currentQuestion: null, displayedWords: [], expansionExhausted: false,
       phase: "revealing", activeBuzzerId: null, revealedToBuzzer: false, answerRemaining: 0, checkOccurrences: null,
       objectorId: null, objectionRemaining: 0, objectionOccurrences: null, objectionRevealed: false,
       objectionTypedCount: 0, objectionCooldownActive: false, roundOverMessage: null, winnerName: null,
-      searchFailMessage: null, countdownRemaining: 0, eliminationCountdownRemaining: 0,
+      searchFailMessage: null, countdownRemaining: 0, eliminationCountdownRemaining: 0, finalMessage: null,
       revealTimerId: null, answerTimerId: null, objectionTimerId: null, objectionCooldownTimerId: null,
       countdownTimerId: null, eliminationCountdownTimerId: null
     };
 
-    await fb.update(fb.ref(fb.db, 'rooms/' + roomCode), { status: 'playing' });
     listenForIntents();
     listenForBuzzClaims();
     startRound();
+    await fb.update(fb.ref(fb.db, 'rooms/' + roomCode), { status: 'playing' });
   }
 
   function stopRevealTimer(){ if(hg.revealTimerId){ clearInterval(hg.revealTimerId); hg.revealTimerId = null; } }
   function stopAnswerTimer(){ if(hg.answerTimerId){ clearInterval(hg.answerTimerId); hg.answerTimerId = null; } }
   function stopObjectionTimer(){ if(hg.objectionTimerId){ clearInterval(hg.objectionTimerId); hg.objectionTimerId = null; } }
   function stopObjectionCooldownTimer(){ if(hg.objectionCooldownTimerId){ clearTimeout(hg.objectionCooldownTimerId); hg.objectionCooldownTimerId = null; } }
-  function stopCountdownTimer(){ if(hg.countdownTimerId){ clearInterval(hg.countdownTimerId); hg.countdownTimerId = null; } }
-  function stopEliminationCountdown(){ if(hg.eliminationCountdownTimerId){ clearInterval(hg.eliminationCountdownTimerId); hg.eliminationCountdownTimerId = null; } }
 
   function resetBuzzClaim(){
     fb.set(fb.ref(fb.db, 'rooms/' + roomCode + '/buzzClaim'), null);
   }
 
   function startRound(){
-    stopRevealTimer(); stopAnswerTimer(); stopObjectionTimer(); stopObjectionCooldownTimer(); stopCountdownTimer(); stopEliminationCountdown();
     resetBuzzClaim();
+    stopRevealTimer();
+    stopAnswerTimer();
+    stopObjectionTimer();
+    stopObjectionCooldownTimer();
+    stopCountdownTimer();
+    stopEliminationCountdown();
 
-    const result = generateQuestion(hg.questionSettings);
+    const result = generateQuestion();
     if(!result.ok){
+      if(result.exhausted){finishExhaustedGame();return;}
       hg.phase = "searchFailed";
       hg.searchFailMessage = result.message;
       syncState();
       return;
     }
-    const phraseWords = result.uniquePhrase.words;
-    hg.currentQuestion = result;
-    hg.phraseTotal = phraseWords.length;
-    const initialCount = Math.min(hg.startWords, phraseWords.length);
-    hg.displayedWords = phraseWords.slice(0, initialCount);
-    hg.leftGlobal = hg.displayedWords[0].globalWordNumber;
-    hg.rightGlobal = hg.displayedWords[hg.displayedWords.length - 1].globalWordNumber;
-    hg.expandNextDirection = "forward"; hg.expansionExhausted = false;
-    hg.phase = "revealing"; hg.activeBuzzerId = null; hg.revealedToBuzzer = false;
-    hg.checkOccurrences = null; hg.objectorId = null; hg.objectionRemaining = 0;
-    hg.objectionOccurrences = null; hg.objectionRevealed = false; hg.objectionTypedCount = 0;
-    hg.objectionCooldownActive = false; hg.roundOverMessage = null;
-    hg.players.forEach(function(p){ p.eliminatedThisRound = p.eliminatedNextRound; p.eliminatedNextRound = false; });
 
-    if(endRoundIfCompleteAyahShown()) return;
-    hg.revealTimerId = setInterval(tickReveal, hg.revealDelayMs);
+    hg.currentQuestion = result;
+    hg.phraseTotal = result.uniqueAt;
+    hg.displayedWords = result.clues.slice(0,Math.min(hg.startWords,result.clues.length));
+    hg.expansionExhausted = hg.displayedWords.length >= result.clues.length;
+    hg.phase = "revealing";
+    hg.activeBuzzerId = null;
+    hg.revealedToBuzzer = false;
+    hg.checkOccurrences = null;
+    hg.objectorId = null;
+    hg.objectionRemaining = 0;
+    hg.objectionOccurrences = null;
+    hg.objectionRevealed = false;
+    hg.objectionTypedCount = 0;
+    hg.objectionCooldownActive = false;
+    hg.roundOverMessage = null;
+    hg.skipAnswerReveal = false;
+
+    hg.players.forEach(function(p){
+      p.eliminatedThisRound = p.eliminatedNextRound;
+      p.eliminatedNextRound = false;
+    });
+
+    if(!hg.expansionExhausted) hg.revealTimerId = setInterval(tickReveal, hg.revealDelayMs);
     syncState();
   }
 
-  function endRoundIfCompleteAyahShown(){
-    if(!containsCompleteAyah(hg.displayedWords)) return false;
-    stopRevealTimer(); stopEliminationCountdown();
-    hg.checkOccurrences = findPortionOccurrences(hg.displayedWords);
-    finishRound("A full ayah was revealed \u2014 no one got it in time.");
-    return true;
-  }
-
   function tickReveal(){
-    const phraseWords = hg.currentQuestion.uniquePhrase.words;
-    if(hg.displayedWords.length < phraseWords.length){
-      hg.displayedWords.push(phraseWords[hg.displayedWords.length]);
-      hg.rightGlobal = hg.displayedWords[hg.displayedWords.length - 1].globalWordNumber;
-      if(endRoundIfCompleteAyahShown()) return;
-      syncState();
-      return;
-    }
-    const tryForward = function(){
-      const next = quranWordMap[hg.rightGlobal + 1];
-      if(!next || !hg.portionWordNumbers.has(next.globalWordNumber)) return false;
-      hg.displayedWords.push(next); hg.rightGlobal++; return true;
-    };
-    const tryBackward = function(){
-      const prev = quranWordMap[hg.leftGlobal - 1];
-      if(!prev || !hg.portionWordNumbers.has(prev.globalWordNumber)) return false;
-      hg.displayedWords.unshift(prev); hg.leftGlobal--; return true;
-    };
-    let extended;
-    if(hg.expandNextDirection === "forward"){ extended = tryForward() || tryBackward(); hg.expandNextDirection = "backward"; }
-    else{ extended = tryBackward() || tryForward(); hg.expandNextDirection = "forward"; }
-    if(!extended){ hg.expansionExhausted = true; stopRevealTimer(); syncState(); return; }
-    if(endRoundIfCompleteAyahShown()) return;
+    if(hg.phase !== 'revealing')return;
+    const clues=hg.currentQuestion.clues;
+    if(hg.displayedWords.length<clues.length)hg.displayedWords.push(clues[hg.displayedWords.length]);
+    hg.expansionExhausted=hg.displayedWords.length>=clues.length;
+    if(hg.expansionExhausted)stopRevealTimer();
     syncState();
   }
 
   function resumeRevealIfNeeded(){
-    if(!hg.expansionExhausted && !hg.revealTimerId) hg.revealTimerId = setInterval(tickReveal, hg.revealDelayMs);
-  }
-
-  function finishRound(message){
-    hg.roundOverMessage = message;
-    const winner = hg.players.find(function(p){ return p.score >= hg.pointsToWin; });
-    if(winner){ hg.phase = "gameOver"; hg.winnerName = winner.name; }
-    else{ hg.phase = "roundOver"; }
-    syncState();
+    if(!hg.expansionExhausted && !hg.revealTimerId){
+      hg.revealTimerId = setInterval(tickReveal, hg.revealDelayMs);
+    }
   }
 
   function buzz(playerId){
     if(hg.phase !== "revealing") return;
     const player = hg.players[playerId];
     if(!player || player.eliminatedThisRound) return;
-    // Match Competitive: only a 3/4-player game with this option enabled
-    // penalizes a buzz, and only when the visible phrase is not unique yet.
-    // The penalty applies to the following round, never the current one.
-    if((hg.players.length === 3 || hg.players.length === 4) && hg.penalizeEarlyBuzz){
+
+    // Optional 3/4-player rule: buzzing while the phrase still matches more
+    // than one ayah ends the round immediately (showing every match) and
+    // costs the buzzer their next round, instead of going to a private
+    // check - the app can tell objectively that it wasn't unique yet, so
+    // there's nothing to self-report.
+    if(hg.players.length > 2 && hg.penalizeEarlyBuzz){
       const occ = findPortionOccurrences(hg.displayedWords);
       if(occ.totalCount > 1){
-        stopRevealTimer(); stopEliminationCountdown();
+        stopRevealTimer();
+        stopEliminationCountdown();
         hg.checkOccurrences = occ;
         player.eliminatedNextRound = true;
-        finishRound(player.name + " buzzed before it was unique — they’ll sit out next round.");
+        finishRound(player.name + " buzzed before it was unique \u2014 they\u2019ll sit out next round.");
         return;
       }
     }
-    stopRevealTimer(); stopEliminationCountdown();
-    hg.phase = "answering"; hg.activeBuzzerId = playerId; hg.answerRemaining = hg.answerTimeSeconds;
+
+    stopRevealTimer();
+    stopEliminationCountdown();
+    hg.phase = "answering";
+    hg.activeBuzzerId = playerId;
+    hg.answerRemaining = hg.answerTimeSeconds;
+
+    // Brief grace period before the other player's zone becomes tappable
+    // for an objection - without this, two near-simultaneous buzzes could
+    // resolve as one real buzz plus an accidental "objection" from what was
+    // actually just a slightly-late competing buzz.
     hg.objectionCooldownActive = true;
     hg.objectionCooldownTimerId = setTimeout(function(){
-      hg.objectionCooldownTimerId = null; hg.objectionCooldownActive = false;
+      hg.objectionCooldownTimerId = null;
+      hg.objectionCooldownActive = false;
       if(hg.phase === "answering") syncState();
-    }, 300);
+    }, OBJECTION_COOLDOWN_MS);
+
     syncState();
+
     hg.answerTimerId = setInterval(function(){
       hg.answerRemaining--;
       if(hg.answerRemaining <= 0){
-        stopAnswerTimer(); hg.phase = "checking"; hg.revealedToBuzzer = false;
+        stopAnswerTimer();
+        hg.phase = "checking";
+        hg.revealedToBuzzer = false;
       }
       syncState();
     }, 1000);
@@ -1211,35 +1209,173 @@
     syncState();
   }
 
+  // Ends the round, applying whatever score changes already happened,
+  // showing `message` centrally, and moving to gameOver if anyone has now
+  // reached the points-to-win threshold.
+  function finishExhaustedGame(){
+    const high=Math.max.apply(null,hg.players.map(function(p){return p.score;}));
+    const leaders=hg.players.filter(function(p){return p.score===high;});
+    hg.finalMessage='All questions played. '+(leaders.length===1?leaders[0].name+' wins with '+high+' points!':'Draw: '+leaders.map(function(p){return p.name;}).join(', ')+' ('+high+' points).');
+    hg.phase='gameOver';hg.winnerName=leaders.length===1?leaders[0].name:null;
+    syncState();
+  }
+
+  function finishRound(message){
+    hg.roundOverMessage = message;
+    const winner = hg.players.find(function(p){ return p.score >= hg.pointsToWin; });
+    if(winner){
+      hg.phase = "gameOver";
+      hg.winnerName = winner.name;
+    }else if(!questionQueue.length){
+      finishExhaustedGame();return;
+    }else{
+      hg.phase = "roundOver";
+    }
+    syncState();
+  }
+
   function markCorrect(){
     if(hg.phase !== "checking" || hg.activeBuzzerId === null) return;
-    hg.players[hg.activeBuzzerId].score++;
-    finishRound(hg.players[hg.activeBuzzerId].name + " scores a point!");
+    const player = hg.players[hg.activeBuzzerId];
+    player.score++;
+    // The buzzer already privately confirmed this themselves, so in a
+    // 2-player game there's no need to show it to them again - just take
+    // over the screen for whoever didn't buzz. (3-4 player games keep the
+    // per-zone display, since "the other player" isn't well-defined there.)
+    if(hg.players.length === 2){
+      const other = hg.players.find(function(p){ return p.id !== player.id; });
+      hg.revealTargetPlayerId = other.id;
+    }
+    finishRound(player.name + " scores a point!");
   }
 
   function markWrong(){
     if(hg.phase !== "checking" || hg.activeBuzzerId === null) return;
     hg.players[hg.activeBuzzerId].eliminatedThisRound = true;
-    hg.activeBuzzerId = null; hg.revealedToBuzzer = false;
+    hg.activeBuzzerId = null;
+    hg.revealedToBuzzer = false;
+
     const allEliminated = hg.players.every(function(p){ return p.eliminatedThisRound; });
-    if(allEliminated){ finishRound("No one got it this time."); }
-    else{ hg.phase = "revealing"; resetBuzzClaim(); resumeRevealIfNeeded(); startEliminationCountdown(); syncState(); }
+    if(allEliminated){
+      finishRound("No one got it this time.");
+    }else{
+      hg.phase = "revealing";
+      resetBuzzClaim();
+      resumeRevealIfNeeded();
+      startEliminationCountdown();
+      syncState();
+    }
   }
 
   function manualReveal(){
     if(hg.phase !== "revealing") return;
-    stopRevealTimer(); stopAnswerTimer(); stopEliminationCountdown();
+    stopRevealTimer();
+    stopAnswerTimer();
+    stopEliminationCountdown();
     hg.checkOccurrences = findPortionOccurrences(hg.displayedWords);
     finishRound("No one got it this time.");
   }
 
+  // ---------- Objections (2-player games only - see the settings tooltip) ----------
+
+  // Raised by the non-buzzing player, mid-answer-countdown, to challenge
+  // that not enough has been shown yet to identify the ayah uniquely.
+  function raiseObjection(playerId){
+    if(!hg.objectionsEnabled || hg.phase !== "answering") return;
+    if(playerId === hg.activeBuzzerId) return;
+
+    stopAnswerTimer();
+    hg.objectorId = playerId;
+    hg.objectionRemaining = hg.objectionTimeSeconds;
+    hg.phase = "objecting";
+    syncState();
+
+    hg.objectionTimerId = setInterval(function(){
+      hg.objectionRemaining--;
+      if(hg.objectionRemaining <= 0){
+        stopObjectionTimer();
+        hg.phase = "objectingChecking";
+        hg.objectionRevealed = false;
+      }
+      syncState();
+    }, 1000);
+  }
+
+  // Lets the objector tap again once they've finished naming ayahs, rather
+  // than sitting through the rest of their own countdown.
+  function finishObjecting(){
+    if(hg.phase !== "objecting") return;
+    stopObjectionTimer();
+    hg.phase = "objectingChecking";
+    hg.objectionRevealed = false;
+    syncState();
+  }
+
+  // The objector privately checks what's currently on screen against every
+  // occurrence of that exact sequence within the selected portion. If it
+  // turns out to already be unique (<=1 match), that's decided by the app
+  // itself, automatically, since there's nothing left to self-report; with
+  // 2+ matches, the objector is shown the list to verify their spoken
+  // answer against, then self-reports as normal.
+  function checkObjection(){
+    if(hg.phase !== "objectingChecking" || hg.objectionRevealed) return;
+    hg.objectionOccurrences = findPortionOccurrences(hg.displayedWords);
+    hg.objectionRevealed = true;
+    hg.objectionTypedCount = 0;
+
+    if(hg.objectionOccurrences.totalCount <= 1){
+      resolveObjectionOutcome(false);
+      return;
+    }
+    syncState();
+  }
+
+  function confirmObjection(claimedCountRaw){
+    if(hg.phase!=="objectingChecking"||!hg.objectionRevealed)return;
+    const occ=hg.objectionOccurrences;
+    const claimed=Math.max(0,Math.min(parseInt(claimedCountRaw,10)||0,occ.totalCount));
+    if(claimed>=2)resolveObjectionOutcome(true,claimed);
+    else{hg.skipAnswerReveal=true;finishRound(hg.players[hg.objectorId].name+"’s objection was valid, but they didn’t claim at least two phrases — no points awarded.");}
+  }
+
+  function resolveObjectionOutcome(wasCorrect, awardedCount){
+    const objector = hg.players[hg.objectorId];
+    const buzzer = hg.players[hg.activeBuzzerId];
+    if(wasCorrect){
+      objector.score += awardedCount;
+      // The tick screen they just came from already showed every matching
+      // ayah's text - showing the same list again at round-end would just
+      // be repeating it, so skip it here.
+      hg.skipAnswerReveal = true;
+      finishRound(objector.name + " correctly objects and scores " + awardedCount + " point" + (awardedCount === 1 ? "" : "s") + "!");
+    }else{
+      objector.score -= 1;
+      buzzer.score += 1;
+      finishRound("Objection failed \u2014 the clues already identified one phrase. " + objector.name + " loses a point, " + buzzer.name + " wins the point!");
+    }
+  }
+
+  function stopCountdownTimer(){
+    if(hg.countdownTimerId){ clearInterval(hg.countdownTimerId); hg.countdownTimerId = null; }
+  }
+
+  function stopEliminationCountdown(){
+    if(hg.eliminationCountdownTimerId){ clearInterval(hg.eliminationCountdownTimerId); hg.eliminationCountdownTimerId = null; }
+  }
+
+  // Starts once at least one player has been eliminated from a round but
+  // others remain in it - without this, whoever's left could just wait
+  // indefinitely while context keeps expanding in their favour. If time
+  // runs out before anyone else buzzes, the round ends as unsolved.
   function startEliminationCountdown(){
     stopEliminationCountdown();
     hg.eliminationCountdownRemaining = hg.eliminationTimeLimitSeconds;
     hg.eliminationCountdownTimerId = setInterval(function(){
       hg.eliminationCountdownRemaining--;
       if(hg.eliminationCountdownRemaining <= 0){
-        stopEliminationCountdown(); stopRevealTimer(); stopAnswerTimer();
+        stopEliminationCountdown();
+        stopRevealTimer();
+        stopAnswerTimer();
         hg.checkOccurrences = findPortionOccurrences(hg.displayedWords);
         finishRound("Time\u2019s up \u2014 no one got it this time.");
         return;
@@ -1248,110 +1384,74 @@
     }, 1000);
   }
 
-  function raiseObjection(playerId){
-    if(!hg.objectionsEnabled || hg.phase !== "answering") return;
-    if(playerId === hg.activeBuzzerId) return;
-    stopAnswerTimer();
-    hg.objectorId = playerId; hg.objectionRemaining = hg.objectionTimeSeconds; hg.phase = "objecting";
-    syncState();
-    hg.objectionTimerId = setInterval(function(){
-      hg.objectionRemaining--;
-      if(hg.objectionRemaining <= 0){ stopObjectionTimer(); hg.phase = "objectingChecking"; hg.objectionRevealed = false; }
-      syncState();
-    }, 1000);
-  }
-  function finishObjecting(){
-    if(hg.phase !== "objecting") return;
-    stopObjectionTimer(); hg.phase = "objectingChecking"; hg.objectionRevealed = false;
-    syncState();
-  }
-  function checkObjection(){
-    if(hg.phase !== "objectingChecking" || hg.objectionRevealed) return;
-    hg.objectionOccurrences = findPortionOccurrences(hg.displayedWords);
-    hg.objectionRevealed = true; hg.objectionTypedCount = 0;
-    if(hg.objectionOccurrences.totalCount <= 1){ resolveObjectionOutcome(false); return; }
-    syncState();
-  }
-  function confirmObjection(claimedCountRaw){
-    if(hg.phase !== "objectingChecking" || !hg.objectionRevealed) return;
-    const occ = hg.objectionOccurrences;
-    const claimedCount = Math.max(0, Math.min(parseInt(claimedCountRaw, 10) || 0, occ.totalCount));
-    if(claimedCount >= 2){ resolveObjectionOutcome(true, claimedCount); }
-    else{ finishRound(hg.players[hg.objectorId].name + "\u2019s objection was valid, but they didn\u2019t claim at least two ayahs \u2014 no points awarded."); }
-  }
-  function resolveObjectionOutcome(wasCorrect, awardedCount){
-    const objector = hg.players[hg.objectorId];
-    const buzzer = hg.players[hg.activeBuzzerId];
-    if(wasCorrect){
-      objector.score += awardedCount;
-      finishRound(objector.name + " correctly objects and scores " + awardedCount + " point" + (awardedCount === 1 ? "" : "s") + "!");
-    }else{
-      objector.score -= 1; buzzer.score += 1;
-      finishRound("Objection failed \u2014 the phrase was already unique. " + objector.name + " loses a point, " + buzzer.name + " wins the point!");
-    }
-  }
-
-  const NEXT_ROUND_COUNTDOWN_SECONDS = 3;
+  // A few seconds of "get ready" between pressing Next Round/Play Again and
+  // the reveal actually starting, so whoever just pressed it (likely still
+  // looking at their own private check-answer view a moment ago) has time
+  // to look up before words start appearing.
   function beginCountdownThenStartRound(){
     stopCountdownTimer();
-    hg.phase = "countdown"; hg.countdownRemaining = NEXT_ROUND_COUNTDOWN_SECONDS;
+    hg.phase = "countdown";
+    hg.countdownRemaining = NEXT_ROUND_COUNTDOWN_SECONDS;
     syncState();
     hg.countdownTimerId = setInterval(function(){
       hg.countdownRemaining--;
-      if(hg.countdownRemaining <= 0){ stopCountdownTimer(); startRound(); return; }
+      if(hg.countdownRemaining <= 0){
+        stopCountdownTimer();
+        startRound();
+        return;
+      }
       syncState();
     }, 1000);
   }
-  function nextRound(){ if(hg.phase === "roundOver" || hg.phase === "searchFailed") beginCountdownThenStartRound(); }
-  function playAgain(){ hg.players.forEach(function(p){ p.score = 0; }); beginCountdownThenStartRound(); }
 
-  async function endGameAsHost(){
-    stopRevealTimer(); stopAnswerTimer(); stopObjectionTimer(); stopObjectionCooldownTimer(); stopCountdownTimer(); stopEliminationCountdown();
-    const code = roomCode;
-    await fb.remove(fb.ref(fb.db, 'rooms/' + code));
-    hg = null; roomCode = null; isHost = false; myIndex = null; latestState = null;
-    showScreen("landing");
+  function nextRound(){
+    if(hg.phase !== "roundOver" && hg.phase !== "searchFailed") return;
+    beginCountdownThenStartRound();
   }
 
-  // Serialises the host's in-memory game object into plain, display-ready
+  function playAgain(){
+    resetQuestionQueue();hg.finalMessage=null;hg.winnerName=null;
+    hg.players.forEach(function(p){ p.score = 0; p.eliminatedThisRound = false; p.eliminatedNextRound = false; });
+    beginCountdownThenStartRound();
+  }
+
+  async function endGameAsHost(){
+    stopRevealTimer();stopAnswerTimer();stopObjectionTimer();stopObjectionCooldownTimer();stopCountdownTimer();stopEliminationCountdown();
+    const code=roomCode;
+    await fb.remove(fb.ref(fb.db,'rooms/'+code));
+    hg=null;roomCode=null;isHost=false;myIndex=null;latestState=null;
+    showScreen('landing');
+  }
+
+  // Two-tap confirm instead of window.confirm() - see buildChangeSettingsButtonHTML.
+  // Serialises the host  // Serialises the host's in-memory game object into plain, display-ready
   // data (no functions, no timer IDs) and pushes it to Firebase. Every
   // player's client (including the host's own) renders purely from this.
   function syncState(){
     if(!hg) return;
-    const payload = {
-      phase: hg.phase,
-      pointsToWin: hg.pointsToWin,
-      matchListCap: hg.matchListCap,
-      objectionsEnabled: hg.objectionsEnabled,
-      players: hg.players.map(function(p){ return { id: p.id, name: p.name, color: p.color, score: p.score, eliminatedThisRound: p.eliminatedThisRound }; }),
-      activeBuzzerId: hg.activeBuzzerId,
-      objectorId: hg.objectorId,
-      answerRemaining: hg.answerRemaining,
-      objectionRemaining: hg.objectionRemaining,
-      countdownRemaining: hg.countdownRemaining,
-      eliminationCountdownRemaining: hg.eliminationCountdownRemaining,
-      eliminationActive: !!hg.eliminationCountdownTimerId,
-      objectionCooldownActive: hg.objectionCooldownActive,
-      revealedToBuzzer: hg.revealedToBuzzer,
-      objectionRevealed: hg.objectionRevealed,
-      roundOverMessage: hg.roundOverMessage,
-      winnerName: hg.winnerName,
-      searchFailMessage: hg.searchFailMessage,
-      revealText: hg.displayedWords && hg.displayedWords.length ? buildPhraseText(hg.displayedWords, hg.showAyahMarker) : "",
-      revealMeta: (hg.displayedWords && !hg.objectionsEnabled)
-        ? (hg.displayedWords.length <= hg.phraseTotal ? (hg.displayedWords.length + ' of ' + hg.phraseTotal + ' words shown') : (hg.displayedWords.length + ' words shown (extra context added)'))
-        : null,
-      answerHTML: (hg.phase === "roundOver" || hg.phase === "gameOver" || (hg.phase === "checking" && hg.revealedToBuzzer)) ? buildAnswerBlockHTML(hg) : null,
-      objectionData: (hg.phase === "objectingChecking" && hg.objectionRevealed && hg.objectionOccurrences && hg.objectionOccurrences.totalCount > 1)
-        ? {
-            totalCount: hg.objectionOccurrences.totalCount,
-            overCap: hg.objectionOccurrences.totalCount > hg.matchListCap,
-            uniqueAyahs: hg.objectionOccurrences.uniqueAyahs.map(function(a){ return { sura: a.sura, aya: a.aya, verseText: verseTextFor(a.sura, a.aya), surahName: suraNameOf(a.sura) }; })
-          }
-        : null,
-      updatedAt: fb.serverTimestamp()
+    const visible=hg.phase==="roundOver"||hg.phase==="gameOver"||(hg.phase==="checking"&&hg.revealedToBuzzer);
+    const occ=hg.checkOccurrences||hg.objectionOccurrences;
+    const answerHTML=visible&&hg.currentQuestion&&!hg.skipAnswerReveal
+      ? buildAnswerHTML(hg.currentQuestion)+(occ&&occ.totalCount>1
+          ? '<p>'+occ.totalCount+' eligible phrases fitted the clues when buzzing stopped.</p>'+
+            occ.matches.filter(function(m){return m!==hg.currentQuestion.entry;}).map(candidateHTML).join(''):'')
+      : null;
+    const payload={
+      phase:hg.phase,pointsToWin:hg.pointsToWin,matchListCap:hg.matchListCap,objectionsEnabled:hg.objectionsEnabled,
+      players:hg.players.map(function(p){return {id:p.id,name:p.name,color:p.color,score:p.score,eliminatedThisRound:p.eliminatedThisRound};}),
+      activeBuzzerId:hg.activeBuzzerId,objectorId:hg.objectorId,answerRemaining:hg.answerRemaining,
+      objectionRemaining:hg.objectionRemaining,countdownRemaining:hg.countdownRemaining,
+      eliminationCountdownRemaining:hg.eliminationCountdownRemaining,eliminationActive:!!hg.eliminationCountdownTimerId,
+      objectionCooldownActive:hg.objectionCooldownActive,revealedToBuzzer:hg.revealedToBuzzer,
+      objectionRevealed:hg.objectionRevealed,roundOverMessage:hg.roundOverMessage,winnerName:hg.winnerName,
+      finalMessage:hg.finalMessage,searchFailMessage:hg.searchFailMessage,
+      revealText:hg.displayedWords.map(clueLabel).join(' · '),answerHTML:answerHTML,
+      objectionData:(hg.phase==="objectingChecking"&&hg.objectionRevealed&&hg.objectionOccurrences&&hg.objectionOccurrences.totalCount>1)
+        ? {totalCount:hg.objectionOccurrences.totalCount,overCap:hg.objectionOccurrences.totalCount>hg.matchListCap,
+           matches:hg.objectionOccurrences.totalCount>hg.matchListCap?[]:hg.objectionOccurrences.matches.map(function(m){return {phrase:m.phrase,html:candidateHTML(m)};})}:null,
+      updatedAt:fb.serverTimestamp()
     };
-    // Defensive: Firebase's set() rejects the ENTIRE write if any field is
+    // Defensive:    // Defensive: Firebase's set() rejects the ENTIRE write if any field is
     // undefined, and fails silently unless the promise is handled - this
     // is exactly what caused the blank game screen bug. Coercing any
     // stray undefined to null means a future oversight degrades instead
@@ -1403,23 +1503,25 @@
     });
   }
 
-  function handleIntent(type, playerUid, data){
-    const player = hg.players.find(function(p){ return p.uid === playerUid; });
-    const playerId = player ? player.id : null;
-    if(type === "raise-objection") raiseObjection(playerId);
-    else if(type === "finish-objecting") finishObjecting();
-    else if(type === "check-answer") checkAnswer();
-    else if(type === "mark-correct") markCorrect();
-    else if(type === "mark-wrong") markWrong();
-    else if(type === "check-objection") checkObjection();
-    else if(type === "confirm-objection") confirmObjection(data && data.claimedCount);
-    else if(type === "reveal-fallback" && playerUid === myId) manualReveal();
-    else if(type === "next-round" && playerUid === myId) nextRound();
-    else if(type === "play-again" && playerUid === myId) playAgain();
-
+  function handleIntent(type,playerUid,data){
+    if(!hg)return;
+    const player=hg.players.find(function(p){return p.uid===playerUid;});
+    if(!player)return;
+    const id=player.id,host=playerUid===myId;
+    if(type==="raise-objection"&&hg.phase==="answering"&&id!==hg.activeBuzzerId)raiseObjection(id);
+    else if(type==="finish-objecting"&&hg.phase==="objecting"&&id===hg.objectorId)finishObjecting();
+    else if(type==="check-answer"&&hg.phase==="checking"&&id===hg.activeBuzzerId)checkAnswer();
+    else if(type==="mark-correct"&&hg.phase==="checking"&&id===hg.activeBuzzerId&&hg.revealedToBuzzer)markCorrect();
+    else if(type==="mark-wrong"&&hg.phase==="checking"&&id===hg.activeBuzzerId&&hg.revealedToBuzzer)markWrong();
+    else if(type==="check-objection"&&hg.phase==="objectingChecking"&&id===hg.objectorId)checkObjection();
+    else if(type==="confirm-objection"&&hg.phase==="objectingChecking"&&id===hg.objectorId&&hg.objectionRevealed)confirmObjection(data&&data.claimedCount);
+    else if(type==="reveal-fallback"&&host)manualReveal();
+    else if(type==="next-round"&&host)nextRound();
+    else if(type==="play-again"&&host)playAgain();
   }
 
   // =====================================================================
+  // EVERY CLIENT  // =====================================================================
   // EVERY CLIENT (host included): render from synced state + send intents
   // =====================================================================
 
@@ -1427,6 +1529,7 @@
   let myUidToIndex = {};
 
   function enterGame(){
+    const gameCode = roomCode;
     showScreen("game");
     fb.onValue(fb.ref(fb.db, 'rooms/' + roomCode + '/players'), function(snap){
       const players = snap.val() || {};
@@ -1443,6 +1546,7 @@
     // post-acknowledgment render is specifically avoiding.
     if(!isHost){
       fb.onValue(fb.ref(fb.db, 'rooms/' + roomCode + '/game'), function(snap){
+        if(roomCode !== gameCode) return;
         latestState = snap.val();
         if(latestState) renderGameScreen(latestState);
       });
@@ -1470,7 +1574,8 @@
   const gameScreenEl = document.getElementById("game-screen");
 
   function renderGameScreen(state){
-    const me = state.players[myIndex];
+    if(!state||!Array.isArray(state.players))return;
+    const me=state.players[myIndex];
     let html = '';
     if(me) html += '<div class="my-name-score">' + escapeHTML(me.name) + ' \u2014 ' + me.score + ' point' + (me.score === 1 ? '' : 's') + '</div>';
 
@@ -1480,7 +1585,7 @@
     }else if(state.phase === "countdown"){
       html += '<div class="buzz-countdown">' + state.countdownRemaining + '</div><div class="buzz-status-note">Get ready\u2026</div>';
     }else if(state.phase === "roundOver" || state.phase === "gameOver"){
-      html += '<div class="win-message">' + (state.phase === "gameOver" ? ('\ud83c\udfc6 ' + escapeHTML(state.winnerName) + ' wins!') : escapeHTML(state.roundOverMessage)) + '</div>';
+      html += '<div class="win-message">' + (state.phase === "gameOver" ? ('\ud83c\udfc6 ' + escapeHTML(state.finalMessage || (state.winnerName+' wins!'))) : escapeHTML(state.roundOverMessage)) + '</div>';
       if(state.answerHTML) html += state.answerHTML;
       if(isHost){
         if(state.phase === "gameOver") html += buildActionButtons(['play-again:Play Again:btn-primary']);
@@ -1511,7 +1616,7 @@
       const isObjector = myIndex === state.objectorId;
       if(isObjector){
         html += '<div class="buzz-countdown">' + Math.max(state.objectionRemaining, 0) + '</div>';
-        html += '<div class="tap-surface objectable" data-tap="finish-objecting"><div class="objection-hint">Name at least 2 ayahs! \ud83d\udc46 Tap when finished</div></div>';
+        html += '<div class="tap-surface objectable" data-tap="finish-objecting"><div class="objection-hint">Name at least 2 different phrases! \ud83d\udc46 Tap when finished</div></div>';
       }else{
         html += '<div class="buzz-status-note">\u26a0\ufe0f ' + escapeHTML(state.players[state.objectorId].name) + ' is objecting\u2026</div>';
       }
@@ -1533,7 +1638,7 @@
       if(isObjector){
         if(!state.objectionRevealed){
           html += '<div class="buzz-status-note">Ready to check?</div>';
-          html += buildActionButtons(['check-objection:Check occurrences:btn-primary']);
+          html += buildActionButtons(['check-objection:Check competing phrases:btn-primary']);
         }else if(state.objectionData){
           html += buildObjectionCheckHTML(state.objectionData);
         }else{
@@ -1556,7 +1661,7 @@
   }
 
   function buildRevealHTML(state){
-    let html = '<div class="reveal-phrase">' + escapeHTML(state.revealText) + '</div>';
+    let html = '<div class="buzz-status-note">Find the phrase common to:</div><div class="reveal-phrase" style="direction:ltr">' + escapeHTML(state.revealText) + '</div>';
     if(state.revealMeta) html += '<div class="reveal-meta">' + escapeHTML(state.revealMeta) + '</div>';
     return html;
   }
@@ -1575,34 +1680,21 @@
   }
 
   function buildObjectionCheckHTML(occData){
-    let html = '<div class="buzz-status-note">This phrase occurs ' + occData.totalCount + ' time' + (occData.totalCount === 1 ? '' : 's') + ' in the selected portion.</div>';
+    let html='<p>'+occData.totalCount+' eligible phrases fit every revealed clue.</p>';
     if(occData.overCap){
-      html += '<div class="buzz-status-note">Woah, very not unique \u2014 too many to list. Use the buttons to set how many different ayahs you actually named out loud:</div>';
-      html += '<div class="count-stepper">';
-      html += '<button type="button" class="btn-secondary" data-action="objection-count-step" data-step="-10">\u221210</button>';
-      html += '<button type="button" class="btn-secondary" data-action="objection-count-step" data-step="-1">\u22121</button>';
-      html += '<span class="stepper-value" id="objection-count-value">' + myObjectionTypedCount + '</span>';
-      html += '<button type="button" class="btn-secondary" data-action="objection-count-step" data-step="1">+1</button>';
-      html += '<button type="button" class="btn-secondary" data-action="objection-count-step" data-step="10">+10</button>';
-      html += '</div>';
-      html += '<p class="field-help">Need at least 2 to score - you\u2019ll be awarded points equal to the number you\u2019re credited for.</p>';
-      html += buildActionButtons(['confirm-objection-typed:Confirm:btn-primary']);
+      html+='<p>Too many to list. Count different matching phrases you recited (at least two).</p><div class="count-stepper">';
+      [-10,-1,1,10].forEach(function(n){html+='<button type="button" class="btn-secondary" data-action="objection-count-step" data-step="'+n+'">'+(n>0?'+':'')+n+'</button>';});
+      html+='<span class="stepper-value" id="objection-count-value">'+myObjectionTypedCount+'</span></div>';
+      html+=buildActionButtons(['confirm-objection-typed:Confirm:btn-primary']);
     }else{
-      html += '<div class="buzz-status-note">Tick every ayah you actually named out loud:</div>';
-      html += '<div class="objection-list">';
-      occData.uniqueAyahs.forEach(function(a, idx){
-        html += '<label class="objection-item"><input type="checkbox" class="objection-tick" data-idx="' + idx + '">';
-        html += '<span class="objection-item-text"><span class="objection-item-verse">' + escapeHTML(a.verseText) + '</span>';
-        html += '<span class="objection-item-ref">' + escapeHTML(a.surahName) + ' \u2014 Ayah ' + a.aya + '</span></span></label>';
-      });
-      html += '</div>';
-      html += '<p class="field-help">Need at least 2 ticked to score - you\u2019ll be awarded points equal to however many you tick.</p>';
-      html += buildActionButtons(['confirm-objection-ticks:Confirm:btn-primary']);
+      html+='<p>Tick different answer groups you recited. A fragment shared by two groups cannot count twice. At least two are required.</p><div class="objection-list">';
+      occData.matches.forEach(function(m,i){html+='<label class="objection-item"><input type="checkbox" class="objection-tick" data-idx="'+i+'"><span class="objection-item-verse" dir="rtl">'+escapeHTML(m.phrase)+'</span></label><details><summary>Show occurrences</summary>'+m.html+'</details>';});
+      html+='</div>'+buildActionButtons(['confirm-objection-ticks:Confirm:btn-primary']);
     }
     return html;
   }
 
-  // Local-only (not synced) state for the objector's own in-progress tick/type input.
+  // Local-only (not synced)  // Local-only (not synced) state for the objector's own in-progress tick/type input.
   let myObjectionTypedCount = 0;
 
   gameScreenEl.addEventListener("click", function(e){
@@ -1651,7 +1743,7 @@
     }
   });
 
-  QuranPicker.wireSideMenu("minimaltest-online", "en");
+  QuranPicker.wireSideMenu("commonphrase-online", "en");
 })();
 </script>
 </body>

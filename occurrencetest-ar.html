@@ -14,8 +14,6 @@
            buttons, field-help/error, and loading indicator live in styles.css. */
 
         body {
-            font-family: 'Amiri', 'Traditional Arabic', serif;
-            line-height: 1.7;
             padding: 70px 20px 20px;
             max-width: 900px;
             margin: 0 auto;
@@ -53,7 +51,7 @@
         }
 
         .checkbox-group input {
-            margin-inline-end: 8px;
+            margin-right: 8px;
         }
 
         .checkbox-group label {
@@ -73,7 +71,7 @@
             font-size: 12px;
             font-weight: bold;
             cursor: pointer;
-            margin-inline-start: 5px;
+            margin-left: 5px;
             vertical-align: middle;
         }
 
@@ -108,7 +106,7 @@
         #new-question-loading {
             color: var(--text-muted);
             font-size: 14px;
-            margin-inline-start: 4px;
+            margin-left: 4px;
             display: none;
         }
 
@@ -166,7 +164,7 @@
             background: var(--panel-alt);
             border: 1px solid var(--border);
             border-radius: 4px;
-            border-inline-start: 4px solid var(--accent);
+            border-left: 4px solid var(--accent);
         }
 
         .occurrence-number {
@@ -390,7 +388,8 @@
 
         function populateSurahAndJuzLists() {
             QuranPicker.populateSurahAndJuzLists(metadata, {
-                surahLabelHTML: sura => '<span>' + sura.index + '. ' + sura.name + '</span>'
+                surahLabelHTML: sura => '<span>' + sura.index + '. ' + sura.name + '</span>',
+      juzLabelHTML: function(i){ return '<span>الجزء ' + i + '</span>'; }
             });
         }
 
@@ -585,6 +584,7 @@
             switch (questionType) {
                 case 'nth':
                     const n = Math.floor(Math.random() * occurrences.length) + 1;
+                    const ordinal = n === 1 ? '1st' : n === 2 ? '2nd' : n === 3 ? '3rd' : `${n}th`;
                     return {
                         type: 'nth',
                         question: `أوجد التكرار رقم ${n} لهذه العبارة`,
@@ -725,6 +725,7 @@
             // For "nth occurrence" questions, show the specific answer first
             if (question.type === 'nth') {
                 const nthOccurrence = phraseData.occurrences[question.answer - 1];
+                const ordinal = question.answer === 1 ? '1st' : question.answer === 2 ? '2nd' : question.answer === 3 ? '3rd' : `${question.answer}th`;
                 
                 const headerDiv = document.createElement('div');
                 headerDiv.className = 'answer-header';

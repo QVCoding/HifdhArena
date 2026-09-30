@@ -1,5 +1,5 @@
 // =====================================================================
-// Quran Tester - shared picker module
+// Hifdh Arena - shared picker module
 // =====================================================================
 // Used by: minimaltest.html, irab.html, commonphrase.html, occurrencetest.html
 // (and their -ar.html Arabic counterparts, where they exist)
@@ -486,7 +486,7 @@ const QuranPicker = (function () {
     // Editing APPS below is the only change needed to add a new app to the
     // menu everywhere at once.
 
-    const REPO_URL = 'https://github.com/QVCoding/Quran_Tester';
+    const REPO_URL = 'https://github.com/QVCoding/HifdhArena';
 
     // The homepage's filename per language - used for the Home link (from
     // any page) and, when currentAppId is 'home', for the language switch.
@@ -508,7 +508,19 @@ const QuranPicker = (function () {
           ar: { file: 'occurrencetest-ar.html', label: 'اختبار مواضع تكرار العبارات' } },
         { id: 'irab',
           en: { file: 'irab.html', label: "I'rab Tester" },
-          ar: { file: 'irab.html', label: 'اختبار الإعراب كلمة كلمة' } }
+          ar: { file: 'irab.html', label: 'اختبار الإعراب كلمة كلمة' } },
+        { id: 'minimaltest-competitive', section: 'head-to-head',
+          en: { file: 'minimaltest-competitive.html', label: 'Smallest Phrase — One Device' },
+          ar: { file: 'minimaltest-competitive-ar.html', label: 'أقصر عبارة — جهاز واحد' } },
+        { id: 'minimaltest-online', section: 'head-to-head',
+          en: { file: 'minimaltest-online.html', label: 'Smallest Phrase — Online' },
+          ar: { file: 'minimaltest-online-ar.html', label: 'أقصر عبارة — عبر الإنترنت' } },
+        { id: 'commonphrase-competitive', section: 'head-to-head',
+          en: { file: 'commonphrase-competitive.html', label: 'Common Phrase — One Device' },
+          ar: { file: 'commonphrase-competitive-ar.html', label: 'العبارة المشتركة — جهاز واحد' } },
+        { id: 'commonphrase-online', section: 'head-to-head',
+          en: { file: 'commonphrase-online.html', label: 'Common Phrase — Online' },
+          ar: { file: 'commonphrase-online-ar.html', label: 'العبارة المشتركة — عبر الإنترنت' } }
     ];
 
     // Theme button text, per menu language. Language names themselves
@@ -522,8 +534,8 @@ const QuranPicker = (function () {
     const LANGUAGE_NAMES = { en: 'English', ar: 'العربية' };
 
     const SIDE_MENU_STRINGS = {
-        en: { menuLabel: 'Menu', close: 'Close', theme: 'Theme', apps: 'Apps', home: 'Home' },
-        ar: { menuLabel: 'القائمة', close: 'إغلاق', theme: 'المظهر', apps: 'التطبيقات', home: 'الرئيسية' }
+        en: { menuLabel: 'Menu', close: 'Close', theme: 'Theme', apps: 'Apps', home: 'Home', headToHead: 'Head To Head' },
+        ar: { menuLabel: 'القائمة', close: 'إغلاق', theme: 'المظهر', apps: 'التطبيقات', home: 'الرئيسية', headToHead: 'مواجهة بين اللاعبين' }
     };
 
     // currentAppId must match one of the ids in APPS above. lang is 'en' or 'ar'.
@@ -590,14 +602,19 @@ const QuranPicker = (function () {
         html += '<div class="side-menu-section">';
         html += '<div class="side-menu-heading">' + strings.apps + '</div>';
         html += '<ul class="side-menu-list">';
-        APPS.forEach(app => {
+        function appItem(app) {
             const target = app[lang];
             if (app.id === currentAppId) {
-                html += '<li class="current"><span>' + target.label + '</span></li>';
-            } else {
-                html += '<li><a href="' + target.file + '">' + target.label + '</a></li>';
+                return '<li class="current"><span>' + target.label + '</span></li>';
             }
-        });
+            return '<li><a href="' + target.file + '">' + target.label + '</a></li>';
+        }
+        APPS.filter(app => !app.section).forEach(app => { html += appItem(app); });
+        html += '<li class="side-menu-group"><details>';
+        html += '<summary>' + strings.headToHead + '</summary>';
+        html += '<ul class="side-menu-sublist">';
+        APPS.filter(app => app.section === 'head-to-head').forEach(app => { html += appItem(app); });
+        html += '</ul></details></li>';
         html += '</ul></div>';
 
         html += '<a class="side-menu-github" href="' + REPO_URL + '" target="_blank" rel="noopener">GitHub &#8599;</a>';

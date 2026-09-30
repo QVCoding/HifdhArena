@@ -1,0 +1,1751 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<script>(function(){try{var t=localStorage.getItem('quranTester:theme');if(t&&t!=='gold')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>العبارة المشتركة — عبر الإنترنت</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&amp;family=Spectral:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* =====================================================================
+     This is the online sibling of minimaltest-competitive.html. Since each
+     player now has their own screen, the whole rotated-arena/fullscreen-
+     takeover apparatus from that file is gone - there's nothing to rotate
+     toward and no "look away" privacy to fake, since everyone already has
+     their own device. What's left is close to a single-player view per
+     person, driven by state a Firebase-connected host pushes out.
+     ===================================================================== */
+
+  body{ font-family:var(--quran-font); padding:1.5rem 1.1rem 3rem; }
+  #app{ max-width:520px; margin:0 auto; }
+  header{ margin-bottom:1.5rem; border-bottom:1px solid var(--border); padding-bottom:1.1rem; }
+  h1{ font-size:1.5rem; margin:0 0 0.35rem; }
+  header p{ margin:0; color:var(--text-muted); font-size:0.9rem; }
+
+  h2{ font-family:"Spectral",Georgia,serif; font-weight:500; font-size:1.05rem; margin:0 0 0.9rem; }
+  h2.section-heading{ margin-top:1.7rem; padding-top:1.3rem; border-top:1px solid var(--border); }
+  h2.section-heading:first-child{ margin-top:0; padding-top:0; border-top:none; }
+
+  .panel{ background:var(--panel); border:1px solid var(--border); border-radius:4px; padding:1.4rem; }
+  .status{ padding:0.85rem 1rem; border:1px solid var(--border); border-radius:4px; background:var(--panel); color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem; }
+  .status.error{ border-color:var(--danger); color:var(--danger); }
+  .status.hidden{ display:none; }
+
+  .field{ margin-bottom:1.3rem; }
+  .field:last-child{ margin-bottom:0; }
+  .field-label{ display:block; font-size:0.9rem; font-weight:600; margin-bottom:0.4rem; }
+  .range-row{ display:flex; gap:1rem; align-items:center; flex-wrap:wrap; }
+  .range-row label{ font-size:0.85rem; color:var(--text-muted); display:flex; align-items:center; gap:0.5rem; }
+  input[type="number"]{ width:5.5rem; }
+  input[type="text"].wide{ width:100%; }
+
+  .checkbox-group{ margin-top:10px; }
+  .checkbox-group input{ margin-right:8px; }
+  .checkbox-group label{ display:inline; font-weight:normal; }
+
+  .info-icon{ display:inline-block; width:18px; height:18px; line-height:18px; text-align:center; background:var(--accent); color:var(--accent-text); border-radius:50%; font-size:12px; font-weight:bold; cursor:pointer; margin-left:5px; vertical-align:middle; }
+  .info-tooltip{ display:none; background:var(--panel-alt); border:1px solid var(--border); border-radius:4px; padding:10px; margin-top:5px; font-size:13px; color:var(--text-muted); line-height:1.5; }
+  .info-tooltip.show{ display:block; }
+
+  .more-settings-toggle{ display:flex; align-items:center; gap:0.4rem; background:none; border:none; color:var(--text-muted); font-family:inherit; font-size:0.88rem; cursor:pointer; padding:0.4rem 0; margin-bottom:0.5rem; }
+  .more-settings-toggle .chevron{ display:inline-block; transition:transform 0.15s ease; font-size:1.1rem; line-height:1; }
+  .more-settings-toggle[aria-expanded="true"] .chevron{ transform:rotate(90deg); }
+  #more-settings{ border-top:1px solid var(--border); padding-top:1.3rem; margin-bottom:1.3rem; }
+
+  .segmented{ display:inline-flex; border:1px solid var(--border); border-radius:4px; overflow:hidden; flex-wrap:wrap; }
+  .segment-btn{ background:var(--panel-alt); border:none; color:var(--text-muted); padding:0.45rem 1.1rem; font-size:0.88rem; font-family:inherit; cursor:pointer; }
+  .segment-btn + .segment-btn{ border-inline-start:1px solid var(--border); }
+  .segment-btn.active{ background:var(--accent); color:var(--accent-text); font-weight:600; }
+
+  .lobby-settings{ margin:1.2rem 0; padding:1rem; border:1px solid var(--border); border-radius:4px; background:var(--panel-alt); font-size:0.88rem; }
+  .lobby-settings h3{ margin:0 0 0.7rem; font-size:1rem; }
+  .lobby-settings p{ margin:0.4rem 0; }
+  .settings-status{ font-size:0.88rem; color:var(--text-muted); margin:0 0 0.85rem; }
+  .settings-status.error{ color:var(--danger); }
+  .settings-status:empty{ display:none; }
+
+  [hidden]{ display:none !important; }
+
+  /* ---------- Landing / role choice ---------- */
+  .role-cards{ display:flex; flex-direction:column; gap:1rem; }
+  .role-card{ background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:1.2rem; text-align:center; cursor:pointer; }
+  .role-card:hover{ border-color:var(--accent); }
+  .role-card h3{ margin:0 0 0.4rem; font-family:"Spectral",Georgia,serif; font-weight:500; }
+  .role-card p{ margin:0; font-size:0.85rem; color:var(--text-muted); }
+
+  /* ---------- Lobby ---------- */
+  .room-code{ font-size:2.2rem; font-weight:700; letter-spacing:0.3em; text-align:center; padding:1rem; background:var(--panel-alt); border-radius:6px; margin-bottom:1rem; }
+  .player-roster{ display:flex; flex-direction:column; gap:0.5rem; margin:1rem 0; }
+  .player-row{ display:flex; align-items:center; gap:0.6rem; padding:0.6rem 0.8rem; border:1px solid var(--border); border-radius:4px; background:var(--panel-alt); }
+  .player-row .dot{ width:12px; height:12px; border-radius:50%; flex:none; }
+  .player-row .you-tag{ margin-left:auto; font-size:0.75rem; color:var(--text-muted); }
+
+  /* ---------- Game screen ---------- */
+  #game-screen{ display:flex; flex-direction:column; align-items:center; gap:1.1rem; text-align:center; min-height:60vh; justify-content:center; }
+  .my-name-score{ font-size:0.95rem; color:var(--text-muted); }
+  .reveal-phrase{ font-family:var(--quran-font); font-size:1.75rem; direction:rtl; line-height:1.9; }
+  .reveal-meta{ font-size:0.78rem; color:var(--text-muted); }
+  .buzz-hint{ font-size:0.85rem; color:var(--accent); font-weight:700; }
+  .objection-hint{ font-size:0.8rem; color:#e0a83a; font-weight:700; }
+
+  .tap-surface{ width:100%; min-height:40vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1rem; border:3px dashed var(--border); border-radius:10px; padding:1rem; cursor:pointer; }
+  .tap-surface.buzzable{ border-color:var(--danger); animation:pulse-red 1.6s ease-in-out infinite; cursor:pointer; }
+  .tap-surface.objectable{ border-color:#e0a83a; animation:pulse-amber 1.6s ease-in-out infinite; cursor:pointer; }
+  @keyframes pulse-red{ 0%,100%{ box-shadow:0 0 0 0 rgba(220,53,69,0.35); } 50%{ box-shadow:0 0 0 12px transparent; } }
+  @keyframes pulse-amber{ 0%,100%{ box-shadow:0 0 0 0 rgba(224,168,58,0.35); } 50%{ box-shadow:0 0 0 12px transparent; } }
+
+  .buzz-countdown{ font-size:3.2rem; font-weight:700; color:var(--accent); line-height:1; }
+  .buzz-status-note{ font-size:0.95rem; color:var(--text-muted); }
+
+  .phrase-block{width:100%;text-align:left}.answer-phrase{font-family:var(--quran-font);font-size:1.5rem;direction:rtl;text-align:right}.unit-heading{font-weight:600;color:var(--accent)}.occurrence{padding:.65rem;margin:.4rem 0;background:var(--panel-alt);border-radius:4px}.occurrence-meta{font-size:.8rem;color:var(--text-muted);display:flex;gap:.6rem;flex-wrap:wrap}.ayah-text{font-family:var(--quran-font);font-size:1.2rem;direction:rtl;text-align:right;line-height:2}.ayah-text mark{background:var(--highlight-bg);color:var(--highlight-text)}
+  .zone-answer{ font-family:var(--quran-font); font-size:1.2rem; direction:rtl; line-height:1.9; width:100%; }
+  .zone-answer .answer-verse{ padding:0.6rem 0.7rem; background:var(--panel-alt); border-inline-start:3px solid var(--accent); border-radius:4px; margin-bottom:0.6rem; }
+  .zone-answer .answer-metadata{ font-family:"Spectral",Georgia,serif; font-size:0.8rem; color:var(--text-muted); direction:ltr; text-align:center; }
+  .zone-answer .answer-metadata div{ margin-bottom:0.2rem; }
+  .zone-answer .answer-match{ margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px dashed var(--border); }
+  .zone-answer .answer-match:last-child{ margin-bottom:0; padding-bottom:0; border-bottom:none; }
+
+  .objection-list{ text-align:start; direction:ltr; font-family:"Spectral",Georgia,serif; font-size:0.85rem; width:100%; display:flex; flex-direction:column; gap:0.5rem; }
+  .objection-item{ display:flex; align-items:flex-start; gap:0.6rem; padding:0.55rem 0.7rem; border:1px solid var(--border); border-radius:4px; background:var(--panel-alt); cursor:pointer; text-align:start; }
+  .objection-item input{ flex:none; margin-top:0.35rem; }
+  .objection-item-text{ display:flex; flex-direction:column; gap:0.2rem; }
+  .objection-item-verse{ font-family:var(--quran-font); font-size:1.15rem; direction:rtl; line-height:1.7; }
+  .objection-item-ref{ font-family:"Spectral",Georgia,serif; font-size:0.75rem; color:var(--text-muted); direction:ltr; }
+  .count-stepper{ display:flex; align-items:center; justify-content:center; gap:0.5rem; margin:0.4rem 0; }
+  .count-stepper .stepper-value{ font-size:2rem; font-weight:700; min-width:3rem; text-align:center; }
+
+  .scoreboard{ display:flex; flex-wrap:wrap; gap:0.4rem; justify-content:center; }
+  .score-chip{ font-size:0.78rem; padding:0.25rem 0.6rem; border-radius:999px; border:1px solid var(--border); background:var(--panel-alt); white-space:nowrap; }
+  .score-chip.eliminated{ text-decoration:line-through; color:var(--text-muted); }
+  .win-message{ font-size:1.1rem; font-weight:700; color:var(--accent); }
+
+  .modal-overlay{
+    position:fixed; inset:0; z-index:2000;
+    background:rgba(0,0,0,0.5);
+    display:flex; align-items:center; justify-content:center;
+    padding:1.2rem;
+  }
+  .modal-box{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:1.4rem;
+    max-width:480px;
+    width:100%;
+    max-height:80vh;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    position:relative;
+  }
+  .modal-close{
+    position:absolute; top:0.6rem; right:0.8rem;
+    background:none; border:none; font-size:1.6rem; line-height:1;
+    color:var(--text-muted); cursor:pointer; padding:0.2rem 0.4rem;
+  }
+  .modal-close:hover{ color:var(--text); }
+
+  .end-game-link{ background:none; border:none; padding:0; margin:0; font:inherit; font-size:0.78rem; color:var(--text-muted); text-decoration:underline; cursor:pointer; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <h1>العبارة المشتركة — عبر الإنترنت</h1>
+    <p>اعثر على العبارة المشتركة بين السور أو الأجزاء التي تظهر تباعًا. يستخدم كل لاعب جهازه.</p>
+    <button type="button" class="btn-secondary" id="how-to-play-btn" style="margin-top:0.8rem;">طريقة اللعب</button>
+  </header>
+
+  <div id="how-to-play-modal" class="modal-overlay" hidden>
+    <div class="modal-box">
+      <button type="button" class="modal-close" id="how-to-play-close" aria-label="إغلاق">&times;</button>
+      <h2 style="margin-top:0;">طريقة اللعب</h2>
+      <div id="how-to-play-content">
+      <p>تظهر أسماء السور أو الأجزاء واحدًا تلو الآخر. اعثر على عبارة ترد فيها جميعًا. اضغط على شاشتك واتلُ العبارة فورًا، ثم تحقق من إجابتك بنفسك. الإجابة الصحيحة عن العبارة المستهدفة تمنحك نقطة.</p>
+      <p>تصبح التلميحات حاسمة حين لا توافقها كلها إلا إجابة مؤهلة واحدة. وقد تظهر أسماء إضافية بعدها للمساعدة. يسري الحد الأدنى لطول العبارة على الأسئلة والإجابات جميعًا، أما الحد الأقصى فيقيد العبارات المستهدفة فقط؛ وعند التحقق من إجابة أو اعتراض تُحتسب العبارات المشتركة الأطول ضمن الآية. تُعد الأجزاء الأقصر المطابقة لعبارة أطول مجموعة إجابة واحدة، بينما تبقى العبارات المتداخلة فقط مجموعات مستقلة. وتُقبل تلاوة نص أطول يحتوي الإجابة المميزة.</p>
+      <p><b>لاعبان:</b> إذا فُعّلت الاعتراضات، يجوز للمنافس الاعتراض خلال مهلة الإجابة وذكر عبارتين مؤهلتين مختلفتين على الأقل، ترد كل منهما في جميع المواضع الظاهرة. ضع علامة على مجموعات الإجابات التي ذكرتها؛ ولا تُحتسب العبارة القصيرة المشتركة بين مجموعتين مرتين. تحصل على نقطة عن كل عبارة مؤكدة، بشرط ذكر عبارتين على الأقل. وإذا كانت التلميحات حاسمة أصلًا، خسر المعترض نقطة وكسبها من ضغط.</p>
+      <p><b>ثلاثة أو أربعة لاعبين:</b> إذا فُعّل استبعاد من يضغط مبكرًا، فإن الضغط قبل أن تصبح التلميحات حاسمة ينهي الجولة ويُبعدك عن الجولة التالية دون خصم نقطة.</p>
+      <p>عند تعطيل هذين الخيارين، يُسمح بالتخمين المبكر، لكن يجب أن يطابق الإجابة المستهدفة. الإجابة الخاطئة تستبعدك من الجولة الحالية ويواصل الآخرون. يفوز أول من يبلغ عدد النقاط المحدد. لا تتكرر العبارات المستهدفة في اللعبة الواحدة؛ وإذا نفدت الأسئلة، يفوز صاحب أعلى نتيجة، ويتعادل المتصدرون عند تساويهم. تعيد «العب مجددًا» مجموعة الأسئلة إلى بدايتها.</p>
+      <p>بعد ظهور جميع التلميحات، يمكنك مواصلة الضغط، ويمكن للمضيف إظهار الإجابة.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="status" class="status hidden"></div>
+
+  <!-- ================= Landing ================= -->
+  <section id="screen-landing" class="panel">
+    <h2>اللعب عبر الإنترنت</h2>
+    <div class="role-cards">
+      <div class="role-card" id="choose-host">
+        <h3>استضافة لعبة</h3>
+        <p>اضبط الإعدادات، واحصل على رمز الغرفة، وانتظر انضمام الآخرين.</p>
+      </div>
+      <div class="role-card" id="choose-join">
+        <h3>الانضمام إلى لعبة</h3>
+        <p>أدخل رمز الغرفة الذي شاركه معك أحد اللاعبين.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= انضم form ================= -->
+  <section id="screen-join" class="panel" hidden>
+    <h2>الانضمام إلى لعبة</h2>
+    <div class="field">
+      <span class="field-label">رمز الغرفة</span>
+      <input type="text" class="wide" id="join-code" maxlength="4" placeholder="مثال: ABCD" style="text-transform:uppercase; letter-spacing:0.3em; text-align:center; font-size:1.3rem;">
+    </div>
+    <div class="field">
+      <span class="field-label">اسمك</span>
+      <input type="text" class="wide" id="join-name" placeholder="اسمك">
+    </div>
+    <p class="settings-status" id="join-status"></p>
+    <div class="button-group">
+      <button type="button" class="btn-primary" id="join-submit-btn">انضم</button>
+      <button type="button" class="btn-secondary" id="join-back-btn">رجوع</button>
+    </div>
+  </section>
+
+  <!-- ================= Host setup ================= -->
+  <section id="screen-host-setup" class="panel" hidden>
+    <h2 class="section-heading">إعداد اللعبة</h2>
+
+    <div class="field">
+      <label><strong>اختر الجزء المراد اختباره:</strong></label>
+      <div style="margin-top: 10px;">
+        <input type="radio" id="entire-quran" name="portion-type" value="entire" checked>
+        <label for="entire-quran" style="display: inline; font-weight: normal;">القرآن كاملًا (الافتراضي)</label>
+      </div>
+      <div style="margin-top: 5px;">
+        <input type="radio" id="select-portion" name="portion-type" value="select">
+        <label for="select-portion" style="display: inline; font-weight: normal;">اختيار جزء محدد</label>
+      </div>
+    </div>
+
+    <div id="filter-options" class="filter-options-box" style="display: none;">
+      <div class="tabs">
+        <button type="button" class="tab-btn active" data-tab="surah">السورة</button>
+        <button type="button" class="tab-btn" data-tab="juz">الجزء</button>
+        <button type="button" class="tab-btn" data-tab="page">الصفحة</button>
+      </div>
+
+      <div class="tab-panel active" id="tab-surah">
+        <div class="select-all-row">
+          <input type="checkbox" id="surah-select-all" checked>
+          <label for="surah-select-all">تحديد جميع السور</label>
+        </div>
+        <div class="checkbox-list" id="surah-list"><div class="list-loading">جارٍ تحميل بيانات القرآن<span class="loading-dots">.</span></div></div>
+      </div>
+
+      <div class="tab-panel" id="tab-juz">
+        <div class="select-all-row">
+          <input type="checkbox" id="juz-select-all" checked>
+          <label for="juz-select-all">تحديد جميع الأجزاء</label>
+        </div>
+        <div class="checkbox-list" id="juz-list"><div class="list-loading">جارٍ تحميل بيانات القرآن<span class="loading-dots">.</span></div></div>
+      </div>
+
+      <div class="tab-panel" id="tab-page">
+        <label for="page-range">نطاقات الصفحات</label>
+        <input type="text" class="wide" id="page-range" placeholder="مثال: 1-100، 150-200">
+        <p class="field-help">نطاقات صفحات مفصولة بفواصل (١–٦٠٤). اترك الحقل فارغًا لتضمين جميع الصفحات.</p>
+        <p class="field-error" id="page-range-error"></p>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">الحد الأقصى للاعبين</span>
+      <div class="segmented" id="player-count-toggle">
+        <button type="button" class="segment-btn active" data-players="2">2</button>
+        <button type="button" class="segment-btn" data-players="3">3</button>
+        <button type="button" class="segment-btn" data-players="4">4</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">اسمك</span>
+      <input type="text" class="wide" id="host-name" placeholder="اسمك">
+    </div>
+
+    <div class="field">
+      <span class="field-label">التلميحات</span>
+      <div class="segmented" id="group-mode-toggle">
+        <button type="button" class="segment-btn active" data-mode="sura">السور</button>
+        <button type="button" class="segment-btn" data-mode="juz">الأجزاء</button>
+      </div>
+      <input type="hidden" id="group-mode" value="sura">
+    </div>
+
+    <div class="field">
+      <span class="field-label">النقاط المطلوبة للفوز</span>
+      <input type="number" id="points-to-win" min="1" step="1" value="5">
+      <p class="field-error" id="points-error"></p>
+    </div>
+
+    <button type="button" class="more-settings-toggle" id="more-settings-toggle" aria-expanded="false">
+      <span class="chevron">&rsaquo;</span> إعدادات إضافية
+    </button>
+
+    <div id="more-settings" hidden>
+    <div class="field">
+      <span class="field-label">التوقيت</span>
+      <div class="range-row">
+        <label>عدد التلميحات المعروضة أولًا <input type="number" id="start-words" min="1" step="1" value="1"></label>
+        <label>الثواني بين كل كشف <input type="number" id="reveal-delay" min="1" step="0.5" value="3"></label>
+      </div>
+      <p class="field-error" id="timing-error"></p>
+    </div>
+
+
+    <div class="field">
+      <span class="field-label">طول العبارة (بالكلمات)</span>
+      <div class="range-row"><label>الحد الأدنى <input id="min-words" type="number" min="1" max="20" value="5"></label><label>الحد الأقصى <input id="max-words" type="number" min="1" max="20" value="8"></label></div>
+    </div>
+    <div class="field">
+      <span class="field-label">عدد السور أو الأجزاء في السؤال</span>
+      <div class="range-row"><label>الحد الأدنى <input id="min-units" type="number" min="2" max="10" value="2"></label><label>الحد الأقصى <input id="max-units" type="number" min="2" max="10" value="10"></label></div>
+      <p class="field-help">يحدد الحد الأقصى لطول العبارة وعدد المواضع العبارات المستهدفة. وقد تكون الإجابات المنافسة أطول أو ترد في مواضع أكثر؛ ويظل الحد الأدنى لطول العبارة ساريًا دائمًا.</p>
+      <p class="field-error" id="phrase-settings-error"></p>
+    </div>
+    <div class="field" id="objections-field">
+      <div class="checkbox-group">
+        <input type="checkbox" id="enable-objections" checked>
+        <label for="enable-objections">السماح بالاعتراض (للعب بلاعبين فقط)</label>
+        <span class="info-icon" data-tooltip="objections-tooltip">i</span>
+        <div id="objections-tooltip" class="info-tooltip">اعترض إذا كانت هناك أكثر من عبارة مؤهلة توافق جميع التلميحات الظاهرة. اذكر عبارتين مختلفتين على الأقل. تُحتسب لك نقاط العبارات التي ذكرتها فعلًا؛ والاعتراض الخاطئ يخصم منك نقطة ويمنحها لمن ضغط.</div>
+      </div>
+      <div class="range-row" id="objection-time-row" style="margin-top:10px;">
+        <label>مهلة الاعتراض (بالثواني) <input type="number" id="objection-time" min="1" step="1" value="8"></label>
+      </div>
+    </div>
+
+      <div class="field">
+        <span class="field-label">مزيد من إعدادات الوقت</span>
+        <div class="range-row">
+          <label>مهلة الإجابة بعد الضغط (بالثواني) <input type="number" id="answer-time" min="1" step="1" value="3"></label>
+          <label>المهلة بعد استبعاد لاعب (بالثواني) <input type="number" id="elimination-time-limit" min="1" step="1" value="20"></label>
+        </div>
+      </div>
+
+      <div class="field" id="early-buzz-penalty-field" hidden>
+        <div class="checkbox-group">
+          <input type="checkbox" id="penalize-early-buzz" checked>
+          <label for="penalize-early-buzz">استبعاد من يضغط مبكرًا من الجولة التالية (٣ أو ٤ لاعبين)</label>
+          <span class="info-icon" data-tooltip="early-buzz-tooltip">i</span>
+          <div id="early-buzz-tooltip" class="info-tooltip">إذا ظلت عدة عبارات مؤهلة توافق التلميحات الظاهرة، فإن الضغط ينهي الجولة ويستبعد من ضغط من الجولة التالية.</div>
+        </div>
+      </div>
+
+
+
+
+
+
+
+      <div class="field" style="margin-top: 15px;">
+        <span class="field-label">الحد الأقصى للمطابقات المعروضة</span>
+        <input type="number" id="match-list-cap" min="1" step="1" value="10">
+        <p class="field-help">إذا تجاوز عدد العبارات المنافسة هذا الحد، يُعرض عددها ويحدد المعترض كم عبارة ذكر. وإذا لم يتجاوزه، يضع علامة على العبارات المطابقة.</p>
+        <p class="field-error" id="match-list-cap-error"></p>
+      </div>
+    </div>
+
+    <p class="settings-status" id="settings-status"></p>
+    <div class="button-group">
+      <button class="btn-primary" id="create-room-btn" disabled>إنشاء غرفة</button>
+      <span class="loading-note" id="create-room-loading">جارٍ تحميل بيانات القرآن<span class="loading-dots">.</span></span>
+      <button type="button" class="btn-secondary" id="host-back-btn">رجوع</button>
+    </div>
+  </section>
+
+  <!-- ================= Lobby ================= -->
+  <section id="screen-lobby" class="panel" hidden>
+    <h2>في انتظار اللاعبين</h2>
+    <div class="room-code" id="lobby-room-code">----</div>
+    <p style="text-align:center; color:var(--text-muted); font-size:0.85rem;">شارك هذا الرمز مع اللاعبين الآخرين.</p>
+    <div class="player-roster" id="lobby-roster"></div>
+    <div id="lobby-settings" class="lobby-settings" aria-live="polite"></div>
+    <p class="settings-status" id="lobby-status"></p>
+    <div class="button-group" id="lobby-host-controls" hidden>
+      <button type="button" class="btn-primary" id="start-game-btn" disabled>ابدأ اللعبة</button>
+    </div>
+    <button type="button" class="end-game-link" id="lobby-leave-btn">مغادرة</button>
+  </section>
+
+  <!-- ================= Game screen ================= -->
+  <section id="game-screen" hidden></section>
+
+</div>
+
+<script type="module">
+  // Firebase - modular CDN import, no bundler/npm needed. Pinned to the
+  // version the console registered this app with.
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+  import {
+    getDatabase, ref, set, get, update, remove, push, onValue, onChildAdded,
+    serverTimestamp, onDisconnect, runTransaction
+  } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDxvhV0iL8JOeDlQI59-LfY2TBWRNwDDHY",
+    authDomain: "qurantester-4e466.firebaseapp.com",
+    databaseURL: "https://qurantester-4e466-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "qurantester-4e466",
+    storageBucket: "qurantester-4e466.firebasestorage.app",
+    messagingSenderId: "423141219944",
+    appId: "1:423141219944:web:3522d3373e2f169743e5dd"
+  };
+
+  window.fbReady = (async function(){
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const userCredential = await signInAnonymously(auth);
+    const db = getDatabase(app);
+    const authUserId = userCredential.user.uid;
+
+    // Exposed for the classic script below - keeps this file's game logic in
+    // the same plain-script style as the rest of the project instead of
+    // converting the whole thing to a module.
+    window.fb = { db, ref, set, get, update, remove, push, onValue, onChildAdded, serverTimestamp, onDisconnect, runTransaction, authUserId };
+    return window.fb;
+  })();
+</script>
+
+<script src="quran-picker.js"></script>
+<script type="module">
+(function(){
+  "use strict";
+
+  function arabicPoints(n){return QuranPicker.pluralize(n,{one:"نقطة واحدة",two:"نقطتان",few:"{n} نقاط",many:"{n} نقطة",other:"{n} نقطة"},"ar");}
+  const PLAYER_COLORS = ['#c9a15a', '#5aa9d6', '#6abf6a', '#d6708a'];
+  const OBJECTION_COOLDOWN_MS = 300;
+  const NEXT_ROUND_COUNTDOWN_SECONDS = 3;
+
+  // ---------- Local identity (persists across reloads on this device) ----------
+  function getOrCreateDeviceId(){
+    let id = null;
+    try{ id = localStorage.getItem('quranTester:onlineDeviceId'); }catch(e){}
+    if(!id){
+      id = 'p' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+      try{ localStorage.setItem('quranTester:onlineDeviceId', id); }catch(e){}
+    }
+    return id;
+  }
+  let fb = window.fb || null;
+  let myId = fb && fb.authUserId ? fb.authUserId : null;
+  let myName = "";
+  let roomCode = null;
+  let isHost = false;
+  let myIndex = null;
+
+  async function ensureFirebaseReady(){
+    if(!fb){
+      fb = await window.fbReady;
+    }
+    if(!myId){
+      myId = fb.authUserId || getOrCreateDeviceId();
+    }
+    return fb;
+  }
+
+  // ---------- DOM refs ----------
+  const statusEl = document.getElementById("status");
+  const screens = {
+    landing: document.getElementById("screen-landing"),
+    join: document.getElementById("screen-join"),
+    hostSetup: document.getElementById("screen-host-setup"),
+    lobby: document.getElementById("screen-lobby"),
+    game: document.getElementById("game-screen")
+  };
+  function showScreen(name){
+    Object.keys(screens).forEach(function(k){ screens[k].hidden = (k !== name); });
+  }
+  function setStatus(msg, isError){
+    statusEl.textContent = msg;
+    statusEl.classList.toggle("error", !!isError);
+    statusEl.classList.remove("hidden");
+  }
+  function hideStatus(){ statusEl.classList.add("hidden"); }
+
+  const howToPlayModal = document.getElementById("how-to-play-modal");
+  document.getElementById("how-to-play-btn").addEventListener("click", function(){ howToPlayModal.hidden = false; });
+  document.getElementById("how-to-play-close").addEventListener("click", function(){ howToPlayModal.hidden = true; });
+  howToPlayModal.addEventListener("click", function(e){ if(e.target === howToPlayModal) howToPlayModal.hidden = true; });
+
+  document.getElementById("choose-host").addEventListener("click", function(){ showScreen("hostSetup"); ensureQuranDataLoading(); });
+  document.getElementById("choose-join").addEventListener("click", function(){ showScreen("join"); });
+  document.getElementById("join-back-btn").addEventListener("click", function(){ showScreen("landing"); });
+  document.getElementById("host-back-btn").addEventListener("click", function(){ showScreen("landing"); });
+
+  // =====================================================================
+  // Qur'an data - ONLY the host ever loads this. Guests just render
+  // whatever fully-resolved text the host puts in the synced game state,
+  // so they never need the dataset at all.
+  // =====================================================================
+  let ayahs=[],candidates=[],questionPool=[],questionQueue=[],groupMode="sura";
+  let indexCache=null,indexCacheKey="",metadata=null,quranDataLoading=false,quranDataReady=false;
+  function ensureQuranDataLoading(){
+    if(quranDataLoading||quranDataReady)return;
+    quranDataLoading=true;
+    loadQuranData().catch(function(err){console.error(err);setStatus("تعذّر تحميل بيانات القرآن. حدّث الصفحة ثم حاول مجددًا.",true);document.getElementById("create-room-loading").textContent="البيانات غير متوفرة.";});
+  }
+  async function loadQuranData(){
+    QuranPicker.startLoadingAnimation();
+    const response=await fetch("quran-simple-plain_nobasmalah.sql");
+    if(!response.ok)throw new Error("بيانات القرآن: HTTP "+response.status);
+    ayahs=parseSQL(await response.text()).map(function(r){return {sura:r.sura,aya:r.aya,tokens:r.text.split(/\s+/).filter(Boolean)};});
+    metadata=await QuranPicker.loadMetadataXML("app_quran_metadata.xml");
+    ayahs.forEach(function(a){a.juz=QuranPicker.findJuz(metadata,a.sura,a.aya);a.page=QuranPicker.findPage(metadata,a.sura,a.aya);});
+    QuranPicker.populateSurahAndJuzLists(metadata,{surahLabelHTML:function(a){return '<span>'+a.index+'. </span><span class="arabic-name" dir="rtl">'+a.name+'</span>'; },juzLabelHTML:function(i){return '<span>الجزء '+i+'</span>'; }});
+    quranDataReady=true;QuranPicker.stopLoadingAnimation();
+    document.getElementById("create-room-btn").disabled=false;document.getElementById("create-room-loading").hidden=true;hideStatus();
+  }
+
+  // ---------- Host settings UI wiring ----------
+  let moreSettingsOpen = false;
+  document.getElementById("more-settings-toggle").addEventListener("click", function(){
+    moreSettingsOpen = !moreSettingsOpen;
+    document.getElementById("more-settings").hidden = !moreSettingsOpen;
+    document.getElementById("more-settings-toggle").setAttribute("aria-expanded", moreSettingsOpen ? "true" : "false");
+  });
+  document.querySelectorAll(".info-icon").forEach(function(icon){
+    icon.addEventListener("click", function(e){
+      e.stopPropagation();
+      const tip = document.getElementById(icon.dataset.tooltip);
+      if(tip) tip.classList.toggle("show");
+    });
+  });
+  document.addEventListener("click", function(e){
+    if(!e.target.closest(".info-icon")){
+      document.querySelectorAll(".info-tooltip").forEach(function(t){ t.classList.remove("show"); });
+    }
+  });
+  document.querySelectorAll("#player-count-toggle .segment-btn").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      document.querySelectorAll("#player-count-toggle .segment-btn").forEach(function(b){ b.classList.remove("active"); });
+      btn.classList.add("active");
+      const count = parseInt(btn.dataset.players, 10);
+      document.getElementById("objections-field").hidden = (count !== 2);
+      document.getElementById("early-buzz-penalty-field").hidden = (count === 2);
+    });
+  });
+  function getMaxPlayers(){
+    const btn = document.querySelector("#player-count-toggle .segment-btn.active");
+    return btn ? parseInt(btn.dataset.players, 10) : 2;
+  }
+  document.getElementById("enable-objections").addEventListener("change", function(e){
+    document.getElementById("objection-time-row").style.display = e.target.checked ? "flex" : "none";
+  });
+  document.querySelectorAll("#group-mode-toggle .segment-btn").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      document.querySelectorAll("#group-mode-toggle .segment-btn").forEach(function(b){b.classList.remove("active");});
+      btn.classList.add("active");document.getElementById("group-mode").value=btn.dataset.mode;
+    });
+  });
+  QuranPicker.wireCorePickerUI({ portionTypeName: 'portion-type' });
+
+  const INT_RE = /^\d+$/;
+  const NUM_RE = /^\d+(\.\d+)?$/;
+  function clearFieldErrors(){
+    ["page-range-error", "points-error", "timing-error", "match-list-cap-error", "phrase-settings-error"].forEach(function(id){
+      const el = document.getElementById(id);
+      el.textContent = ""; el.style.display = "none";
+    });
+  }
+  function showFieldError(id, msg){
+    const el = document.getElementById(id);
+    el.textContent = msg; el.style.display = "block";
+  }
+  function validatePositiveNumber(el, errId, floor, mustBeInteger){
+    const raw = el.value.trim();
+    const re = mustBeInteger ? INT_RE : NUM_RE;
+    if(!re.test(raw)){ showFieldError(errId, mustBeInteger ? "أدخل عددًا صحيحًا." : "أدخل عددًا موجبًا."); return null; }
+    const val = mustBeInteger ? parseInt(raw, 10) : parseFloat(raw);
+    if(val < floor){ showFieldError(errId, "يجب ألا يقل عن " + floor + "."); return null; }
+    return val;
+  }
+  function setSettingsStatus(msg, isError){
+    const el = document.getElementById("settings-status");
+    el.textContent = msg;
+    el.classList.toggle("error", !!isError);
+  }
+
+  function parseSQL(text){
+    // Matches tuples like: (6231, 114, 1, 'text with '' escaped quotes')
+    const rows = [];
+    const re = /\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*'((?:[^'\\]|\\.|'')*)'\s*\)/g;
+    let m;
+    while((m = re.exec(text)) !== null){
+      const sura = parseInt(m[2], 10);
+      const aya = parseInt(m[3], 10);
+      let t = m[4];
+      t = t.replace(/''/g, "'").replace(/\\'/g, "'");
+      rows.push({ sura: sura, aya: aya, text: t.trim() });
+    }
+    if(rows.length === 0){
+      throw new Error("تعذّر قراءة بيانات الآيات من " + 'النص القرآني' + ". قد لا يطابق تنسيق الملف ما يتوقعه التطبيق.");
+    }
+    return rows;
+  }
+  function buildPhraseIndex(minWords, maxWords){
+    const index = new Map(); // phrase -> occurrences[] (every occurrence, not deduped per surah)
+    for(let ai = 0; ai < ayahs.length; ai++){
+      const a = ayahs[ai];
+      const tokens = a.tokens;
+      const n = tokens.length;
+      for(let len = minWords; len <= maxWords; len++){
+        if(len > n) break;
+        for(let i = 0; i + len <= n; i++){
+          const key = tokens.slice(i, i + len).join(" ");
+          let occs = index.get(key);
+          if(!occs){
+            occs = [];
+            index.set(key, occs);
+          }
+          occs.push({ sura: a.sura, ayah: a.aya, page: a.page, juz: a.juz, tokens: tokens, startTok: i, endTok: i + len - 1 });
+        }
+      }
+    }
+    return index;
+  }
+  function unitOf(occurrence, groupBy){
+    return groupBy === "juz" ? occurrence.juz : occurrence.sura;
+  }
+  function buildPool(index, minUnits, maxUnits, portionSet, groupBy){
+    const result = [];
+    index.forEach(function(occurrences, phrase){
+      let allInPortion = true;
+      for(let i = 0; i < occurrences.length; i++){
+        const o = occurrences[i];
+        if(!portionSet.has(o.sura + "-" + o.ayah)){ allInPortion = false; break; }
+      }
+      if(!allInPortion) return;
+
+      const unitSet = new Set(occurrences.map(function(o){ return unitOf(o, groupBy); }));
+      if(unitSet.size < minUnits || unitSet.size > maxUnits) return;
+
+      result.push({ phrase: phrase, occurrences: occurrences });
+    });
+    return result;
+  }
+  function dedupOverlappingPhrases(flatPool, groupBy){
+    const byUnitSet = new Map();
+    flatPool.forEach(function(entry){
+      const unitList = Array.from(new Set(entry.occurrences.map(function(o){ return unitOf(o, groupBy); }))).sort(function(a, b){ return a - b; });
+      const key = unitList.join(",");
+      if(!byUnitSet.has(key)) byUnitSet.set(key, []);
+      byUnitSet.get(key).push(entry);
+    });
+
+    const kept = [];
+    byUnitSet.forEach(function(group){
+      group.sort(function(a, b){
+        const la = a.phrase.split(" ").length, lb = b.phrase.split(" ").length;
+        if(lb !== la) return lb - la; // longer first
+        const minA = Math.min.apply(null, a.occurrences.map(function(o){ return o.startTok; }));
+        const minB = Math.min.apply(null, b.occurrences.map(function(o){ return o.startTok; }));
+        return minA - minB; // earlier position first, as a tiebreak
+      });
+
+      const survivors = [];
+      group.forEach(function(candidate){
+        const overlapsSurvivor = survivors.some(function(kept){
+          return candidate.occurrences.every(function(co){
+            return kept.occurrences.some(function(ko){
+              if(ko.sura !== co.sura || ko.ayah !== co.ayah) return false; // different verse: not the same physical span
+              return !(co.endTok < ko.startTok || co.startTok > ko.endTok); // ranges overlap
+            });
+          });
+        });
+        if(!overlapsSurvivor) survivors.push(candidate);
+      });
+      survivors.forEach(function(s){ kept.push(s); });
+    });
+
+    return kept;
+  }
+  function groupByUnitSet(flatPool, groupBy){
+    const groups = new Map(); // key (sorted unit list joined) -> {unitList, phrases}
+    flatPool.forEach(function(entry){
+      const unitList = Array.from(new Set(entry.occurrences.map(function(o){ return unitOf(o, groupBy); }))).sort(function(a, b){ return a - b; });
+      const key = unitList.join(",");
+      let group = groups.get(key);
+      if(!group){
+        group = { unitList: unitList, phrases: [] };
+        groups.set(key, group);
+      }
+      group.phrases.push(entry);
+    });
+    return Array.from(groups.values());
+  }
+  function shuffleArray(arr){
+    for(let i = arr.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+    return arr;
+  }
+  function escapeHTML(s){
+    const div=document.createElement('div');div.textContent=String(s);return div.innerHTML;
+  }
+  function suraNameOf(idx){
+    const s = metadata.suras.find(function(s){ return s.index === idx; });
+    return s ? s.name : ("Surah " + idx);
+  }
+  function clueLabel(unit){ return groupMode === 'juz' ? 'الجزء ' + unit : suraNameOf(unit); }
+  function matchesClues(clues){ return candidates.filter(function(p){ return clues.every(function(u){ return p.units.has(u); }); }); }
+  function findPortionOccurrences(clues){
+    const raw=matchesClues(clues);
+    const matches=raw.filter(function(p){return !raw.some(function(q){return q!==p && q.fragments.has(p.phrase);});});
+    return {totalCount:matches.length,matches:matches};
+  }
+  async function buildLongerCandidates(index, maxWords, portion, mode){
+    const result=[];
+    let frontier=[];
+    index.forEach(function(occurrences,phrase){
+      if(phrase.split(' ').length!==maxWords)return;
+      if(new Set(occurrences.map(function(o){return unitOf(o,mode);})).size>=2){
+        frontier.push({phrase:phrase,occurrences:occurrences});
+      }
+    });
+    while(frontier.length){
+      const next=new Map();
+      frontier.forEach(function(entry){
+        entry.occurrences.forEach(function(o){
+          if(o.endTok+1>=o.tokens.length)return;
+          const phrase=entry.phrase+' '+o.tokens[o.endTok+1];
+          if(!next.has(phrase))next.set(phrase,[]);
+          next.get(phrase).push({sura:o.sura,ayah:o.ayah,page:o.page,juz:o.juz,tokens:o.tokens,startTok:o.startTok,endTok:o.endTok+1});
+        });
+      });
+      frontier=[];
+      next.forEach(function(occurrences,phrase){
+        if(new Set(occurrences.map(function(o){return unitOf(o,mode);})).size<2)return;
+        frontier.push({phrase:phrase,occurrences:occurrences});
+        if(occurrences.every(function(o){return portion.has(o.sura+'-'+o.ayah);})){
+          result.push({phrase:phrase,occurrences:occurrences});
+        }
+      });
+      await new Promise(function(resolve){setTimeout(resolve,0);});
+    }
+    return result;
+  }
+  function resetQuestionQueue(){ questionQueue=questionPool.slice();shuffleArray(questionQueue); }
+  async function prepareQuestions(){
+    const num=function(id,min,max){const n=Number(document.getElementById(id).value);if(!Number.isInteger(n)||n<min||n>max)throw new Error('راجع إعدادات العبارات: طولها من ١ إلى ٢٠ كلمة، وعدد التلميحات من ٢ إلى ١٠.');return n;};
+    const lo=num('min-words',1,20),hi=num('max-words',1,20),min=num('min-units',2,10),max=num('max-units',2,10);
+    if(lo>hi || min>max) throw new Error('يجب ألا يزيد الحد الأدنى على الحد الأقصى.');
+    groupMode=document.getElementById('group-mode').value;
+    const portion=new Set(QuranPicker.getFilteredByPortion(ayahs,{portionTypeName:'portion-type'}).map(function(a){return a.sura+'-'+a.aya;}));
+    if(!portion.size)throw new Error('اختر سورة أو جزءًا واحدًا على الأقل، أو نطاق صفحات صالحًا.');
+    const key=lo+':'+hi;
+    if(indexCacheKey!==key){indexCache=buildPhraseIndex(lo,hi);indexCacheKey=key;}
+    const targetPool=buildPool(indexCache,2,groupMode==='juz'?30:114,portion,groupMode);
+    candidates=targetPool.concat(await buildLongerCandidates(indexCache,hi,portion,groupMode));
+    const ids=new Map(candidates.map(function(p,i){return [p.phrase,i];}));
+    const postings={};
+    candidates.forEach(function(p,i){
+      p.units=new Set(p.occurrences.map(function(o){return unitOf(o,groupMode);}));
+      p.units.forEach(function(u){postings[u]=(postings[u]||0n)|(1n<<BigInt(i));});
+      p.fragments=new Set();p.fragmentMask=0n;
+      const words=p.phrase.split(' ');
+      for(let len=lo;len<=words.length;len++)for(let j=0;j+len<=words.length;j++){
+        const fragment=words.slice(j,j+len).join(' '),id=ids.get(fragment);
+        if(id!==undefined){p.fragments.add(fragment);p.fragmentMask|=1n<<BigInt(id);}
+      }
+    });
+    const all=(1n<<BigInt(candidates.length))-1n;questionPool=[];
+    for(let i=0;i<targetPool.length;i++){
+      const p=targetPool[i],units=Array.from(p.units).sort(function(a,b){return a-b;});
+      if(units.length<min || units.length>max)continue;
+      const full=units.reduce(function(mask,u){return mask&postings[u];},all);
+      // A single maximal answer remains only when it contains every match.
+      if((full&~p.fragmentMask)===0n)questionPool.push({entry:p,units:units});
+      if(i%100===0)await new Promise(function(resolve){setTimeout(resolve,0);});
+    }
+    if(!questionPool.length)throw new Error('لا توجد أسئلة يمكن تمييزها بهذه الإعدادات. وسّع الجزء المختار أو غيّر إعدادات العبارة.');
+    resetQuestionQueue();
+  }
+  function generateQuestion(){
+    if(!questionQueue.length)return {ok:false,exhausted:true};
+    const q=questionQueue.pop(),clues=q.units.slice();shuffleArray(clues);
+    let uniqueAt=clues.length;
+    for(let n=1;n<=clues.length;n++){
+      if(findPortionOccurrences(clues.slice(0,n)).totalCount===1){uniqueAt=n;break;}
+    }
+    return {ok:true,entry:q.entry,units:q.units,clues:clues,uniqueAt:uniqueAt};
+  }
+  function candidateHTML(entry){
+    let html='<div class="phrase-block"><div class="answer-phrase" dir="rtl">'+escapeHTML(entry.phrase)+'</div>';
+    const groups=new Map();
+    entry.occurrences.forEach(function(o){const u=unitOf(o,groupMode);if(!groups.has(u))groups.set(u,[]);groups.get(u).push(o);});
+    Array.from(groups.keys()).sort(function(a,b){return a-b;}).forEach(function(u){
+      html+='<p class="unit-heading"><span dir="auto">'+escapeHTML(clueLabel(u))+'</span></p>';
+      const verses=new Map();groups.get(u).forEach(function(o){const key=o.sura+':'+o.ayah;if(!verses.has(key))verses.set(key,[]);verses.get(key).push(o);});
+      Array.from(verses.values()).sort(function(a,b){return a[0].sura-b[0].sura||a[0].ayah-b[0].ayah;}).forEach(function(occs){
+        const o=occs[0];
+        html+='<div class="occurrence"><div class="occurrence-meta"><span class="surah-name" dir="rtl">'+escapeHTML(suraNameOf(o.sura))+'</span><span>Ayah '+o.ayah+'</span><span>Page '+o.page+'</span></div>';
+        html+='<div class="ayah-text" dir="rtl">'+o.tokens.map(function(t,i){const word=escapeHTML(t);return occs.some(function(x){return i>=x.startTok&&i<=x.endTok;})?'<mark>'+word+'</mark>':word;}).join(' ')+'</div></div>';
+      });
+    });
+    return html+'</div>';
+  }
+  function buildAnswerHTML(q){
+    return '<p>جميع التلميحات: '+q.units.map(function(u){return escapeHTML(clueLabel(u));}).join(' · ')+'</p><p>تصبح الإجابة فريدة بعد التلميح '+q.uniqueAt+': '+q.clues.slice(0,q.uniqueAt).map(function(u){return escapeHTML(clueLabel(u));}).join(' · ')+'</p>'+candidateHTML(q.entry);
+  }
+
+  function makeRoomCode(){
+    const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ"; // no I/O to avoid confusion
+    let code = "";
+    for(let i = 0; i < 4; i++) code += letters[Math.floor(Math.random() * letters.length)];
+    return code;
+  }
+
+  document.getElementById("create-room-btn").addEventListener("click", createRoom);
+
+  async function createRoom(){
+    clearFieldErrors();
+    setSettingsStatus("", false);
+    try{
+      await ensureFirebaseReady();
+    }catch(err){
+      console.error("Firebase sign-in failed:", err);
+      setSettingsStatus("تعذّر الاتصال بفايربيس. تحقق من تفعيل تسجيل الدخول المجهول ثم حاول مجددًا.", true);
+      return;
+    }
+
+    const hostName = (document.getElementById("host-name").value || "").trim() || "Host";
+    const pointsToWin = validatePositiveNumber(document.getElementById("points-to-win"), "points-error", 1, true);
+    const startWords = validatePositiveNumber(document.getElementById("start-words"), "timing-error", 1, true);
+    const revealDelay = validatePositiveNumber(document.getElementById("reveal-delay"), "timing-error", 1, false);
+    const answerTime = validatePositiveNumber(document.getElementById("answer-time"), "timing-error", 1, true);
+    const eliminationTimeLimit = validatePositiveNumber(document.getElementById("elimination-time-limit"), "timing-error", 1, true);
+    const matchListCap = validatePositiveNumber(document.getElementById("match-list-cap"), "match-list-cap-error", 1, true);
+    const maxPlayers = getMaxPlayers();
+    const objectionsWanted = document.getElementById("enable-objections").checked;
+    let objectionTimeSeconds = null;
+    if(maxPlayers === 2 && objectionsWanted){
+      objectionTimeSeconds = validatePositiveNumber(document.getElementById("objection-time"), "timing-error", 1, true);
+      if(objectionTimeSeconds === null) return;
+    }
+
+    const portionType = document.querySelector('input[name="portion-type"]:checked').value;
+    const activeTab = portionType === 'select' ? document.querySelector('.tab-btn.active').dataset.tab : null;
+    if(activeTab === 'page'){
+      const pages = QuranPicker.parsePageRange(document.getElementById('page-range').value);
+      if(pages === undefined){ showFieldError('page-range-error', 'النطاق غير صالح.'); return; }
+    }
+
+    if(pointsToWin === null || startWords === null || revealDelay === null || answerTime === null || eliminationTimeLimit === null || matchListCap === null) return;
+    if(!quranDataReady){ setSettingsStatus("لا تزال بيانات القرآن قيد التحميل؛ حاول بعد قليل.", true); return; }
+
+    document.getElementById("create-room-btn").disabled=true;
+    setSettingsStatus("جارٍ إعداد الأسئلة ذات التلميحات الحاسمة…",false);
+    try{await prepareQuestions();}catch(err){setSettingsStatus(err.message,true);document.getElementById("create-room-btn").disabled=false;return;}
+    document.getElementById("create-room-btn").disabled=false;setSettingsStatus("",false);
+
+    myName = hostName;
+    isHost = true;
+    myIndex = 0;
+    roomCode = makeRoomCode();
+
+    hostState = {
+      pointsToWin: pointsToWin, startWords: startWords, revealDelayMs: revealDelay * 1000,
+      answerTimeSeconds: answerTime, eliminationTimeLimitSeconds: eliminationTimeLimit,
+      matchListCap: matchListCap, objectionsWanted: objectionsWanted, objectionTimeSeconds: objectionTimeSeconds,
+      groupMode: groupMode,
+      minWords: Number(document.getElementById("min-words").value), maxWords: Number(document.getElementById("max-words").value),
+      minUnits: Number(document.getElementById("min-units").value), maxUnits: Number(document.getElementById("max-units").value),
+      maxPlayers: maxPlayers, penalizeEarlyBuzz: maxPlayers > 2 && document.getElementById("penalize-early-buzz").checked
+    };
+    const selectedSurahs = Array.from(document.querySelectorAll("#surah-list input[type=checkbox]:checked")).map(function(el){ return el.closest("label")?.textContent.trim() || el.value; });
+    const selectedJuz = Array.from(document.querySelectorAll("#juz-list input[type=checkbox]:checked")).map(function(el){ return el.closest("label")?.textContent.trim() || el.value; });
+    const publicSettings = {
+      portion: portionType === "entire" ? "القرآن كاملًا" : activeTab === "page" ? "الصفحات: " + (document.getElementById("page-range").value.trim() || "all") : (activeTab === "juz" ? "الأجزاء: " + selectedJuz.join(", ") : "السور: " + selectedSurahs.join(", ")),
+      maxPlayers: maxPlayers, pointsToWin: pointsToWin, startWords: startWords, revealDelay: revealDelay,
+      answerTime: answerTime, eliminationTimeLimit: eliminationTimeLimit,
+      objections: maxPlayers === 2 && objectionsWanted, objectionTime: objectionTimeSeconds,
+      penalizeEarlyBuzz: hostState.penalizeEarlyBuzz,
+      groupMode: groupMode, minWords: hostState.minWords, maxWords: hostState.maxWords,
+      minUnits: hostState.minUnits, maxUnits: hostState.maxUnits, matchListCap: matchListCap
+    };
+
+    try{await fb.set(fb.ref(fb.db, 'rooms/' + roomCode), {
+      status: 'lobby',
+      gameType: 'commonphrase',
+      hostId: myId,
+      maxPlayers: maxPlayers,
+      settings: publicSettings,
+      createdAt: fb.serverTimestamp(),
+      players: {
+        [myId]: { name: hostName, joinedAt: fb.serverTimestamp() }
+      }
+    });
+    }catch(err){console.error("Room creation failed:",err);roomCode=null;isHost=false;myIndex=null;setSettingsStatus("تعذّر إنشاء الغرفة: "+err.message,true);return;}
+    // Register server-side cleanup before allowing the host to start a game.
+    try{
+      await fb.onDisconnect(fb.ref(fb.db, 'rooms/' + roomCode)).remove();
+    }catch(err){
+      await fb.remove(fb.ref(fb.db, 'rooms/' + roomCode));
+      roomCode = null; isHost = false; myIndex = null;
+      setSettingsStatus("تعذّر إعداد التعامل مع انقطاع الاتصال. حاول إنشاء الغرفة مجددًا.", true);
+      console.error("Room disconnect setup failed:", err);
+      return;
+    }
+
+    enterLobby();
+  }
+
+  // =====================================================================
+  // GUEST: joining
+  // =====================================================================
+
+  document.getElementById("join-submit-btn").addEventListener("click", joinRoom);
+
+  async function joinRoom(){
+    const code = document.getElementById("join-code").value.trim().toUpperCase();
+    const name = (document.getElementById("join-name").value || "").trim();
+    const statusEl2 = document.getElementById("join-status");
+    statusEl2.textContent = ""; statusEl2.classList.remove("error");
+
+    if(code.length !== 4){ statusEl2.textContent = "أدخل رمز الغرفة المكوّن من أربعة أحرف."; statusEl2.classList.add("error"); return; }
+    if(!name){ statusEl2.textContent = "أدخل اسمك."; statusEl2.classList.add("error"); return; }
+    try{
+      await ensureFirebaseReady();
+    }catch(err){
+      console.error("Firebase sign-in failed:", err);
+      statusEl2.textContent = "تعذّر الاتصال بفايربيس. تحقق من تفعيل تسجيل الدخول المجهول ثم حاول مجددًا.";
+      statusEl2.classList.add("error");
+      return;
+    }
+
+    const roomSnap = await fb.get(fb.ref(fb.db, 'rooms/' + code));
+    if(!roomSnap.exists()){ statusEl2.textContent = "لم يُعثر على غرفة بهذا الرمز."; statusEl2.classList.add("error"); return; }
+    const room = roomSnap.val();
+    if(room.gameType !== 'commonphrase'){ statusEl2.textContent = 'هذا الرمز خاص بلعبة أخرى.'; statusEl2.classList.add('error'); return; }
+    if(room.status !== 'lobby'){ statusEl2.textContent = "بدأت هذه اللعبة بالفعل."; statusEl2.classList.add("error"); return; }
+    const currentCount = room.players ? Object.keys(room.players).length : 0;
+    if(currentCount >= room.maxPlayers){ statusEl2.textContent = "الغرفة ممتلئة."; statusEl2.classList.add("error"); return; }
+
+    myName = name;
+    isHost = false;
+    roomCode = code;
+
+    await fb.set(fb.ref(fb.db, 'rooms/' + code + '/players/' + myId), { name: name, joinedAt: fb.serverTimestamp() });
+    fb.onDisconnect(fb.ref(fb.db, 'rooms/' + code + '/players/' + myId)).remove();
+
+    enterLobby();
+  }
+
+  // =====================================================================
+  // Lobby (shared by host and guests)
+  // =====================================================================
+
+  function enterLobby(){
+    showScreen("lobby");
+    document.getElementById("lobby-room-code").textContent = roomCode;
+    document.getElementById("lobby-host-controls").hidden = !isHost;
+
+    fb.onValue(fb.ref(fb.db, 'rooms/' + roomCode + '/settings'), function(snap){
+      renderLobbySettings(snap.val());
+    });
+
+    fb.onValue(fb.ref(fb.db, 'rooms/' + roomCode + '/players'), function(snap){
+      const players = snap.val() || {};
+      renderLobbyRoster(players);
+    });
+
+    const lobbyCode = roomCode;
+    function roomClosed(){
+      if(roomCode !== lobbyCode) return;
+      if(isHost && hg){
+        stopRevealTimer(); stopAnswerTimer(); stopObjectionTimer(); stopObjectionCooldownTimer(); stopCountdownTimer(); stopEliminationCountdown();
+        hg = null;
+      }
+      roomCode = null; isHost = false; myIndex = null; latestState = null;
+      showScreen("landing");
+      setStatus("أنهى المضيف اللعبة أو انقطع اتصاله.", false);
+    }
+    fb.onValue(fb.ref(fb.db, 'rooms/' + lobbyCode + '/status'), function(snap){
+      if(roomCode !== lobbyCode) return;
+      if(snap.val() === 'playing' && screens.game.hidden) enterGame();
+      else if(!snap.exists() || snap.val() === 'ended'){
+        roomClosed();
+      }
+    }, function(err){
+      // Membership-based read access disappears when the room is deleted.
+      if(err.code === "PERMISSION_DENIED" || err.code === "permission-denied") roomClosed();
+      else console.error("Room status listener failed:", err);
+    });
+
+    if(isHost){
+      document.getElementById("start-game-btn").addEventListener("click", startGameAsHost);
+    }
+  }
+
+  function renderLobbySettings(settings){
+    const el = document.getElementById("lobby-settings");
+    if(!settings){ el.textContent = "بانتظار إعدادات الغرفة…"; return; }
+    const row = function(label, value){ return '<p><strong>' + label + ':</strong> ' + escapeHTML(String(value)) + '</p>'; };
+    const yesNo = function(value){ return value ? "Yes" : "No"; };
+    el.innerHTML = '<h3>إعداد اللعبة</h3>' +
+      row("Portion",settings.portion)+row("عدد اللاعبين",settings.maxPlayers)+
+      row("التلميحات",settings.groupMode==="juz"?"الجزء":"السور")+row("النقاط المطلوبة للفوز",settings.pointsToWin)+
+      '<details><summary>إعدادات إضافية</summary>'+row("عدد التلميحات المعروضة أولًا",settings.startWords)+
+      row("الثواني بين كل كشف",settings.revealDelay)+row("طول العبارة",settings.minWords+"–"+settings.maxWords+" words")+
+      row("عدد المواضع في السؤال",settings.minUnits+"–"+settings.maxUnits)+row("مهلة الإجابة (بالثواني)",settings.answerTime)+
+      row("المهلة بعد الاستبعاد (بالثواني)",settings.eliminationTimeLimit)+
+      (settings.maxPlayers===2?row("الاعتراضات",yesNo(settings.objections))+
+        (settings.objections?row("مهلة الاعتراض (بالثواني)",settings.objectionTime):""):row("استبعاد من يضغط مبكرًا",yesNo(settings.penalizeEarlyBuzz)))+
+      row("الحد الأقصى لمطابقات الاعتراض المعروضة",settings.matchListCap)+'</details>';
+  }
+
+  function renderLobbyRoster(players){
+    const ids = Object.keys(players).sort(function(a, b){
+      return (players[a].joinedAt || 0) - (players[b].joinedAt || 0);
+    });
+    const roster = document.getElementById("lobby-roster");
+    roster.innerHTML = ids.map(function(id, idx){
+      return '<div class="player-row"><span class="dot" style="background:' + PLAYER_COLORS[idx % 4] + '"></span>' +
+        escapeHTML(players[id].name) + (id === myId ? '<span class="you-tag">أنت</span>' : '') + '</div>';
+    }).join('');
+    if(isHost){
+      document.getElementById("start-game-btn").disabled = ids.length < 2;
+      document.getElementById("lobby-status").textContent = ids.length < 2 ? "يلزم لاعبان على الأقل لبدء اللعبة." : "";
+    }else{
+      document.getElementById("lobby-status").textContent = "بانتظار المضيف ليبدأ اللعبة…";
+    }
+  }
+
+  document.getElementById("lobby-leave-btn").addEventListener("click", async function(){
+    if(roomCode){
+      await fb.remove(fb.ref(fb.db, 'rooms/' + roomCode + '/players/' + myId));
+      if(isHost) await fb.remove(fb.ref(fb.db, 'rooms/' + roomCode));
+    }
+    roomCode = null; isHost = false; myIndex = null;
+    showScreen("landing");
+  });
+
+  // =====================================================================
+  // HOST: game state machine - this is the same shape of logic as the
+  // local competitive version's game object and functions, just pushing
+  // to Firebase instead of calling renderArena() directly. Only ever runs
+  // on the host's device.
+  // =====================================================================
+
+  let hostState = null; // settings captured at room-creation time
+  let hg = null;         // the live host-side game object
+
+  async function startGameAsHost(){
+    const snap = await fb.get(fb.ref(fb.db, 'rooms/' + roomCode + '/players'));
+    const players = snap.val() || {};
+    const ids = Object.keys(players).sort(function(a, b){ return (players[a].joinedAt || 0) - (players[b].joinedAt || 0); });
+
+    const updates = {};
+    const rosterById = {};
+    ids.forEach(function(id, idx){
+      updates['players/' + id + '/index'] = idx;
+      rosterById[id] = idx;
+      if(id === myId) myIndex = idx;
+    });
+    await fb.update(fb.ref(fb.db, 'rooms/' + roomCode), updates);
+
+    const playerCount = ids.length;
+    const objectionsEnabled = playerCount === 2 && hostState.objectionsWanted;
+
+    hg = {
+      players: ids.map(function(id, idx){ return { id: idx, uid: id, name: players[id].name, color: PLAYER_COLORS[idx], score: 0, eliminatedThisRound: false, eliminatedNextRound: false }; }),
+      pointsToWin: hostState.pointsToWin,
+      startWords: hostState.startWords,
+      revealDelayMs: hostState.revealDelayMs,
+      answerTimeSeconds: hostState.answerTimeSeconds,
+      eliminationTimeLimitSeconds: hostState.eliminationTimeLimitSeconds,
+      matchListCap: hostState.matchListCap,
+      objectionsEnabled: objectionsEnabled,
+      penalizeEarlyBuzz: playerCount > 2 && hostState.penalizeEarlyBuzz,
+      objectionTimeSeconds: hostState.objectionTimeSeconds,
+      currentQuestion: null, displayedWords: [], expansionExhausted: false,
+      phase: "revealing", activeBuzzerId: null, revealedToBuzzer: false, answerRemaining: 0, checkOccurrences: null,
+      objectorId: null, objectionRemaining: 0, objectionOccurrences: null, objectionRevealed: false,
+      objectionTypedCount: 0, objectionCooldownActive: false, roundOverMessage: null, winnerName: null,
+      searchFailMessage: null, countdownRemaining: 0, eliminationCountdownRemaining: 0, finalMessage: null,
+      revealTimerId: null, answerTimerId: null, objectionTimerId: null, objectionCooldownTimerId: null,
+      countdownTimerId: null, eliminationCountdownTimerId: null
+    };
+
+    listenForIntents();
+    listenForBuzzClaims();
+    startRound();
+    await fb.update(fb.ref(fb.db, 'rooms/' + roomCode), { status: 'playing' });
+  }
+
+  function stopRevealTimer(){ if(hg.revealTimerId){ clearInterval(hg.revealTimerId); hg.revealTimerId = null; } }
+  function stopAnswerTimer(){ if(hg.answerTimerId){ clearInterval(hg.answerTimerId); hg.answerTimerId = null; } }
+  function stopObjectionTimer(){ if(hg.objectionTimerId){ clearInterval(hg.objectionTimerId); hg.objectionTimerId = null; } }
+  function stopObjectionCooldownTimer(){ if(hg.objectionCooldownTimerId){ clearTimeout(hg.objectionCooldownTimerId); hg.objectionCooldownTimerId = null; } }
+
+  function resetBuzzClaim(){
+    fb.set(fb.ref(fb.db, 'rooms/' + roomCode + '/buzzClaim'), null);
+  }
+
+  function startRound(){
+    resetBuzzClaim();
+    stopRevealTimer();
+    stopAnswerTimer();
+    stopObjectionTimer();
+    stopObjectionCooldownTimer();
+    stopCountdownTimer();
+    stopEliminationCountdown();
+
+    const result = generateQuestion();
+    if(!result.ok){
+      if(result.exhausted){finishExhaustedGame();return;}
+      hg.phase = "searchFailed";
+      hg.searchFailMessage = result.message;
+      syncState();
+      return;
+    }
+
+    hg.currentQuestion = result;
+    hg.phraseTotal = result.uniqueAt;
+    hg.displayedWords = result.clues.slice(0,Math.min(hg.startWords,result.clues.length));
+    hg.expansionExhausted = hg.displayedWords.length >= result.clues.length;
+    hg.phase = "revealing";
+    hg.activeBuzzerId = null;
+    hg.revealedToBuzzer = false;
+    hg.checkOccurrences = null;
+    hg.objectorId = null;
+    hg.objectionRemaining = 0;
+    hg.objectionOccurrences = null;
+    hg.objectionRevealed = false;
+    hg.objectionTypedCount = 0;
+    hg.objectionCooldownActive = false;
+    hg.roundOverMessage = null;
+    hg.skipAnswerReveal = false;
+
+    hg.players.forEach(function(p){
+      p.eliminatedThisRound = p.eliminatedNextRound;
+      p.eliminatedNextRound = false;
+    });
+
+    if(!hg.expansionExhausted) hg.revealTimerId = setInterval(tickReveal, hg.revealDelayMs);
+    syncState();
+  }
+
+  function tickReveal(){
+    if(hg.phase !== 'revealing')return;
+    const clues=hg.currentQuestion.clues;
+    if(hg.displayedWords.length<clues.length)hg.displayedWords.push(clues[hg.displayedWords.length]);
+    hg.expansionExhausted=hg.displayedWords.length>=clues.length;
+    if(hg.expansionExhausted)stopRevealTimer();
+    syncState();
+  }
+
+  function resumeRevealIfNeeded(){
+    if(!hg.expansionExhausted && !hg.revealTimerId){
+      hg.revealTimerId = setInterval(tickReveal, hg.revealDelayMs);
+    }
+  }
+
+  function buzz(playerId){
+    if(hg.phase !== "revealing") return;
+    const player = hg.players[playerId];
+    if(!player || player.eliminatedThisRound) return;
+
+    // Optional 3/4-player rule: buzzing while the phrase still matches more
+    // than one ayah ends the round immediately (showing every match) and
+    // costs the buzzer their next round, instead of going to a private
+    // check - the app can tell objectively that it wasn't unique yet, so
+    // there's nothing to self-report.
+    if(hg.players.length > 2 && hg.penalizeEarlyBuzz){
+      const occ = findPortionOccurrences(hg.displayedWords);
+      if(occ.totalCount > 1){
+        stopRevealTimer();
+        stopEliminationCountdown();
+        hg.checkOccurrences = occ;
+        player.eliminatedNextRound = true;
+        finishRound(player.name + " ضغط قبل أن تصبح الإجابة فريدة — وسيجلس خارج الجولة التالية.");
+        return;
+      }
+    }
+
+    stopRevealTimer();
+    stopEliminationCountdown();
+    hg.phase = "answering";
+    hg.activeBuzzerId = playerId;
+    hg.answerRemaining = hg.answerTimeSeconds;
+
+    // Brief grace period before the other player's zone becomes tappable
+    // for an objection - without this, two near-simultaneous buzzes could
+    // resolve as one real buzz plus an accidental "objection" from what was
+    // actually just a slightly-late competing buzz.
+    hg.objectionCooldownActive = true;
+    hg.objectionCooldownTimerId = setTimeout(function(){
+      hg.objectionCooldownTimerId = null;
+      hg.objectionCooldownActive = false;
+      if(hg.phase === "answering") syncState();
+    }, OBJECTION_COOLDOWN_MS);
+
+    syncState();
+
+    hg.answerTimerId = setInterval(function(){
+      hg.answerRemaining--;
+      if(hg.answerRemaining <= 0){
+        stopAnswerTimer();
+        hg.phase = "checking";
+        hg.revealedToBuzzer = false;
+      }
+      syncState();
+    }, 1000);
+  }
+
+  function checkAnswer(){
+    if(hg.phase !== "checking") return;
+    hg.checkOccurrences = findPortionOccurrences(hg.displayedWords);
+    hg.revealedToBuzzer = true;
+    syncState();
+  }
+
+  // Ends the round, applying whatever score changes already happened,
+  // showing `message` centrally, and moving to gameOver if anyone has now
+  // reached the points-to-win threshold.
+  function finishExhaustedGame(){
+    const high=Math.max.apply(null,hg.players.map(function(p){return p.score;}));
+    const leaders=hg.players.filter(function(p){return p.score===high;});
+    hg.finalMessage='استُنفدت جميع الأسئلة. '+(leaders.length===1?leaders[0].name+' يفوز برصيد '+arabicPoints(high)+'!':'تعادل: '+leaders.map(function(p){return p.name;}).join(', ')+' ('+arabicPoints(high)+').');
+    hg.phase='gameOver';hg.winnerName=leaders.length===1?leaders[0].name:null;
+    syncState();
+  }
+
+  function finishRound(message){
+    hg.roundOverMessage = message;
+    const winner = hg.players.find(function(p){ return p.score >= hg.pointsToWin; });
+    if(winner){
+      hg.phase = "gameOver";
+      hg.winnerName = winner.name;
+    }else if(!questionQueue.length){
+      finishExhaustedGame();return;
+    }else{
+      hg.phase = "roundOver";
+    }
+    syncState();
+  }
+
+  function markCorrect(){
+    if(hg.phase !== "checking" || hg.activeBuzzerId === null) return;
+    const player = hg.players[hg.activeBuzzerId];
+    player.score++;
+    // The buzzer already privately confirmed this themselves, so in a
+    // 2-player game there's no need to show it to them again - just take
+    // over the screen for whoever didn't buzz. (3-4 player games keep the
+    // per-zone display, since "the other player" isn't well-defined there.)
+    if(hg.players.length === 2){
+      const other = hg.players.find(function(p){ return p.id !== player.id; });
+      hg.revealTargetPlayerId = other.id;
+    }
+    finishRound(player.name + " يحصل على نقطة!");
+  }
+
+  function markWrong(){
+    if(hg.phase !== "checking" || hg.activeBuzzerId === null) return;
+    hg.players[hg.activeBuzzerId].eliminatedThisRound = true;
+    hg.activeBuzzerId = null;
+    hg.revealedToBuzzer = false;
+
+    const allEliminated = hg.players.every(function(p){ return p.eliminatedThisRound; });
+    if(allEliminated){
+      finishRound("لم يعرف أحد الإجابة هذه المرة.");
+    }else{
+      hg.phase = "revealing";
+      resetBuzzClaim();
+      resumeRevealIfNeeded();
+      startEliminationCountdown();
+      syncState();
+    }
+  }
+
+  function manualReveal(){
+    if(hg.phase !== "revealing") return;
+    stopRevealTimer();
+    stopAnswerTimer();
+    stopEliminationCountdown();
+    hg.checkOccurrences = findPortionOccurrences(hg.displayedWords);
+    finishRound("لم يعرف أحد الإجابة هذه المرة.");
+  }
+
+  // ---------- الاعتراضات (2-player games only - see the settings tooltip) ----------
+
+  // Raised by the non-buzzing player, mid-answer-countdown, to challenge
+  // that not enough has been shown yet to identify the ayah uniquely.
+  function raiseObjection(playerId){
+    if(!hg.objectionsEnabled || hg.phase !== "answering") return;
+    if(playerId === hg.activeBuzzerId) return;
+
+    stopAnswerTimer();
+    hg.objectorId = playerId;
+    hg.objectionRemaining = hg.objectionTimeSeconds;
+    hg.phase = "objecting";
+    syncState();
+
+    hg.objectionTimerId = setInterval(function(){
+      hg.objectionRemaining--;
+      if(hg.objectionRemaining <= 0){
+        stopObjectionTimer();
+        hg.phase = "objectingChecking";
+        hg.objectionRevealed = false;
+      }
+      syncState();
+    }, 1000);
+  }
+
+  // Lets the objector tap again once they've finished naming ayahs, rather
+  // than sitting through the rest of their own countdown.
+  function finishObjecting(){
+    if(hg.phase !== "objecting") return;
+    stopObjectionTimer();
+    hg.phase = "objectingChecking";
+    hg.objectionRevealed = false;
+    syncState();
+  }
+
+  // The objector privately checks what's currently on screen against every
+  // occurrence of that exact sequence within the selected portion. If it
+  // turns out to already be unique (<=1 match), that's decided by the app
+  // itself, automatically, since there's nothing left to self-report; with
+  // 2+ matches, the objector is shown the list to verify their spoken
+  // answer against, then self-reports as normal.
+  function checkObjection(){
+    if(hg.phase !== "objectingChecking" || hg.objectionRevealed) return;
+    hg.objectionOccurrences = findPortionOccurrences(hg.displayedWords);
+    hg.objectionRevealed = true;
+    hg.objectionTypedCount = 0;
+
+    if(hg.objectionOccurrences.totalCount <= 1){
+      resolveObjectionOutcome(false);
+      return;
+    }
+    syncState();
+  }
+
+  function confirmObjection(claimedCountRaw){
+    if(hg.phase!=="objectingChecking"||!hg.objectionRevealed)return;
+    const occ=hg.objectionOccurrences;
+    const claimed=Math.max(0,Math.min(parseInt(claimedCountRaw,10)||0,occ.totalCount));
+    if(claimed>=2)resolveObjectionOutcome(true,claimed);
+    else{hg.skipAnswerReveal=true;finishRound(hg.players[hg.objectorId].name+" اعترض اعتراضًا صحيحًا، لكنه لم يذكر عبارتين على الأقل — لا نقاط.");}
+  }
+
+  function resolveObjectionOutcome(wasCorrect, awardedCount){
+    const objector = hg.players[hg.objectorId];
+    const buzzer = hg.players[hg.activeBuzzerId];
+    if(wasCorrect){
+      objector.score += awardedCount;
+      // The tick screen they just came from already showed every matching
+      // ayah's text - showing the same list again at round-end would just
+      // be repeating it, so skip it here.
+      hg.skipAnswerReveal = true;
+      finishRound(objector.name + " اعترض اعتراضًا صحيحًا ويحصل على " + arabicPoints(awardedCount) + "!");
+    }else{
+      objector.score -= 1;
+      buzzer.score += 1;
+      finishRound("الاعتراض خاطئ — كانت التلميحات تحدد عبارة واحدة بالفعل. " + objector.name + " يخسر نقطة، و" + buzzer.name + " يكسب النقطة!");
+    }
+  }
+
+  function stopCountdownTimer(){
+    if(hg.countdownTimerId){ clearInterval(hg.countdownTimerId); hg.countdownTimerId = null; }
+  }
+
+  function stopEliminationCountdown(){
+    if(hg.eliminationCountdownTimerId){ clearInterval(hg.eliminationCountdownTimerId); hg.eliminationCountdownTimerId = null; }
+  }
+
+  // Starts once at least one player has been eliminated from a round but
+  // others remain in it - without this, whoever's left could just wait
+  // indefinitely while context keeps expanding in their favour. If time
+  // runs out before anyone else buzzes, the round ends as unsolved.
+  function startEliminationCountdown(){
+    stopEliminationCountdown();
+    hg.eliminationCountdownRemaining = hg.eliminationTimeLimitSeconds;
+    hg.eliminationCountdownTimerId = setInterval(function(){
+      hg.eliminationCountdownRemaining--;
+      if(hg.eliminationCountdownRemaining <= 0){
+        stopEliminationCountdown();
+        stopRevealTimer();
+        stopAnswerTimer();
+        hg.checkOccurrences = findPortionOccurrences(hg.displayedWords);
+        finishRound("انتهى الوقت — لم يعرف أحد الإجابة هذه المرة.");
+        return;
+      }
+      syncState();
+    }, 1000);
+  }
+
+  // A few seconds of "get ready" between pressing Next Round/العب مجددًا and
+  // the reveal actually starting, so whoever just pressed it (likely still
+  // looking at their own private check-answer view a moment ago) has time
+  // to look up before words start appearing.
+  function beginCountdownThenStartRound(){
+    stopCountdownTimer();
+    hg.phase = "countdown";
+    hg.countdownRemaining = NEXT_ROUND_COUNTDOWN_SECONDS;
+    syncState();
+    hg.countdownTimerId = setInterval(function(){
+      hg.countdownRemaining--;
+      if(hg.countdownRemaining <= 0){
+        stopCountdownTimer();
+        startRound();
+        return;
+      }
+      syncState();
+    }, 1000);
+  }
+
+  function nextRound(){
+    if(hg.phase !== "roundOver" && hg.phase !== "searchFailed") return;
+    beginCountdownThenStartRound();
+  }
+
+  function playAgain(){
+    resetQuestionQueue();hg.finalMessage=null;hg.winnerName=null;
+    hg.players.forEach(function(p){ p.score = 0; p.eliminatedThisRound = false; p.eliminatedNextRound = false; });
+    beginCountdownThenStartRound();
+  }
+
+  async function endGameAsHost(){
+    stopRevealTimer();stopAnswerTimer();stopObjectionTimer();stopObjectionCooldownTimer();stopCountdownTimer();stopEliminationCountdown();
+    const code=roomCode;
+    await fb.remove(fb.ref(fb.db,'rooms/'+code));
+    hg=null;roomCode=null;isHost=false;myIndex=null;latestState=null;
+    showScreen('landing');
+  }
+
+  // Two-tap confirm instead of window.confirm() - see buildChangeSettingsButtonHTML.
+  // Serialises the host  // Serialises the host's in-memory game object into plain, display-ready
+  // data (no functions, no timer IDs) and pushes it to Firebase. Every
+  // player's client (including the host's own) renders purely from this.
+  function syncState(){
+    if(!hg) return;
+    const visible=hg.phase==="roundOver"||hg.phase==="gameOver"||(hg.phase==="checking"&&hg.revealedToBuzzer);
+    const occ=hg.checkOccurrences||hg.objectionOccurrences;
+    const answerHTML=visible&&hg.currentQuestion&&!hg.skipAnswerReveal
+      ? buildAnswerHTML(hg.currentQuestion)+(occ&&occ.totalCount>1
+          ? '<p>'+occ.totalCount+' عبارات مؤهلة وافقت التلميحات عند توقف الكشف.</p>'+
+            occ.matches.filter(function(m){return m!==hg.currentQuestion.entry;}).map(candidateHTML).join(''):'')
+      : null;
+    const payload={
+      phase:hg.phase,pointsToWin:hg.pointsToWin,matchListCap:hg.matchListCap,objectionsEnabled:hg.objectionsEnabled,
+      players:hg.players.map(function(p){return {id:p.id,name:p.name,color:p.color,score:p.score,eliminatedThisRound:p.eliminatedThisRound};}),
+      activeBuzzerId:hg.activeBuzzerId,objectorId:hg.objectorId,answerRemaining:hg.answerRemaining,
+      objectionRemaining:hg.objectionRemaining,countdownRemaining:hg.countdownRemaining,
+      eliminationCountdownRemaining:hg.eliminationCountdownRemaining,eliminationActive:!!hg.eliminationCountdownTimerId,
+      objectionCooldownActive:hg.objectionCooldownActive,revealedToBuzzer:hg.revealedToBuzzer,
+      objectionRevealed:hg.objectionRevealed,roundOverMessage:hg.roundOverMessage,winnerName:hg.winnerName,
+      finalMessage:hg.finalMessage,searchFailMessage:hg.searchFailMessage,
+      revealText:hg.displayedWords.map(clueLabel).join(' · '),answerHTML:answerHTML,
+      objectionData:(hg.phase==="objectingChecking"&&hg.objectionRevealed&&hg.objectionOccurrences&&hg.objectionOccurrences.totalCount>1)
+        ? {totalCount:hg.objectionOccurrences.totalCount,overCap:hg.objectionOccurrences.totalCount>hg.matchListCap,
+           matches:hg.objectionOccurrences.totalCount>hg.matchListCap?[]:hg.objectionOccurrences.matches.map(function(m){return {phrase:m.phrase,html:candidateHTML(m)};})}:null,
+      updatedAt:fb.serverTimestamp()
+    };
+    // Defensive:    // Defensive: Firebase's set() rejects the ENTIRE write if any field is
+    // undefined, and fails silently unless the promise is handled - this
+    // is exactly what caused the blank game screen bug. Coercing any
+    // stray undefined to null means a future oversight degrades instead
+    // of quietly breaking every client's screen, and logging a failure
+    // means it's at least visible in devtools instead of invisible.
+    const safePayload = JSON.parse(JSON.stringify(payload, function(key, value){
+      return value === undefined ? null : value;
+    }));
+    // Render our own screen only once the server has acknowledged this
+    // write, not from the instant local-cache echo Firebase would
+    // otherwise deliver to our own onValue listener - that instant echo
+    // is exactly what let the host see new words before anyone else's
+    // connection had a chance to receive them, the same underlying issue
+    // as the buzz-fairness bug. This doesn't make delivery perfectly
+    // simultaneous for every guest (each has its own connection latency),
+    // but it removes the host's structural, guaranteed head start.
+    fb.set(fb.ref(fb.db, 'rooms/' + roomCode + '/game'), safePayload).then(function(){
+      latestState = safePayload;
+      renderGameScreen(safePayload);
+    }).catch(function(err){
+      console.error('Failed to sync game state:', err);
+    });
+  }
+
+  function listenForIntents(){
+    fb.onChildAdded(fb.ref(fb.db, 'rooms/' + roomCode + '/intents'), function(snap){
+      const intent = snap.val();
+      if(!intent) return;
+      handleIntent(intent.type, intent.playerId, intent.data);
+      fb.remove(snap.ref);
+    });
+  }
+
+  // Buzzing bypasses the intents queue entirely and uses a transaction
+  // instead - see the write-up on why: routing it through "whichever
+  // intent the host's onChildAdded fires for first" gave the host's own
+  // taps an unfair edge, since a client's own writes reach its own
+  // listeners through Firebase's local optimistic cache almost instantly,
+  // while a remote player's write has to make a real round trip to the
+  // server and back down to the host first. A transaction is resolved by
+  // the server itself - whichever write the server actually receives
+  // first wins, regardless of which device (host or guest) sent it.
+  function listenForBuzzClaims(){
+    fb.onValue(fb.ref(fb.db, 'rooms/' + roomCode + '/buzzClaim'), function(snap){
+      const claim = snap.val();
+      if(!claim || !claim.playerId) return;
+      const player = hg.players.find(function(p){ return p.uid === claim.playerId; });
+      if(player) buzz(player.id);
+    });
+  }
+
+  function handleIntent(type,playerUid,data){
+    if(!hg)return;
+    const player=hg.players.find(function(p){return p.uid===playerUid;});
+    if(!player)return;
+    const id=player.id,host=playerUid===myId;
+    if(type==="raise-objection"&&hg.phase==="answering"&&id!==hg.activeBuzzerId)raiseObjection(id);
+    else if(type==="finish-objecting"&&hg.phase==="objecting"&&id===hg.objectorId)finishObjecting();
+    else if(type==="check-answer"&&hg.phase==="checking"&&id===hg.activeBuzzerId)checkAnswer();
+    else if(type==="mark-correct"&&hg.phase==="checking"&&id===hg.activeBuzzerId&&hg.revealedToBuzzer)markCorrect();
+    else if(type==="mark-wrong"&&hg.phase==="checking"&&id===hg.activeBuzzerId&&hg.revealedToBuzzer)markWrong();
+    else if(type==="check-objection"&&hg.phase==="objectingChecking"&&id===hg.objectorId)checkObjection();
+    else if(type==="confirm-objection"&&hg.phase==="objectingChecking"&&id===hg.objectorId&&hg.objectionRevealed)confirmObjection(data&&data.claimedCount);
+    else if(type==="reveal-fallback"&&host)manualReveal();
+    else if(type==="next-round"&&host)nextRound();
+    else if(type==="play-again"&&host)playAgain();
+  }
+
+  // =====================================================================
+  // EVERY CLIENT  // =====================================================================
+  // EVERY CLIENT (host included): render from synced state + send intents
+  // =====================================================================
+
+  let latestState = null;
+  let myUidToIndex = {};
+
+  function enterGame(){
+    const gameCode = roomCode;
+    showScreen("game");
+    fb.onValue(fb.ref(fb.db, 'rooms/' + roomCode + '/players'), function(snap){
+      const players = snap.val() || {};
+      if(players[myId] && typeof players[myId].index === "number"){
+        const changed = myIndex !== players[myId].index;
+        myIndex = players[myId].index;
+        if(changed && latestState) renderGameScreen(latestState);
+      }
+    });
+    // The host deliberately does NOT attach this listener - it already
+    // has the freshest truth locally in hg, and reading it back through
+    // onValue would fire instantly from Firebase's local optimistic
+    // cache, reintroducing the same head-start problem syncState()'s
+    // post-acknowledgment render is specifically avoiding.
+    if(!isHost){
+      fb.onValue(fb.ref(fb.db, 'rooms/' + roomCode + '/game'), function(snap){
+        if(roomCode !== gameCode) return;
+        latestState = snap.val();
+        if(latestState) renderGameScreen(latestState);
+      });
+    }
+  }
+
+  function sendIntent(type, data){
+    fb.push(fb.ref(fb.db, 'rooms/' + roomCode + '/intents'), {
+      type: type, playerId: myId, data: data || null, ts: fb.serverTimestamp()
+    });
+  }
+
+  // Every player (host included) races this same transaction directly
+  // rather than going through the intents queue - see listenForBuzzClaims
+  // for why. runTransaction() only ever commits for whichever write the
+  // server actually receives first; a losing client's transaction is
+  // reported back as failed/aborted rather than quietly winning locally.
+  function attemptBuzz(){
+    fb.runTransaction(fb.ref(fb.db, 'rooms/' + roomCode + '/buzzClaim'), function(current){
+      if(current !== null) return; // already claimed - abort without overwriting
+      return { playerId: myId, ts: Date.now() };
+    });
+  }
+
+  const gameScreenEl = document.getElementById("game-screen");
+
+  function renderGameScreen(state){
+    if(!state||!Array.isArray(state.players))return;
+    const me=state.players[myIndex];
+    let html = '';
+    if(me) html += '<div class="my-name-score">' + escapeHTML(me.name) + ' \u2014 ' + arabicPoints(me.score) + '</div>';
+
+    if(state.phase === "searchFailed"){
+      html += '<div class="buzz-status-note">' + escapeHTML(state.searchFailMessage) + '</div>';
+      if(isHost) html += buildActionButtons(['next-round:حاول مجددًا:btn-primary']);
+    }else if(state.phase === "countdown"){
+      html += '<div class="buzz-countdown">' + state.countdownRemaining + '</div><div class="buzz-status-note">استعدّ…</div>';
+    }else if(state.phase === "roundOver" || state.phase === "gameOver"){
+      html += '<div class="win-message">' + (state.phase === "gameOver" ? ('\ud83c\udfc6 ' + escapeHTML(state.finalMessage || (state.winnerName+' يفوز!'))) : escapeHTML(state.roundOverMessage)) + '</div>';
+      if(state.answerHTML) html += state.answerHTML;
+      if(isHost){
+        if(state.phase === "gameOver") html += buildActionButtons(['play-again:العب مجددًا:btn-primary']);
+        else html += buildActionButtons(['next-round:الجولة التالية \u25b6:btn-primary']);
+      }
+    }else if(state.phase === "revealing"){
+      html += buildRevealHTML(state);
+      const eliminated = me && me.eliminatedThisRound;
+      if(!eliminated){
+        html += '<div class="tap-surface buzzable" data-tap="buzz"><div class="buzz-hint">\ud83d\udc46 اضغط هنا لتجيب</div></div>';
+      }else{
+        html += '<div class="buzz-status-note">مستبعد من هذه الجولة — انتظر…</div>';
+      }
+      if(state.eliminationActive) html += '<div class="buzz-status-note">\u23f1 ' + state.eliminationCountdownRemaining + ' ثوانٍ متبقية للضغط</div>';
+      if(isHost) html += '<button type="button" class="end-game-link" data-action="reveal-fallback">لا أحد يعرفها — أظهر الإجابة</button>';
+    }else if(state.phase === "answering"){
+      const isBuzzer = myIndex === state.activeBuzzerId;
+      if(isBuzzer){
+        html += '<div class="buzz-countdown">' + Math.max(state.answerRemaining, 0) + '</div><div class="buzz-status-note">اذكر إجابتك الآن!</div>';
+      }else{
+        html += buildRevealHTML(state);
+        html += '<div class="buzz-status-note">' + escapeHTML(state.players[state.activeBuzzerId].name) + ' يجيب الآن…</div>';
+        if(state.objectionsEnabled && !state.objectionCooldownActive && me && !me.eliminatedThisRound){
+          html += '<div class="tap-surface objectable" data-tap="raise-objection"><div class="objection-hint">\u26a0\ufe0f اضغط للاعتراض إذا لم يظهر ما يكفي</div></div>';
+        }
+      }
+    }else if(state.phase === "objecting"){
+      const isObjector = myIndex === state.objectorId;
+      if(isObjector){
+        html += '<div class="buzz-countdown">' + Math.max(state.objectionRemaining, 0) + '</div>';
+        html += '<div class="tap-surface objectable" data-tap="finish-objecting"><div class="objection-hint">اذكر عبارتين مختلفتين على الأقل! \ud83d\udc46 اضغط عند الانتهاء</div></div>';
+      }else{
+        html += '<div class="buzz-status-note">\u26a0\ufe0f ' + escapeHTML(state.players[state.objectorId].name) + ' يعترض الآن…</div>';
+      }
+    }else if(state.phase === "checking"){
+      const isBuzzer = myIndex === state.activeBuzzerId;
+      if(isBuzzer){
+        if(!state.revealedToBuzzer){
+          html += '<div class="buzz-status-note">هل أنت مستعد للتحقق؟</div>';
+          html += buildActionButtons(['check-answer:تحقق من إجابتي:btn-primary']);
+        }else{
+          html += state.answerHTML || '';
+          html += buildActionButtons(['mark-correct:\u2705 إجابتي صحيحة:btn-success', 'mark-wrong:\u274c إجابتي خاطئة:btn-secondary']);
+        }
+      }else{
+        html += '<div class="buzz-status-note">' + escapeHTML(state.players[state.activeBuzzerId].name) + ' يتحقق من إجابته…</div>';
+      }
+    }else if(state.phase === "objectingChecking"){
+      const isObjector = myIndex === state.objectorId;
+      if(isObjector){
+        if(!state.objectionRevealed){
+          html += '<div class="buzz-status-note">هل أنت مستعد للتحقق؟</div>';
+          html += buildActionButtons(['check-objection:تحقق من العبارات المنافسة:btn-primary']);
+        }else if(state.objectionData){
+          html += buildObjectionCheckHTML(state.objectionData);
+        }else{
+          html += '<div class="buzz-status-note">جارٍ الفصل في النتيجة…</div>';
+        }
+      }else{
+        html += '<div class="buzz-status-note">' + escapeHTML(state.players[state.objectorId].name) + ' يتحقق من اعتراضه…</div>';
+      }
+    }
+
+    html += '<div class="scoreboard">' + state.players.map(function(p){
+      return '<span class="score-chip' + (p.eliminatedThisRound && state.phase !== "roundOver" && state.phase !== "gameOver" ? ' eliminated' : '') + '" style="border-color:' + p.color + '">' + escapeHTML(p.name) + ': ' + p.score + '</span>';
+    }).join('') + '</div>';
+
+    if(state.phase !== "gameOver"){
+      html += buildEndGameButtonHTML();
+    }
+
+    gameScreenEl.innerHTML = html;
+  }
+
+  function buildRevealHTML(state){
+    let html = '<div class="buzz-status-note">اعثر على العبارة المشتركة بين:</div><div class="reveal-phrase" style="direction:ltr">' + escapeHTML(state.revealText) + '</div>';
+    if(state.revealMeta) html += '<div class="reveal-meta">' + escapeHTML(state.revealMeta) + '</div>';
+    return html;
+  }
+
+  function buildActionButtons(defs){
+    return '<div class="button-group">' + defs.map(function(d){
+      const parts = d.split(':');
+      return '<button type="button" class="' + parts[2] + '" data-action="' + parts[0] + '">' + parts[1] + '</button>';
+    }).join('') + '</div>';
+  }
+
+  let confirmingEndGame = false;
+  function buildEndGameButtonHTML(){
+    const label = confirmingEndGame ? "اضغط مرة أخرى لتأكيد إنهاء اللعبة" : (isHost ? "إنهاء اللعبة للجميع" : "مغادرة اللعبة");
+    return '<button type="button" class="end-game-link" data-action="end-game">' + label + '</button>';
+  }
+
+  function buildObjectionCheckHTML(occData){
+    let html='<p>'+occData.totalCount+' عبارات مؤهلة توافق جميع التلميحات الظاهرة.</p>';
+    if(occData.overCap){
+      html+='<p>العبارات أكثر من أن تُعرض كلها. حدد عدد العبارات المختلفة التي تلوتها (اثنتان على الأقل).</p><div class="count-stepper">';
+      [-10,-1,1,10].forEach(function(n){html+='<button type="button" class="btn-secondary" data-action="objection-count-step" data-step="'+n+'">'+(n>0?'+':'')+n+'</button>';});
+      html+='<span class="stepper-value" id="objection-count-value">'+myObjectionTypedCount+'</span></div>';
+      html+=buildActionButtons(['confirm-objection-typed:تأكيد:btn-primary']);
+    }else{
+      html+='<p>ضع علامة على مجموعات الإجابات المختلفة التي تلوتها. لا يُحتسب الجزء المشترك بين مجموعتين مرتين، ويلزم اختيار مجموعتين على الأقل.</p><div class="objection-list">';
+      occData.matches.forEach(function(m,i){html+='<label class="objection-item"><input type="checkbox" class="objection-tick" data-idx="'+i+'"><span class="objection-item-verse" dir="rtl">'+escapeHTML(m.phrase)+'</span></label><details><summary>أظهر مواضع الورود</summary>'+m.html+'</details>';});
+      html+='</div>'+buildActionButtons(['confirm-objection-ticks:تأكيد:btn-primary']);
+    }
+    return html;
+  }
+
+  // Local-only (not synced)  // Local-only (not synced) state for the objector's own in-progress tick/type input.
+  let myObjectionTypedCount = 0;
+
+  gameScreenEl.addEventListener("click", function(e){
+    const target = e.target.closest("[data-action],[data-tap]");
+    if(!target || !latestState) return;
+
+    if(target.dataset.tap){
+      const tap = target.dataset.tap;
+      if(tap === "buzz") attemptBuzz();
+      else if(tap === "raise-objection") sendIntent("raise-objection");
+      else if(tap === "finish-objecting") sendIntent("finish-objecting");
+      return;
+    }
+
+    const action = target.dataset.action;
+    if(action !== "end-game" && confirmingEndGame){ confirmingEndGame = false; }
+
+    if(action === "check-answer") sendIntent("check-answer");
+    else if(action === "mark-correct") sendIntent("mark-correct");
+    else if(action === "mark-wrong") sendIntent("mark-wrong");
+    else if(action === "check-objection"){ myObjectionTypedCount = 0; sendIntent("check-objection"); }
+    else if(action === "objection-count-step"){
+      const max = latestState.objectionData ? latestState.objectionData.totalCount : 0;
+      myObjectionTypedCount = Math.max(0, Math.min(max, myObjectionTypedCount + parseInt(target.dataset.step, 10)));
+      const valueEl = document.getElementById("objection-count-value");
+      if(valueEl) valueEl.textContent = myObjectionTypedCount;
+    }
+    else if(action === "confirm-objection-typed") sendIntent("confirm-objection", { claimedCount: myObjectionTypedCount });
+    else if(action === "confirm-objection-ticks"){
+      const ticked = gameScreenEl.querySelectorAll(".objection-tick:checked").length;
+      sendIntent("confirm-objection", { claimedCount: ticked });
+    }
+    else if(action === "reveal-fallback" && isHost) manualReveal();
+    else if(action === "next-round" && isHost) nextRound();
+    else if(action === "play-again" && isHost) playAgain();
+    else if(action === "end-game"){
+      if(!confirmingEndGame){ confirmingEndGame = true; renderGameScreen(latestState); return; }
+      confirmingEndGame = false;
+      if(isHost){
+        endGameAsHost().catch(function(err){ console.error("Failed to end game:", err); setStatus("تعذّر إنهاء اللعبة. حاول مجددًا.", true); });
+      }else{
+        fb.remove(fb.ref(fb.db, 'rooms/' + roomCode + '/players/' + myId));
+        roomCode = null; isHost = false; myIndex = null; latestState = null;
+        showScreen("landing");
+      }
+    }
+  });
+
+  QuranPicker.wireSideMenu("commonphrase-online", "ar");
+})();
+</script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-# Quran Tester
+# Hifdh Arena
 HTML-based Quran (Hifdh) testing apps.
 
 Are made public on [hifdharena.com](hifdharena.com).

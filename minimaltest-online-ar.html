@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8" />
 <script>(function(){try{var t=localStorage.getItem('quranTester:theme');if(t&&t!=='gold')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Smallest Phrase Hifdh-Tester - Online</title>
+<title>اختبار أقصر عبارة — عبر الإنترنت</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&amp;family=Spectral:wght@400;500;600&amp;display=swap" rel="stylesheet">
@@ -19,7 +19,7 @@
      person, driven by state a Firebase-connected host pushes out.
      ===================================================================== */
 
-  body{ padding:1.5rem 1.1rem 3rem; }
+  body{ font-family:var(--quran-font); padding:1.5rem 1.1rem 3rem; }
   #app{ max-width:520px; margin:0 auto; }
   header{ margin-bottom:1.5rem; border-bottom:1px solid var(--border); padding-bottom:1.1rem; }
   h1{ font-size:1.5rem; margin:0 0 0.35rem; }
@@ -153,27 +153,27 @@
 <div id="app">
 
   <header>
-    <h1>Smallest Phrase Hifdh-Tester &mdash; Online</h1>
-    <p>Same buzzer game as the local pass-the-phone version, but everyone plays from their own device.</p>
-    <button type="button" class="btn-secondary" id="how-to-play-btn" style="margin-top:0.8rem;">How To Play</button>
+    <h1>اختبار أقصر عبارة — عبر الإنترنت</h1>
+    <p>لعبة الضغط نفسها، لكن كل لاعب يشارك من جهازه.</p>
+    <button type="button" class="btn-secondary" id="how-to-play-btn" style="margin-top:0.8rem;">طريقة اللعب</button>
   </header>
 
   <div id="how-to-play-modal" class="modal-overlay" hidden>
     <div class="modal-box">
-      <button type="button" class="modal-close" id="how-to-play-close" aria-label="Close">&times;</button>
-      <h2 style="margin-top:0;">How To Play</h2>
+      <button type="button" class="modal-close" id="how-to-play-close" aria-label="إغلاق">&times;</button>
+      <h2 style="margin-top:0;">طريقة اللعب</h2>
       <div id="how-to-play-content">
-      A part of the Qur'an will be revealed on the screen, appearing one word at a time. This can be from anywhere in the Qur'an, not just the beginning of an ayah. Players should have their fingers ready to buzz in their screen. Once the phrase (portion of the Quran) shown becomes unique (only comes once in the Qur'an - this could even be just the first word), the first player to (mentally) find the beginning of the ayah should buzz and recite it. There is no time to buzz and then think - the answer must be given immediately after buzzing, and the ayah should be recited at least from its beginning up until the displayed phrase (concession can be given for very long ayaat). If the player buzzes when the displayed phrase is unique and recites the ayah, they win one point.
+      يُكشف مقطع من القرآن كلمةً كلمةً، وقد يبدأ من أي موضع، لا من أول الآية فقط. استعد للضغط على شاشتك فور تعرفك على الآية. عندما تصبح العبارة الظاهرة فريدة في القرآن، اضغط وابدأ تلاوة الآية من أولها حتى المقطع المعروض على الأقل؛ ويمكن التيسير في الآيات الطويلة. لا وقت للتفكير بعد الضغط. إذا ضغطت بعد أن صارت العبارة فريدة وتلوت الآية صحيحة، فلك نقطة.
         <br><br>
-      However, if a player buzzes whilst the shown phrase is not yet unique (it comes more than once in the Qur'an), then what happens next depends on whether there are 2 players or more:
+      إذا ضغط لاعب قبل أن تصبح العبارة فريدة، أي حين ترد في أكثر من موضع، يختلف الحكم بحسب عدد اللاعبين:
       <br><br>
-      <b>2 players:</b> The opponent may 'object' immediately by tapping their screen. They then have a few seconds to name at least 2 places where the shown phrase comes in the Qur'an. If they are successful, then they receive points equal to the number of ayaat they recited where the phrase appears. If the phrase shown was not unique, but the player who objected did not manage to recite at least 2 ayaat, then no one gets the point. If the objection was false (the phrase was indeed unique), then the one who objected loses, and the other wins a point.
+      <b>لاعبان:</b> يجوز للمنافس أن يعترض فورًا بالضغط على شاشته، ثم يذكر خلال المهلة موضعين على الأقل ترد فيهما العبارة. إن نجح، حصل على نقطة عن كل آية صحيحة ذكرها. وإن كانت العبارة غير فريدة لكنه لم يذكر آيتين، فلا نقاط. أما إذا كان اعتراضه خاطئًا وكانت العبارة فريدة، فتُخصم منه نقطة ويُمنح منافسه نقطة.
       <br>
-      <b>3 or 4 players:</b> The point is lost, and the player who buzzed early is eliminated from the next round.
+      <b>ثلاثة أو أربعة لاعبين:</b> تضيع فرصة النقطة ويُستبعد من ضغط مبكرًا من الجولة التالية.
         <br><br>
-      Both of the above (objection and round elimination) can be turned off, in which case early buzzing has no penalty.
+      يمكن تعطيل الاعتراض والاستبعاد؛ وعندئذ لا عقوبة على الضغط المبكر.
         <br><br>
-      The first player to reach the set point threshold wins.
+      يفوز أول لاعب يبلغ العدد المحدد من النقاط.
       </div>
     </div>
   </div>
@@ -182,86 +182,86 @@
 
   <!-- ================= Landing ================= -->
   <section id="screen-landing" class="panel">
-    <h2>Play Online</h2>
+    <h2>اللعب عبر الإنترنت</h2>
     <div class="role-cards">
       <div class="role-card" id="choose-host">
-        <h3>Host a Game</h3>
-        <p>Configure the settings, get a room code, wait for others to join.</p>
+        <h3>استضافة لعبة</h3>
+        <p>اضبط الإعدادات، واحصل على رمز الغرفة، وانتظر انضمام الآخرين.</p>
       </div>
       <div class="role-card" id="choose-join">
-        <h3>Join a Game</h3>
-        <p>Enter a room code someone shared with you.</p>
+        <h3>الانضمام إلى لعبة</h3>
+        <p>أدخل رمز الغرفة الذي شاركه معك أحد اللاعبين.</p>
       </div>
     </div>
   </section>
 
-  <!-- ================= Join form ================= -->
+  <!-- ================= انضم form ================= -->
   <section id="screen-join" class="panel" hidden>
-    <h2>Join a Game</h2>
+    <h2>الانضمام إلى لعبة</h2>
     <div class="field">
-      <span class="field-label">Room Code</span>
-      <input type="text" class="wide" id="join-code" maxlength="4" placeholder="e.g. ABCD" style="text-transform:uppercase; letter-spacing:0.3em; text-align:center; font-size:1.3rem;">
+      <span class="field-label">رمز الغرفة</span>
+      <input type="text" class="wide" id="join-code" maxlength="4" موضعholder="e.g. ABCD" style="text-transform:uppercase; letter-spacing:0.3em; text-align:center; font-size:1.3rem;">
     </div>
     <div class="field">
-      <span class="field-label">Your Name</span>
-      <input type="text" class="wide" id="join-name" placeholder="Your name">
+      <span class="field-label">اسمك</span>
+      <input type="text" class="wide" id="join-name" موضعholder="Your name">
     </div>
     <p class="settings-status" id="join-status"></p>
     <div class="button-group">
-      <button type="button" class="btn-primary" id="join-submit-btn">Join</button>
-      <button type="button" class="btn-secondary" id="join-back-btn">Back</button>
+      <button type="button" class="btn-primary" id="join-submit-btn">انضم</button>
+      <button type="button" class="btn-secondary" id="join-back-btn">رجوع</button>
     </div>
   </section>
 
   <!-- ================= Host setup ================= -->
   <section id="screen-host-setup" class="panel" hidden>
-    <h2 class="section-heading">Game Setup</h2>
+    <h2 class="section-heading">إعداد اللعبة</h2>
 
     <div class="field">
-      <label><strong>Select Portion for Testing:</strong></label>
+      <label><strong>اختر الجزء المراد اختباره:</strong></label>
       <div style="margin-top: 10px;">
         <input type="radio" id="entire-quran" name="portion-type" value="entire" checked>
-        <label for="entire-quran" style="display: inline; font-weight: normal;">Entire Qur'an (default)</label>
+        <label for="entire-quran" style="display: inline; font-weight: normal;">القرآن كاملًا (الافتراضي)</label>
       </div>
       <div style="margin-top: 5px;">
         <input type="radio" id="select-portion" name="portion-type" value="select">
-        <label for="select-portion" style="display: inline; font-weight: normal;">Select Portion</label>
+        <label for="select-portion" style="display: inline; font-weight: normal;">اختيار جزء محدد</label>
       </div>
     </div>
 
     <div id="filter-options" class="filter-options-box" style="display: none;">
       <div class="tabs">
-        <button type="button" class="tab-btn active" data-tab="surah">Surah</button>
-        <button type="button" class="tab-btn" data-tab="juz">Juz</button>
-        <button type="button" class="tab-btn" data-tab="page">Page</button>
+        <button type="button" class="tab-btn active" data-tab="surah">السورة</button>
+        <button type="button" class="tab-btn" data-tab="juz">الجزء</button>
+        <button type="button" class="tab-btn" data-tab="page">الصفحة</button>
       </div>
 
       <div class="tab-panel active" id="tab-surah">
         <div class="select-all-row">
           <input type="checkbox" id="surah-select-all" checked>
-          <label for="surah-select-all">Select all surahs</label>
+          <label for="surah-select-all">تحديد جميع السور</label>
         </div>
-        <div class="checkbox-list" id="surah-list"><div class="list-loading">Loading Qur'an data<span class="loading-dots">.</span></div></div>
+        <div class="checkbox-list" id="surah-list"><div class="list-loading">جارٍ تحميل بيانات القرآن<span class="loading-dots">.</span></div></div>
       </div>
 
       <div class="tab-panel" id="tab-juz">
         <div class="select-all-row">
           <input type="checkbox" id="juz-select-all" checked>
-          <label for="juz-select-all">Select all juz</label>
+          <label for="juz-select-all">تحديد جميع الأجزاء</label>
         </div>
-        <div class="checkbox-list" id="juz-list"><div class="list-loading">Loading Qur'an data<span class="loading-dots">.</span></div></div>
+        <div class="checkbox-list" id="juz-list"><div class="list-loading">جارٍ تحميل بيانات القرآن<span class="loading-dots">.</span></div></div>
       </div>
 
       <div class="tab-panel" id="tab-page">
-        <label for="page-range">Page ranges</label>
-        <input type="text" class="wide" id="page-range" placeholder="e.g. 1-100, 150-200">
-        <p class="field-help">Comma-separated page ranges (1-604). Leave blank to include every page.</p>
+        <label for="page-range">نطاقات الصفحات</label>
+        <input type="text" class="wide" id="page-range" موضعholder="e.g. 1-100, 150-200">
+        <p class="field-help">نطاقات صفحات مفصولة بفواصل (١–٦٠٤). اترك الحقل فارغًا لتضمين جميع الصفحات.</p>
         <p class="field-error" id="page-range-error"></p>
       </div>
     </div>
 
     <div class="field">
-      <span class="field-label">Number of Players (room cap)</span>
+      <span class="field-label">الحد الأقصى للاعبين</span>
       <div class="segmented" id="player-count-toggle">
         <button type="button" class="segment-btn active" data-players="2">2</button>
         <button type="button" class="segment-btn" data-players="3">3</button>
@@ -270,101 +270,101 @@
     </div>
 
     <div class="field">
-      <span class="field-label">Your Name</span>
-      <input type="text" class="wide" id="host-name" placeholder="Your name">
+      <span class="field-label">اسمك</span>
+      <input type="text" class="wide" id="host-name" موضعholder="Your name">
     </div>
 
     <div class="field">
-      <span class="field-label">Timing</span>
+      <span class="field-label">التوقيت</span>
       <div class="range-row">
-        <label>Starting words shown <input type="number" id="start-words" min="1" step="1" value="1"></label>
-        <label>Seconds between reveals <input type="number" id="reveal-delay" min="1" step="0.5" value="3"></label>
+        <label>عدد الكلمات المعروضة أولًا <input type="number" id="start-words" min="1" step="1" value="1"></label>
+        <label>الثواني بين كل كشف <input type="number" id="reveal-delay" min="1" step="0.5" value="3"></label>
       </div>
       <p class="field-error" id="timing-error"></p>
     </div>
     <div class="field" id="objections-field">
       <div class="checkbox-group">
         <input type="checkbox" id="enable-objections" checked>
-        <label for="enable-objections">Allow objections (2-player rooms only)</label>
+        <label for="enable-objections">السماح بالاعتراض (للغرف التي تضم لاعبين فقط)</label>
         <span class="info-icon" data-tooltip="objections-tooltip">i</span>
         <div id="objections-tooltip" class="info-tooltip">
-          While a player is answering, the other player can tap their own screen to object that not enough has been revealed yet. They then get their own time limit to name at least two ayahs where the shown words occur. Points scored equal how many they're credited for; a false objection costs them a point and auto-wins the point for their opponent.
+          أثناء إجابة أحد اللاعبين، يجوز للآخر أن يضغط على شاشته ليعترض بأن الكلمات المعروضة لا تكفي بعد. ثم تُمنح له مهلة لذكر آيتين على الأقل ترد فيهما الكلمات. يحصل على نقاط بعدد الآيات الصحيحة التي ذكرها؛ أما الاعتراض الخاطئ فيخصم منه نقطة ويمنح منافسه نقطة.
         </div>
       </div>
       <div class="range-row" id="objection-time-row" style="margin-top:10px;">
-        <label>Objection answer time (s) <input type="number" id="objection-time" min="1" step="1" value="8"></label>
+        <label>مهلة الاعتراض (بالثواني) <input type="number" id="objection-time" min="1" step="1" value="8"></label>
       </div>
     </div>
 
     <button type="button" class="more-settings-toggle" id="more-settings-toggle" aria-expanded="false">
-      <span class="chevron">&rsaquo;</span> More settings
+      <span class="chevron">&rsaquo;</span> إعدادات إضافية
     </button>
     <div id="more-settings" hidden>
     <div class="field">
-      <span class="field-label">Points to Win</span>
+      <span class="field-label">النقاط المطلوبة للفوز</span>
       <input type="number" id="points-to-win" min="1" step="1" value="5">
       <p class="field-error" id="points-error"></p>
     </div>
 
     <div class="field">
-      <span class="field-label">More Timing</span>
+      <span class="field-label">مزيد من إعدادات الوقت</span>
       <div class="range-row">
-        <label>Answer time after buzzing (s) <input type="number" id="answer-time" min="1" step="1" value="3"></label>
-        <label>Time limit after an elimination (s) <input type="number" id="elimination-time-limit" min="1" step="1" value="20"></label>
+        <label>مهلة الإجابة بعد الضغط (بالثواني) <input type="number" id="answer-time" min="1" step="1" value="3"></label>
+        <label>المهلة بعد استبعاد لاعب (بالثواني) <input type="number" id="elimination-time-limit" min="1" step="1" value="20"></label>
       </div>
     </div>
 
       <div class="field" id="early-buzz-penalty-field" hidden>
         <div class="checkbox-group">
           <input type="checkbox" id="penalize-early-buzz" checked>
-          <label for="penalize-early-buzz">Eliminate early buzzers from the next round (3/4 players)</label>
+          <label for="penalize-early-buzz">استبعاد من يضغط مبكرًا من الجولة التالية (٣ أو ٤ لاعبين)</label>
           <span class="info-icon" data-tooltip="early-buzz-tooltip">i</span>
-          <div id="early-buzz-tooltip" class="info-tooltip">If someone buzzes while the shown phrase still matches more than one ayah, the round ends immediately and that player sits out the following round.</div>
+          <div id="early-buzz-tooltip" class="info-tooltip">إذا ضغط أحدهم والعبارة الظاهرة ما زالت تطابق أكثر من آية، تنتهي الجولة فورًا ويجلس خارج الجولة التالية.</div>
         </div>
       </div>
     <div class="checkbox-group">
       <input type="checkbox" id="single-verse-only" checked>
-      <label for="single-verse-only">Keep questions within one ayah</label>
+      <label for="single-verse-only">حصر الأسئلة في آية واحدة</label>
     </div>
 
     <div class="checkbox-group">
       <input type="checkbox" id="start-of-ayah">
-      <label for="start-of-ayah">Keep questions at the beginning of an ayah</label>
+      <label for="start-of-ayah">بدء الأسئلة من أول الآية</label>
     </div>
 
     <div class="checkbox-group">
       <input type="checkbox" id="show-ayah-marker" checked>
-      <label for="show-ayah-marker">Show ayah marker while revealing</label>
+      <label for="show-ayah-marker">إظهار علامة نهاية الآية أثناء الكشف</label>
     </div>
 
       <div class="field">
-        <span class="field-label">Maximum matches to list</span>
+        <span class="field-label">الحد الأقصى للمطابقات المعروضة</span>
         <input type="number" id="match-list-cap" min="1" step="1" value="10">
-        <p class="field-help">Past this many matches, the answer view just shows the total count, and an objector types how many they found instead of ticking a long list.</p>
+        <p class="field-help">إذا تجاوز عدد المطابقات هذا الحد، يظهر العدد الإجمالي فقط، ويحدد المعترض كم موضعًا ذكر بدلًا من وضع علامات على قائمة طويلة.</p>
         <p class="field-error" id="match-list-cap-error"></p>
       </div>
     </div>
 
     <p class="settings-status" id="settings-status"></p>
     <div class="button-group">
-      <button class="btn-primary" id="create-room-btn" disabled>Create Room</button>
-      <span class="loading-note" id="create-room-loading">Loading Qur'an data<span class="loading-dots">.</span></span>
-      <button type="button" class="btn-secondary" id="host-back-btn">Back</button>
+      <button class="btn-primary" id="create-room-btn" disabled>إنشاء غرفة</button>
+      <span class="loading-note" id="create-room-loading">جارٍ تحميل بيانات القرآن<span class="loading-dots">.</span></span>
+      <button type="button" class="btn-secondary" id="host-back-btn">رجوع</button>
     </div>
   </section>
 
   <!-- ================= Lobby ================= -->
   <section id="screen-lobby" class="panel" hidden>
-    <h2>Waiting for Players</h2>
+    <h2>في انتظار اللاعبين</h2>
     <div class="room-code" id="lobby-room-code">----</div>
-    <p style="text-align:center; color:var(--text-muted); font-size:0.85rem;">Share this code with the other players.</p>
+    <p style="text-align:center; color:var(--text-muted); font-size:0.85rem;">شارك هذا الرمز مع اللاعبين الآخرين.</p>
     <div class="player-roster" id="lobby-roster"></div>
     <div id="lobby-settings" class="lobby-settings" aria-live="polite"></div>
     <p class="settings-status" id="lobby-status"></p>
     <div class="button-group" id="lobby-host-controls" hidden>
-      <button type="button" class="btn-primary" id="start-game-btn" disabled>Start Game</button>
+      <button type="button" class="btn-primary" id="start-game-btn" disabled>ابدأ اللعبة</button>
     </div>
-    <button type="button" class="end-game-link" id="lobby-leave-btn">Leave</button>
+    <button type="button" class="end-game-link" id="lobby-leave-btn">مغادرة</button>
   </section>
 
   <!-- ================= Game screen ================= -->
@@ -412,6 +412,7 @@
 (function(){
   "use strict";
 
+  function arabicPoints(n){return QuranPicker.pluralize(n,{one:"نقطة واحدة",two:"نقطتان",few:"{n} نقاط",many:"{n} نقطة",other:"{n} نقطة"},"ar");}
   const PLAYER_COLORS = ['#c9a15a', '#5aa9d6', '#6abf6a', '#d6708a'];
 
   // ---------- Local identity (persists across reloads on this device) ----------
@@ -486,8 +487,8 @@
     quranDataLoading = true;
     loadQuranData().catch(function(err){
       console.error(err);
-      setStatus("Couldn't load Qur'an data. Please try refreshing the page.", true);
-      document.getElementById("create-room-loading").textContent = "Data unavailable.";
+      setStatus("تعذّر تحميل بيانات القرآن. يُرجى تحديث الصفحة والمحاولة مجددًا.", true);
+      document.getElementById("create-room-loading").textContent = "البيانات غير متوفرة.";
     });
   }
 
@@ -506,7 +507,7 @@
 
   async function loadCSV(){
     const response = await fetch('quran_words.csv');
-    if(!response.ok) throw new Error('Could not fetch quran_words.csv (HTTP ' + response.status + ')');
+    if(!response.ok) throw new Error('تعذّر جلب بيانات الكلمات (HTTP ' + response.status + ')');
     const text = await response.text();
     const lines = text.trim().split('\n');
     for(let i = 0; i < lines.length; i++){
@@ -538,7 +539,8 @@
   }
   function populateSettingsUI(){
     QuranPicker.populateSurahAndJuzLists(metadata, {
-      surahLabelHTML: function(sura){ return '<span>' + sura.index + '. </span><span class="arabic-name" dir="rtl">' + sura.name + '</span>'; }
+      surahLabelHTML: function(sura){ return '<span>' + sura.index + '. </span><span class="arabic-name" dir="rtl">' + sura.name + '</span>'; },
+      juzLabelHTML: function(i){ return '<span>الجزء ' + i + '</span>'; }
     });
   }
 
@@ -594,9 +596,9 @@
   function validatePositiveNumber(el, errId, floor, mustBeInteger){
     const raw = el.value.trim();
     const re = mustBeInteger ? INT_RE : NUM_RE;
-    if(!re.test(raw)){ showFieldError(errId, mustBeInteger ? "Enter a whole number." : "Enter a positive number."); return null; }
+    if(!re.test(raw)){ showFieldError(errId, mustBeInteger ? "أدخل عددًا صحيحًا." : "أدخل عددًا موجبًا."); return null; }
     const val = mustBeInteger ? parseInt(raw, 10) : parseFloat(raw);
-    if(val < floor){ showFieldError(errId, "Must be at least " + floor + "."); return null; }
+    if(val < floor){ showFieldError(errId, "يجب ألا يقل عن " + floor + "."); return null; }
     return val;
   }
   function setSettingsStatus(msg, isError){
@@ -672,15 +674,15 @@
   }
   function generateQuestion(settings){
     const filteredWords = getFilteredWords();
-    if(filteredWords.length === 0) return { ok: false, message: 'No words available with current filter settings.' };
+    if(filteredWords.length === 0) return { ok: false, message: 'لا توجد كلمات تناسب إعدادات التصفية الحالية.' };
 
     let startPositions = [];
     if(settings.startOfAyah){
       filteredWords.forEach(function(word, idx){ if(word.wordInAya === 1 && !isBasmalahWord(word)) startPositions.push(idx); });
-      if(startPositions.length === 0) return { ok: false, message: 'No words at the beginning of ayahs available with current filter settings.' };
+      if(startPositions.length === 0) return { ok: false, message: 'لا توجد كلمات في أوائل الآيات تناسب إعدادات التصفية الحالية.' };
     }else{
       filteredWords.forEach(function(word, idx){ if(!isBasmalahWord(word)) startPositions.push(idx); });
-      if(startPositions.length === 0) return { ok: false, message: 'No words available with current filter settings.' };
+      if(startPositions.length === 0) return { ok: false, message: 'لا توجد كلمات تناسب إعدادات التصفية الحالية.' };
     }
     shuffleArray(startPositions);
 
@@ -692,7 +694,7 @@
       uniquePhrase = findUniquePhraseFromIndex(startPositions[p], filteredWords, settings.singleVerseOnly, checkAgainst, startIndexMap);
       if(uniquePhrase) break;
     }
-    if(!uniquePhrase) return { ok: false, message: 'No results found. Try widening your filter settings.' };
+    if(!uniquePhrase) return { ok: false, message: 'لم تُعثر على نتيجة. جرّب توسيع التصفية.' };
     return { ok: true, uniquePhrase: uniquePhrase };
   }
 
@@ -799,9 +801,9 @@
     if(occ && occ.totalCount > 1){
       let html = '<div class="zone-answer">';
       if(occ.totalCount > gameState.matchListCap){
-        html += '<div class="buzz-status-note">Woah, comes ' + occ.totalCount + ' times, very not unique.</div>';
+        html += '<div class="buzz-status-note">ترد العبارة ' + occ.totalCount + ' مرات؛ فهي غير فريدة إطلاقًا.</div>';
       }else{
-        html += '<div class="buzz-status-note">This phrase wasn\u2019t unique yet when it was checked \u2014 it matched ' + occ.totalCount + ' place' + (occ.totalCount === 1 ? '' : 's') + ':</div>';
+        html += '<div class="buzz-status-note">لم تكن العبارة فريدة عند التحقق — فقد طابقت ' + occ.totalCount + ' موضع' + (occ.totalCount === 1 ? '' : 's') + ':</div>';
         occ.matches.forEach(function(m){ html += buildMatchAnswerHTML(m); });
       }
       html += '</div>';
@@ -830,7 +832,7 @@
       await ensureFirebaseReady();
     }catch(err){
       console.error("Firebase sign-in failed:", err);
-      setSettingsStatus("Could not connect to Firebase. Check that Anonymous Auth is enabled, then try again.", true);
+      setSettingsStatus("تعذّر الاتصال بفايربيس. تحقق من تفعيل تسجيل الدخول المجهول ثم حاول مجددًا.", true);
       return;
     }
 
@@ -853,11 +855,11 @@
     const activeTab = portionType === 'select' ? document.querySelector('.tab-btn.active').dataset.tab : null;
     if(activeTab === 'page'){
       const pages = QuranPicker.parsePageRange(document.getElementById('page-range').value);
-      if(pages === undefined){ showFieldError('page-range-error', 'Invalid range.'); return; }
+      if(pages === undefined){ showFieldError('page-range-error', 'النطاق غير صالح.'); return; }
     }
 
     if(pointsToWin === null || startWords === null || revealDelay === null || answerTime === null || eliminationTimeLimit === null || matchListCap === null) return;
-    if(!quranDataReady){ setSettingsStatus("Still loading Qur'an data - try again in a moment.", true); return; }
+    if(!quranDataReady){ setSettingsStatus("لا تزال بيانات القرآن قيد التحميل؛ حاول بعد قليل.", true); return; }
 
     const questionSettings = {
       singleVerseOnly: document.getElementById('single-verse-only').checked,
@@ -883,7 +885,7 @@
     const selectedSurahs = Array.from(document.querySelectorAll("#surah-list input[type=checkbox]:checked")).map(function(el){ return el.closest("label")?.textContent.trim() || el.value; });
     const selectedJuz = Array.from(document.querySelectorAll("#juz-list input[type=checkbox]:checked")).map(function(el){ return el.closest("label")?.textContent.trim() || el.value; });
     const publicSettings = {
-      portion: portionType === "entire" ? "Entire Qur’an" : activeTab === "page" ? "Pages: " + (document.getElementById("page-range").value.trim() || "all") : (activeTab === "juz" ? "Juz: " + selectedJuz.join(", ") : "Surahs: " + selectedSurahs.join(", ")),
+      portion: portionType === "entire" ? "القرآن كاملًا" : activeTab === "page" ? "الصفحات: " + (document.getElementById("page-range").value.trim() || "all") : (activeTab === "juz" ? "الأجزاء: " + selectedJuz.join(", ") : "السور: " + selectedSurahs.join(", ")),
       maxPlayers: maxPlayers, pointsToWin: pointsToWin, startWords: startWords, revealDelay: revealDelay,
       answerTime: answerTime, eliminationTimeLimit: eliminationTimeLimit,
       objections: maxPlayers === 2 && objectionsWanted, objectionTime: objectionTimeSeconds,
@@ -919,23 +921,23 @@
     const statusEl2 = document.getElementById("join-status");
     statusEl2.textContent = ""; statusEl2.classList.remove("error");
 
-    if(code.length !== 4){ statusEl2.textContent = "Enter the 4-letter room code."; statusEl2.classList.add("error"); return; }
-    if(!name){ statusEl2.textContent = "Enter your name."; statusEl2.classList.add("error"); return; }
+    if(code.length !== 4){ statusEl2.textContent = "أدخل رمز الغرفة المكوّن من أربعة أحرف."; statusEl2.classList.add("error"); return; }
+    if(!name){ statusEl2.textContent = "أدخل اسمك."; statusEl2.classList.add("error"); return; }
     try{
       await ensureFirebaseReady();
     }catch(err){
       console.error("Firebase sign-in failed:", err);
-      statusEl2.textContent = "Could not connect to Firebase. Check that Anonymous Auth is enabled, then try again.";
+      statusEl2.textContent = "تعذّر الاتصال بفايربيس. تحقق من تفعيل تسجيل الدخول المجهول ثم حاول مجددًا.";
       statusEl2.classList.add("error");
       return;
     }
 
     const roomSnap = await fb.get(fb.ref(fb.db, 'rooms/' + code));
-    if(!roomSnap.exists()){ statusEl2.textContent = "No room found with that code."; statusEl2.classList.add("error"); return; }
+    if(!roomSnap.exists()){ statusEl2.textContent = "لم يُعثر على غرفة بهذا الرمز."; statusEl2.classList.add("error"); return; }
     const room = roomSnap.val();
-    if(room.status !== 'lobby'){ statusEl2.textContent = "That game has already started."; statusEl2.classList.add("error"); return; }
+    if(room.status !== 'lobby'){ statusEl2.textContent = "بدأت هذه اللعبة بالفعل."; statusEl2.classList.add("error"); return; }
     const currentCount = room.players ? Object.keys(room.players).length : 0;
-    if(currentCount >= room.maxPlayers){ statusEl2.textContent = "That room is full."; statusEl2.classList.add("error"); return; }
+    if(currentCount >= room.maxPlayers){ statusEl2.textContent = "الغرفة ممتلئة."; statusEl2.classList.add("error"); return; }
 
     myName = name;
     isHost = false;
@@ -972,7 +974,7 @@
       else if(!snap.exists() || snap.val() === 'ended'){
         roomCode = null; isHost = false; myIndex = null; latestState = null;
         showScreen("landing");
-        setStatus("The host ended the game.", false);
+        setStatus("أنهى المضيف اللعبة.", false);
       }
     });
 
@@ -983,20 +985,20 @@
 
   function renderLobbySettings(settings){
     const el = document.getElementById("lobby-settings");
-    if(!settings){ el.textContent = "Waiting for room settings…"; return; }
+    if(!settings){ el.textContent = "بانتظار إعدادات الغرفة…"; return; }
     const row = function(label, value){ return '<p><strong>' + label + ':</strong> ' + escapeHTML(String(value)) + '</p>'; };
     const yesNo = function(value){ return value ? "Yes" : "No"; };
-    el.innerHTML = '<h3>Game Setup</h3>' +
-      row("Portion", settings.portion) + row("Number of Players", settings.maxPlayers) +
-      row("Starting words shown", settings.startWords) + row("Seconds between reveals", settings.revealDelay) +
-      (settings.maxPlayers === 2 ? row("Objections", yesNo(settings.objections)) + (settings.objections ? row("Objection answer time (s)", settings.objectionTime) : "") : "") +
-      '<details><summary>More settings</summary>' + row("Points to Win", settings.pointsToWin) +
-      row("Answer time after buzzing (s)", settings.answerTime) + row("Time limit after an elimination (s)", settings.eliminationTimeLimit) +
-      (settings.maxPlayers > 2 ? row("Eliminate early buzzers from the next round", yesNo(settings.penalizeEarlyBuzz)) : "") +
-      row("Keep questions within one ayah", yesNo(settings.singleVerseOnly)) +
-      row("Keep questions at the beginning of an ayah", yesNo(settings.startOfAyah)) +
-      row("Show ayah marker while revealing", yesNo(settings.showAyahMarker)) +
-      row("Maximum matches to list", settings.matchListCap) + '</details>';
+    el.innerHTML = '<h3>إعداد اللعبة</h3>' +
+      row("Portion", settings.portion) + row("عدد اللاعبين", settings.maxPlayers) +
+      row("عدد الكلمات المعروضة أولًا", settings.startWords) + row("الثواني بين كل كشف", settings.revealDelay) +
+      (settings.maxPlayers === 2 ? row("الاعتراضات", yesNo(settings.objections)) + (settings.objections ? row("مهلة الاعتراض (بالثواني)", settings.objectionTime) : "") : "") +
+      '<details><summary>إعدادات إضافية</summary>' + row("النقاط المطلوبة للفوز", settings.pointsToWin) +
+      row("مهلة الإجابة بعد الضغط (بالثواني)", settings.answerTime) + row("المهلة بعد استبعاد لاعب (بالثواني)", settings.eliminationTimeLimit) +
+      (settings.maxPlayers > 2 ? row("استبعاد من يضغط مبكرًا من الجولة التالية", yesNo(settings.penalizeEarlyBuzz)) : "") +
+      row("حصر الأسئلة في آية واحدة", yesNo(settings.singleVerseOnly)) +
+      row("بدء الأسئلة من أول الآية", yesNo(settings.startOfAyah)) +
+      row("إظهار علامة نهاية الآية أثناء الكشف", yesNo(settings.showAyahMarker)) +
+      row("الحد الأقصى للمطابقات المعروضة", settings.matchListCap) + '</details>';
   }
 
   function renderLobbyRoster(players){
@@ -1006,13 +1008,13 @@
     const roster = document.getElementById("lobby-roster");
     roster.innerHTML = ids.map(function(id, idx){
       return '<div class="player-row"><span class="dot" style="background:' + PLAYER_COLORS[idx % 4] + '"></span>' +
-        escapeHTML(players[id].name) + (id === myId ? '<span class="you-tag">you</span>' : '') + '</div>';
+        escapeHTML(players[id].name) + (id === myId ? '<span class="you-tag">أنت</span>' : '') + '</div>';
     }).join('');
     if(isHost){
       document.getElementById("start-game-btn").disabled = ids.length < 2;
-      document.getElementById("lobby-status").textContent = ids.length < 2 ? "Need at least 2 players to start." : "";
+      document.getElementById("lobby-status").textContent = ids.length < 2 ? "يلزم لاعبان على الأقل لبدء اللعبة." : "";
     }else{
-      document.getElementById("lobby-status").textContent = "Waiting for the host to start the game\u2026";
+      document.getElementById("lobby-status").textContent = "بانتظار المضيف ليبدأ اللعبة…";
     }
   }
 
@@ -1127,7 +1129,7 @@
     if(!containsCompleteAyah(hg.displayedWords)) return false;
     stopRevealTimer(); stopEliminationCountdown();
     hg.checkOccurrences = findPortionOccurrences(hg.displayedWords);
-    finishRound("A full ayah was revealed \u2014 no one got it in time.");
+    finishRound("ظهرت آية كاملة دون أن يجيب أحد في الوقت المناسب.");
     return true;
   }
 
@@ -1145,14 +1147,14 @@
       if(!next || !hg.portionWordNumbers.has(next.globalWordNumber)) return false;
       hg.displayedWords.push(next); hg.rightGlobal++; return true;
     };
-    const tryBackward = function(){
+    const tryرجوعward = function(){
       const prev = quranWordMap[hg.leftGlobal - 1];
       if(!prev || !hg.portionWordNumbers.has(prev.globalWordNumber)) return false;
       hg.displayedWords.unshift(prev); hg.leftGlobal--; return true;
     };
     let extended;
-    if(hg.expandNextDirection === "forward"){ extended = tryForward() || tryBackward(); hg.expandNextDirection = "backward"; }
-    else{ extended = tryBackward() || tryForward(); hg.expandNextDirection = "forward"; }
+    if(hg.expandNextDirection === "forward"){ extended = tryForward() || tryرجوعward(); hg.expandNextDirection = "backward"; }
+    else{ extended = tryرجوعward() || tryForward(); hg.expandNextDirection = "forward"; }
     if(!extended){ hg.expansionExhausted = true; stopRevealTimer(); syncState(); return; }
     if(endRoundIfCompleteAyahShown()) return;
     syncState();
@@ -1183,7 +1185,7 @@
         stopRevealTimer(); stopEliminationCountdown();
         hg.checkOccurrences = occ;
         player.eliminatedNextRound = true;
-        finishRound(player.name + " buzzed before it was unique — they’ll sit out next round.");
+        finishRound(player.name + " ضغط قبل أن تصبح الإجابة فريدة — وسيجلس خارج الجولة التالية.");
         return;
       }
     }
@@ -1214,7 +1216,7 @@
   function markCorrect(){
     if(hg.phase !== "checking" || hg.activeBuzzerId === null) return;
     hg.players[hg.activeBuzzerId].score++;
-    finishRound(hg.players[hg.activeBuzzerId].name + " scores a point!");
+    finishRound(hg.players[hg.activeBuzzerId].name + " يحصل على نقطة!");
   }
 
   function markWrong(){
@@ -1222,7 +1224,7 @@
     hg.players[hg.activeBuzzerId].eliminatedThisRound = true;
     hg.activeBuzzerId = null; hg.revealedToBuzzer = false;
     const allEliminated = hg.players.every(function(p){ return p.eliminatedThisRound; });
-    if(allEliminated){ finishRound("No one got it this time."); }
+    if(allEliminated){ finishRound("لم يعرف أحد الإجابة هذه المرة."); }
     else{ hg.phase = "revealing"; resetBuzzClaim(); resumeRevealIfNeeded(); startEliminationCountdown(); syncState(); }
   }
 
@@ -1230,7 +1232,7 @@
     if(hg.phase !== "revealing") return;
     stopRevealTimer(); stopAnswerTimer(); stopEliminationCountdown();
     hg.checkOccurrences = findPortionOccurrences(hg.displayedWords);
-    finishRound("No one got it this time.");
+    finishRound("لم يعرف أحد الإجابة هذه المرة.");
   }
 
   function startEliminationCountdown(){
@@ -1241,7 +1243,7 @@
       if(hg.eliminationCountdownRemaining <= 0){
         stopEliminationCountdown(); stopRevealTimer(); stopAnswerTimer();
         hg.checkOccurrences = findPortionOccurrences(hg.displayedWords);
-        finishRound("Time\u2019s up \u2014 no one got it this time.");
+        finishRound("انتهى الوقت — لم يعرف أحد الإجابة هذه المرة.");
         return;
       }
       syncState();
@@ -1277,17 +1279,17 @@
     const occ = hg.objectionOccurrences;
     const claimedCount = Math.max(0, Math.min(parseInt(claimedCountRaw, 10) || 0, occ.totalCount));
     if(claimedCount >= 2){ resolveObjectionOutcome(true, claimedCount); }
-    else{ finishRound(hg.players[hg.objectorId].name + "\u2019s objection was valid, but they didn\u2019t claim at least two ayahs \u2014 no points awarded."); }
+    else{ finishRound(hg.players[hg.objectorId].name + " اعترض اعتراضًا صحيحًا، لكنه لم يذكر آيتين على الأقل — لا نقاط."); }
   }
   function resolveObjectionOutcome(wasCorrect, awardedCount){
     const objector = hg.players[hg.objectorId];
     const buzzer = hg.players[hg.activeBuzzerId];
     if(wasCorrect){
       objector.score += awardedCount;
-      finishRound(objector.name + " correctly objects and scores " + awardedCount + " point" + (awardedCount === 1 ? "" : "s") + "!");
+      finishRound(objector.name + " اعترض اعتراضًا صحيحًا ويحصل على " + arabicPoints(awardedCount) + "!");
     }else{
       objector.score -= 1; buzzer.score += 1;
-      finishRound("Objection failed \u2014 the phrase was already unique. " + objector.name + " loses a point, " + buzzer.name + " wins the point!");
+      finishRound("الاعتراض خاطئ — كانت العبارة فريدة بالفعل. " + objector.name + " يخسر نقطة، و" + buzzer.name + " يكسب النقطة!");
     }
   }
 
@@ -1339,7 +1341,7 @@
       searchFailMessage: hg.searchFailMessage,
       revealText: hg.displayedWords && hg.displayedWords.length ? buildPhraseText(hg.displayedWords, hg.showAyahMarker) : "",
       revealMeta: (hg.displayedWords && !hg.objectionsEnabled)
-        ? (hg.displayedWords.length <= hg.phraseTotal ? (hg.displayedWords.length + ' of ' + hg.phraseTotal + ' words shown') : (hg.displayedWords.length + ' words shown (extra context added)'))
+        ? (hg.displayedWords.length <= hg.phraseTotal ? (hg.displayedWords.length + ' من ' + hg.phraseTotal + ' كلمات ظاهرة') : (hg.displayedWords.length + ' كلمات ظاهرة (أُضيف سياق زائد)'))
         : null,
       answerHTML: (hg.phase === "roundOver" || hg.phase === "gameOver" || (hg.phase === "checking" && hg.revealedToBuzzer)) ? buildAnswerBlockHTML(hg) : null,
       objectionData: (hg.phase === "objectingChecking" && hg.objectionRevealed && hg.objectionOccurrences && hg.objectionOccurrences.totalCount > 1)
@@ -1472,75 +1474,75 @@
   function renderGameScreen(state){
     const me = state.players[myIndex];
     let html = '';
-    if(me) html += '<div class="my-name-score">' + escapeHTML(me.name) + ' \u2014 ' + me.score + ' point' + (me.score === 1 ? '' : 's') + '</div>';
+    if(me) html += '<div class="my-name-score">' + escapeHTML(me.name) + ' \u2014 ' + arabicPoints(me.score) + '</div>';
 
     if(state.phase === "searchFailed"){
       html += '<div class="buzz-status-note">' + escapeHTML(state.searchFailMessage) + '</div>';
-      if(isHost) html += buildActionButtons(['next-round:Try Again:btn-primary']);
+      if(isHost) html += buildActionButtons(['next-round:حاول مجددًا:btn-primary']);
     }else if(state.phase === "countdown"){
-      html += '<div class="buzz-countdown">' + state.countdownRemaining + '</div><div class="buzz-status-note">Get ready\u2026</div>';
+      html += '<div class="buzz-countdown">' + state.countdownRemaining + '</div><div class="buzz-status-note">استعدّ…</div>';
     }else if(state.phase === "roundOver" || state.phase === "gameOver"){
-      html += '<div class="win-message">' + (state.phase === "gameOver" ? ('\ud83c\udfc6 ' + escapeHTML(state.winnerName) + ' wins!') : escapeHTML(state.roundOverMessage)) + '</div>';
+      html += '<div class="win-message">' + (state.phase === "gameOver" ? ('\ud83c\udfc6 ' + escapeHTML(state.winnerName) + ' يفوز!') : escapeHTML(state.roundOverMessage)) + '</div>';
       if(state.answerHTML) html += state.answerHTML;
       if(isHost){
-        if(state.phase === "gameOver") html += buildActionButtons(['play-again:Play Again:btn-primary']);
-        else html += buildActionButtons(['next-round:Next Round \u25b6:btn-primary']);
+        if(state.phase === "gameOver") html += buildActionButtons(['play-again:العب مجددًا:btn-primary']);
+        else html += buildActionButtons(['next-round:الجولة التالية \u25b6:btn-primary']);
       }
     }else if(state.phase === "revealing"){
       html += buildRevealHTML(state);
       const eliminated = me && me.eliminatedThisRound;
       if(!eliminated){
-        html += '<div class="tap-surface buzzable" data-tap="buzz"><div class="buzz-hint">\ud83d\udc46 Tap anywhere to buzz</div></div>';
+        html += '<div class="tap-surface buzzable" data-tap="buzz"><div class="buzz-hint">\ud83d\udc46 اضغط هنا لتجيب</div></div>';
       }else{
-        html += '<div class="buzz-status-note">Out this round \u2014 waiting\u2026</div>';
+        html += '<div class="buzz-status-note">مستبعد من هذه الجولة — انتظر…</div>';
       }
-      if(state.eliminationActive) html += '<div class="buzz-status-note">\u23f1 ' + state.eliminationCountdownRemaining + 's left to buzz</div>';
-      if(isHost) html += '<button type="button" class="end-game-link" data-action="reveal-fallback">No one\u2019s got it \u2014 reveal answer</button>';
+      if(state.eliminationActive) html += '<div class="buzz-status-note">\u23f1 ' + state.eliminationCountdownRemaining + ' ثوانٍ متبقية للضغط</div>';
+      if(isHost) html += '<button type="button" class="end-game-link" data-action="reveal-fallback">لا أحد يعرفها — أظهر الإجابة</button>';
     }else if(state.phase === "answering"){
       const isBuzzer = myIndex === state.activeBuzzerId;
       if(isBuzzer){
-        html += '<div class="buzz-countdown">' + Math.max(state.answerRemaining, 0) + '</div><div class="buzz-status-note">Say your answer now!</div>';
+        html += '<div class="buzz-countdown">' + Math.max(state.answerRemaining, 0) + '</div><div class="buzz-status-note">اذكر إجابتك الآن!</div>';
       }else{
         html += buildRevealHTML(state);
-        html += '<div class="buzz-status-note">' + escapeHTML(state.players[state.activeBuzzerId].name) + ' is answering\u2026</div>';
+        html += '<div class="buzz-status-note">' + escapeHTML(state.players[state.activeBuzzerId].name) + ' يجيب الآن…</div>';
         if(state.objectionsEnabled && !state.objectionCooldownActive && me && !me.eliminatedThisRound){
-          html += '<div class="tap-surface objectable" data-tap="raise-objection"><div class="objection-hint">\u26a0\ufe0f Tap to object if not enough was shown</div></div>';
+          html += '<div class="tap-surface objectable" data-tap="raise-objection"><div class="objection-hint">\u26a0\ufe0f اضغط للاعتراض إذا لم يظهر ما يكفي</div></div>';
         }
       }
     }else if(state.phase === "objecting"){
       const isObjector = myIndex === state.objectorId;
       if(isObjector){
         html += '<div class="buzz-countdown">' + Math.max(state.objectionRemaining, 0) + '</div>';
-        html += '<div class="tap-surface objectable" data-tap="finish-objecting"><div class="objection-hint">Name at least 2 ayahs! \ud83d\udc46 Tap when finished</div></div>';
+        html += '<div class="tap-surface objectable" data-tap="finish-objecting"><div class="objection-hint">اذكر آيتين على الأقل! \ud83d\udc46 اضغط عند الانتهاء</div></div>';
       }else{
-        html += '<div class="buzz-status-note">\u26a0\ufe0f ' + escapeHTML(state.players[state.objectorId].name) + ' is objecting\u2026</div>';
+        html += '<div class="buzz-status-note">\u26a0\ufe0f ' + escapeHTML(state.players[state.objectorId].name) + ' يعترض الآن…</div>';
       }
     }else if(state.phase === "checking"){
       const isBuzzer = myIndex === state.activeBuzzerId;
       if(isBuzzer){
         if(!state.revealedToBuzzer){
-          html += '<div class="buzz-status-note">Ready to check?</div>';
-          html += buildActionButtons(['check-answer:Check my answer:btn-primary']);
+          html += '<div class="buzz-status-note">هل أنت مستعد للتحقق؟</div>';
+          html += buildActionButtons(['check-answer:تحقق من إجابتي:btn-primary']);
         }else{
           html += state.answerHTML || '';
-          html += buildActionButtons(['mark-correct:\u2705 I got it right:btn-success', 'mark-wrong:\u274c I was wrong:btn-secondary']);
+          html += buildActionButtons(['mark-correct:\u2705 إجابتي صحيحة:btn-success', 'mark-wrong:\u274c إجابتي خاطئة:btn-secondary']);
         }
       }else{
-        html += '<div class="buzz-status-note">' + escapeHTML(state.players[state.activeBuzzerId].name) + ' is checking their answer\u2026</div>';
+        html += '<div class="buzz-status-note">' + escapeHTML(state.players[state.activeBuzzerId].name) + ' يتحقق من إجابته…</div>';
       }
     }else if(state.phase === "objectingChecking"){
       const isObjector = myIndex === state.objectorId;
       if(isObjector){
         if(!state.objectionRevealed){
-          html += '<div class="buzz-status-note">Ready to check?</div>';
-          html += buildActionButtons(['check-objection:Check occurrences:btn-primary']);
+          html += '<div class="buzz-status-note">هل أنت مستعد للتحقق؟</div>';
+          html += buildActionButtons(['check-objection:تحقق من المواضع:btn-primary']);
         }else if(state.objectionData){
           html += buildObjectionCheckHTML(state.objectionData);
         }else{
-          html += '<div class="buzz-status-note">Resolving\u2026</div>';
+          html += '<div class="buzz-status-note">جارٍ الفصل في النتيجة…</div>';
         }
       }else{
-        html += '<div class="buzz-status-note">' + escapeHTML(state.players[state.objectorId].name) + ' is checking their objection\u2026</div>';
+        html += '<div class="buzz-status-note">' + escapeHTML(state.players[state.objectorId].name) + ' يتحقق من اعتراضه…</div>';
       }
     }
 
@@ -1570,14 +1572,14 @@
 
   let confirmingEndGame = false;
   function buildEndGameButtonHTML(){
-    const label = confirmingEndGame ? "Tap again to confirm ending the game" : (isHost ? "End game for everyone" : "Leave game");
+    const label = confirmingEndGame ? "اضغط مرة أخرى لتأكيد إنهاء اللعبة" : (isHost ? "إنهاء اللعبة للجميع" : "مغادرة اللعبة");
     return '<button type="button" class="end-game-link" data-action="end-game">' + label + '</button>';
   }
 
   function buildObjectionCheckHTML(occData){
-    let html = '<div class="buzz-status-note">This phrase occurs ' + occData.totalCount + ' time' + (occData.totalCount === 1 ? '' : 's') + ' in the selected portion.</div>';
+    let html = '<div class="buzz-status-note">ترد هذه العبارة ' + occData.totalCount + ' time' + (occData.totalCount === 1 ? '' : 's') + ' في الجزء المحدد.</div>';
     if(occData.overCap){
-      html += '<div class="buzz-status-note">Woah, very not unique \u2014 too many to list. Use the buttons to set how many different ayahs you actually named out loud:</div>';
+      html += '<div class="buzz-status-note">توجد مواضع كثيرة لا تتسع لها القائمة. حدد بالأزرار عدد الآيات المختلفة التي ذكرتها بصوت مسموع:</div>';
       html += '<div class="count-stepper">';
       html += '<button type="button" class="btn-secondary" data-action="objection-count-step" data-step="-10">\u221210</button>';
       html += '<button type="button" class="btn-secondary" data-action="objection-count-step" data-step="-1">\u22121</button>';
@@ -1585,19 +1587,19 @@
       html += '<button type="button" class="btn-secondary" data-action="objection-count-step" data-step="1">+1</button>';
       html += '<button type="button" class="btn-secondary" data-action="objection-count-step" data-step="10">+10</button>';
       html += '</div>';
-      html += '<p class="field-help">Need at least 2 to score - you\u2019ll be awarded points equal to the number you\u2019re credited for.</p>';
-      html += buildActionButtons(['confirm-objection-typed:Confirm:btn-primary']);
+      html += '<p class="field-help">يلزم ذكر آيتين على الأقل للحصول على النقاط؛ وتُحتسب لك نقطة عن كل آية صحيحة.</p>';
+      html += buildActionButtons(['confirm-objection-typed:تأكيد:btn-primary']);
     }else{
-      html += '<div class="buzz-status-note">Tick every ayah you actually named out loud:</div>';
+      html += '<div class="buzz-status-note">ضع علامة على كل آية ذكرتها بصوت مسموع:</div>';
       html += '<div class="objection-list">';
       occData.uniqueAyahs.forEach(function(a, idx){
         html += '<label class="objection-item"><input type="checkbox" class="objection-tick" data-idx="' + idx + '">';
         html += '<span class="objection-item-text"><span class="objection-item-verse">' + escapeHTML(a.verseText) + '</span>';
-        html += '<span class="objection-item-ref">' + escapeHTML(a.surahName) + ' \u2014 Ayah ' + a.aya + '</span></span></label>';
+        html += '<span class="objection-item-ref">' + escapeHTML(a.surahName) + '  — الآية ' + a.aya + '</span></span></label>';
       });
       html += '</div>';
-      html += '<p class="field-help">Need at least 2 ticked to score - you\u2019ll be awarded points equal to however many you tick.</p>';
-      html += buildActionButtons(['confirm-objection-ticks:Confirm:btn-primary']);
+      html += '<p class="field-help">يلزم تحديد آيتين على الأقل للحصول على النقاط؛ وتُحتسب لك نقطة عن كل آية تحددها.</p>';
+      html += buildActionButtons(['confirm-objection-ticks:تأكيد:btn-primary']);
     }
     return html;
   }
@@ -1642,7 +1644,7 @@
       if(!confirmingEndGame){ confirmingEndGame = true; renderGameScreen(latestState); return; }
       confirmingEndGame = false;
       if(isHost){
-        endGameAsHost().catch(function(err){ console.error("Failed to end game:", err); setStatus("Could not end the game. Please try again.", true); });
+        endGameAsHost().catch(function(err){ console.error("Failed to end game:", err); setStatus("تعذّر إنهاء اللعبة. حاول مجددًا.", true); });
       }else{
         fb.remove(fb.ref(fb.db, 'rooms/' + roomCode + '/players/' + myId));
         roomCode = null; isHost = false; myIndex = null; latestState = null;
@@ -1651,7 +1653,7 @@
     }
   });
 
-  QuranPicker.wireSideMenu("minimaltest-online", "en");
+  QuranPicker.wireSideMenu("minimaltest-online", "ar");
 })();
 </script>
 </body>
