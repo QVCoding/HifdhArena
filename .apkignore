@@ -1,14 +1,22 @@
-#Images
+# APK update configuration
+.apkignore
+
+# Images
 images/
 
 # Git repository
 .git/
 
-# Python development scripts
+# Development scripts
 *.py
-
-# Khatmah Clock
-khatmahclock.html
 
 # Documentation
 *.md
+
+# Cloudflare / website deployment
+.assetsignore
+wrangler.jsonc
+404.html
+
+# Website-only app
+khatmahclock.html
