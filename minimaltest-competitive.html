@@ -1823,7 +1823,9 @@
   function renderArenaMulti(){
     const halves = PLAYER_HALF[game.players.length];
     const activePhases = ["revealing", "answering", "checking"];
-    const sharedHTML = activePhases.indexOf(game.phase) !== -1 ? buildRevealPhraseHTML() : "";
+    const sharedHTML = game.phase === "countdown"
+      ? '<div class="reveal-phrase" aria-hidden="true">&nbsp;</div>'
+      : activePhases.indexOf(game.phase) !== -1 ? buildRevealPhraseHTML() : "";
 
     ["top", "bottom"].forEach(function(halfName){
       multiSharedEls[halfName].innerHTML = sharedHTML;
